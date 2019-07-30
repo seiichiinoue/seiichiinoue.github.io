@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>いのうの作業ログ</title>
-    <link>https://seiichiinoue.github.io/</link>
-    <description>Recent content on いのうの作業ログ</description>
+    <title>econometrics on いのうの作業ログ</title>
+    <link>https://seiichiinoue.github.io/categories/econometrics/</link>
+    <description>Recent content in econometrics on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Wed, 31 Jul 2019 00:57:04 +0900</lastBuildDate>
     
-	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://seiichiinoue.github.io/categories/econometrics/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>https://seiichiinoue.github.io/post/0731/</guid>
       <description>計量経済学を勉強している中で，制限従属変数の推定で出てくるミルズ比でちょっとつまずいたのでメモ． データの性質 分析の対象となる従属変数（被説明</description>
-    </item>
-    
-    <item>
-      <title>ブログを始めました</title>
-      <link>https://seiichiinoue.github.io/post/0729/</link>
-      <pubDate>Mon, 29 Jul 2019 18:52:16 +0900</pubDate>
-      
-      <guid>https://seiichiinoue.github.io/post/0729/</guid>
-      <description>ブログを始めました 続くかわかりませんが，ブログを始めました．主に技術メモ，論文読みのスタックとして使っていきたいと思います．</description>
     </item>
     
   </channel>

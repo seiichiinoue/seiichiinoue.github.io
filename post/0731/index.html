@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				トービットモデルにおける逆ミルズ比の理解 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="https://seiichiinoue.github.io/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/apple-touch-icon.png">
+        <link rel="stylesheet" href="https://seiichiinoue.github.io/css/syntax.css">
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-07-31 00:57:04 &#43;0900 JST">July 31, 2019</time>
+</div>
+
+		<h1 class="post-title">トービットモデルにおける逆ミルズ比の理解</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>計量経済学を勉強している中で，制限従属変数の推定で出てくるミルズ比でちょっとつまずいたのでメモ．</p>
+
+<h1 id="データの性質">データの性質</h1>
+
+<p>分析の対象となる従属変数（被説明変数）がある水準を境に切り取られている場合を一般的に制限従属変数と呼びます．
+こういったデータの理由としては次の2点が考えられます．</p>
+
+<ul>
+<li><a href="http://tmizuno.web.fc2.com/kobe_file/2014_Micro_Law_02.pdf">端点解</a></li>
+<li>データが何らかの理由で完全に集められていない場合
+
+<ul>
+<li>切断: 被説明変数も説明変数も共にかけている場合</li>
+<li>打ち切り: 説明変数は完全だが，被説明変数がかけている場合</li>
+</ul></li>
+</ul>
+
+<p>こういったデータに対する推定は，通常の方法では多くの場合でパラメータの推定量にはバイアスが生じてしまいます．
+それらに対し，モデリングを行う際に用いる手法としてあげられるのが，前者の端点解の場合，以下で説明をするトービットモデルや，後者のデータ収集の際のセレクションバイアスがある場合は<a href="http://www.ier.hit-u.ac.jp/~kitamura/lecture/Hit/08Statsys10.pdf">ヘックマンの2段階推定法</a>などがあります．（今回は前者に限定して考えていきます）</p>
+
+<h1 id="トービットモデル">トービットモデル</h1>
+
+<p>トービットモデルは&hellip;
+&gt;トービット・モデルはTobin(1958)で初めて論じられ、Goldberger(1964)によってトービットと命名され、一般に広く紹介されるようになった。Amemiya(1985,Chapter10)やMaddala(1983,Chapter6)で包括的にサーベイされている。</p>
+
+<p>らしいです．元論文をわざわざ読む気にもなれなかったので引用．</p>
+
+<p>例えば，所得が一定水準を超えると海外旅行をすると考えられる時に，<strong>一定水準以下の家計も含めた全サンプルの</strong>海外旅行の需要関数を推定したいとします．その時，通常の最小二乗法で推定すると，データの分布の端がある水準で切断されており，誤差項が正規分布せず，推定量にバイアスが生じてしまいます．こんなケースに使えるのがトービットモデルになります．</p>
+
+<p>それではトービットモデルをみていきます．</p>
+
+<p>まず，以下のような$y$の潜在変数$y^*$について考えます．ここで回帰式はOLSの仮定を満たしているものとします．</p>
+
+<p>\begin{eqnarray}
+y^* &amp;=&amp; X \beta + u \\<br />
+y &amp;=&amp; max(y^*, 0)
+\end{eqnarray}</p>
+
+<p>たとえば，$y^* ∼ N(100,100)$, $threshold=0$のときは以下のような感じになります．$y^*$が$0$のところで打ち切られ，それ以下の値はすべて$0$に貼り付いているようなっています．</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">sigma</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">normdist</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">401</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">normdist</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
+<p><img width="632" alt="sample1.png" src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/260618/3d66d17a-d86a-3968-662a-8c46792f04ec.png"></p>
+
+<p>$threshold = 0$としたときの，$y$の条件付き期待値は以下のようになります．
+$$E(y \ | \ X) = P(y^* &gt; 0 \ | \ X_i)E(y \ | \ y^* &gt; 0, X_i) + [1 - P(y &gt; 0 \ | \ X)] \times 0$$</p>
+
+<p>このとき，$\Phi$を正規分布の密度関数として</p>
+
+<p>$y&gt;0$となる確率は，$P(y &gt; 0) = \Phi (\frac{X \beta}{\sigma})$となります．</p>
+
+<p>また，$y = 0$となる確率は$P(y^* &lt; 0 \ | \ X) = P(u &lt; -X \beta \ | \ x) = P(\frac{u}{\sigma} &lt; - \frac{X \beta}{\sigma} \ | \ x) = 1 - \Phi(\frac{X \beta}{\sigma})$となっていることを確認できます．</p>
+
+<p>ここで，$y^* &gt; 0$の時の$y$の期待値を回帰することを考えます．このとき，$y$そのものは<strong>正規分布していないので</strong>，推定量はBLUE(Best Linear Unbiased Estimator)となりません．そこで，閾値の超え易さを考慮して推定してあげるというのがこのモデルの発想です．</p>
+
+<p>さて，$y^* &gt; 0$の場合の$Y$の条件付き期待値は，以下のように表すことができます．ここで，$\phi$は密度関数，$\Phi$は分布関数です．</p>
+
+<p>\begin{aligned}
+E(y | y^* &gt; 0, X) &amp;= E(y | X \beta + u &gt; 0) \\\
+                  &amp;= E(y | u &gt; -X \beta) \\<br />
+                  &amp;= X \beta + E(u | u &gt; -X \beta) \\\
+                  &amp;= X \beta + \sigma E(u / \sigma | u / \sigma &gt; -X \beta / \sigma) \\<br />
+                  &amp;= X \beta + \sigma \frac{\phi(X \beta / \sigma)}{\Phi(X \beta / \sigma)}  \end{aligned}</p>
+
+<p>ここで上式の右辺第2項に出てきているものを，$\lambda(X \beta/ \sigma) = \phi(X \beta/ \sigma) / \Phi(X \beta/ \sigma)$とおきます．この$\lambda$が本題の<strong>逆ミルズ比(inverse Mills ratio)</strong>です．</p>
+
+<p>導出過程を追っていればなぜ出てきたのかわかりますが，（僕は頭が悪いので）これが何を表しているのかわかりませんでした．このミルズ比はなにを表しているのでしょうか．</p>
+
+<h1 id="逆ミルズ比">逆ミルズ比</h1>
+
+<p>まず，先の式の誤差の条件付き期待値（$ E(u / \sigma | u / \sigma &gt; -X \beta / \sigma)$），$u / \sigma$を$-X \beta / \sigma$で打ち切ったときの$u / \sigma$切断正規分布の形状は以下のようになっていることを確認します．</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">truncnorm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">th</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.8</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="c1"># norm</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.99</span><span class="p">),</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;th=-inf&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">truncnorm</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.99</span><span class="p">))</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;th=-0.8&#39;</span><span class="p">)</span>
+<span class="n">th</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.2</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">truncnorm</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.99</span><span class="p">))</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;th=-1.2&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;u/sigma&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></code></pre></div>
+<p><img src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/260618/16010092-cc79-0297-83c5-8ea93d8558fd.png" alt="tran.png" /></p>
+
+<p>青色の線が通常の正規分布，橙色の線が$threshold = -0.8$緑色の線が$threshold = -1.2$となっています．</p>
+
+<p>標準正規分布を$−X \beta / \sigma$で打ち切ったとき，切断正規分布の条件つき期待値$E(u|u &gt; −X \beta)$は，打ち切りが起こるところ（$−X \beta / \sigma$）までの面積（$\Phi(−X \beta / \sigma)$）で密度関数$\phi(u/ \sigma)$を割った値となっています．</p>
+
+<p>この切断正規分布から，$−X \beta$を大きくするほど（$X \beta$を小さくするほど）打ち切り部分に含まれる$\phi(u/ \sigma)$の面積$\Phi(u/ \sigma)$は広くなっていくわけなので，打ち切りが起こりやすくなっていることがわかります．またその結果，条件つき期待値$E(u | u &gt; −X \beta)$は大きくなっていくことがわかります．このときは，もともとの密度関数$\phi(u/ \sigma)$からかなりずれた状態になっています．</p>
+
+<p>逆に，$−X \beta$を小さくするほど打ち切り部分に含まれる$\phi(u/ \sigma)$の面積$\Phi(u/ \sigma)$は狭くなっていくわけなので，打ち切りが起こりにくくなっているといえます．またその結果，条件つき期待値$E(u | u &gt; −Xi \beta)$は小さくなっていくことがわかります．このときは，もともとの密度関数$\phi(u/σ)$に近い状態にあることがわかります．</p>
+
+<p>あとは$X \beta$の値，つまりこれまで閾値として扱ってきたものを正負反転させたもの$-threshold$を変化させたときに，密度関数を分布関数で除した逆ミルズ比$\lambda (X \beta / \sigma)$（すなわち，条件つき期待値$E(u | u &gt; −X \beta)$）がどのような挙動を示すかを見てみましょう．</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">truncnorm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">th</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.8</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="c1"># norm</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;cdf&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;invmills&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x beta&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
+<p><img src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/260618/889a3f30-5026-3e08-2037-054cdf2de827.png" alt="mills.png" /></p>
+
+<p>一見してわかるとおり，$\lambda (X \beta / \sigma)$は，$X \beta$が正の方向に大きくなるほど$0$に近づき，負の方向に大きくなるほど$0$から離れていきます．</p>
+
+<p>先に述べたとおり，$X \beta$が大きくなるとはすなわち，打ち切りが起こりにくくなることを意味していました．ということは，逆ミルズ比$\lambda (X \beta / \sigma)$は，打ち切りの起こりやすさを表していると読むことができます．</p>
+
+<h1 id="逆ミルズ比の直感的な理解">逆ミルズ比の直感的な理解</h1>
+
+<p>これまでやってきたことをまとめると以下のようになります．</p>
+
+<p>$X \beta$が大きくなる
+$\Longleftrightarrow$逆ミルズ比$\lambda (X \beta / \sigma)$が$0$に近づく
+$\Longleftrightarrow$打ち切りが起こりにくくなり，その結果条件つき期待値$E(u | u &gt; −X \beta)$が小さくなる</p>
+
+<p>$X \beta$が小さくなる
+$\Longleftrightarrow$逆ミルズ比$\lambda(X \beta / \sigma)$が$0$から遠ざかる
+$\Longleftrightarrow$打ち切りが起こりやすくなり，その結果条件つき期待値$E(u | u &gt; −X \beta)$が大きくなる</p>
+
+<p>よって，逆ミルズ比は，打ち切りの起こりやすさを制御しているものと解釈できます．</p>
+
+<h1 id="参考文献">参考文献</h1>
+
+<ul>
+<li><a href="http://ryotamugiyama.com/wp-content/uploads/2016/11/millsratio.html">逆ミルズ比を図で理解する</a></li>
+<li><a href="http://www.ier.hit-u.ac.jp/~kitamura/PDF/A226.pdf">ミクロ経済学入門</a></li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/0729/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-07-31 01:52:29.079041 &#43;0900 JST m=&#43;0.069066186">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>

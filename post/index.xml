@@ -6,10 +6,19 @@
     <description>Recent content in Posts on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 29 Jul 2019 18:52:16 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 31 Jul 2019 00:57:04 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>トービットモデルにおける逆ミルズ比の理解</title>
+      <link>https://seiichiinoue.github.io/post/0731/</link>
+      <pubDate>Wed, 31 Jul 2019 00:57:04 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/0731/</guid>
+      <description>計量経済学を勉強している中で，制限従属変数の推定で出てくるミルズ比でちょっとつまずいたのでメモ． データの性質 分析の対象となる従属変数（被説明</description>
+    </item>
     
     <item>
       <title>ブログを始めました</title>
