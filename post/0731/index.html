@@ -113,7 +113,15 @@ $$E(y \ | \ X) = P(y^* &gt; 0 \ | \ X_i)E(y \ | \ y^* &gt; 0, X_i) + [1 - P(y &g
 
 <p>$y&gt;0$となる確率は，$P(y &gt; 0) = \Phi (\frac{X \beta}{\sigma})$となります．</p>
 
-<p>また，$y = 0$となる確率は$P(y^* &lt; 0 \ | \ X) = P(u &lt; -X \beta \ | \ x) = P(\frac{u}{\sigma} &lt; - \frac{X \beta}{\sigma} \ | \ x) = 1 - \Phi(\frac{X \beta}{\sigma})$となっていることを確認できます．</p>
+<p>また，$y = 0$となる確率は</p>
+
+<p>\begin{aligned}
+P(y^* &lt; 0 \ | \ X) &amp;= P(u &lt; -X \beta \ | \ x) \\\
+&amp;= P(\frac{u}{\sigma} &lt; - \frac{X \beta}{\sigma} \ | \ x) \\<br />
+&amp;= 1 - \Phi(\frac{X \beta}{\sigma})
+\end{aligned}</p>
+
+<p>となっていることを確認できます．</p>
 
 <p>ここで，$y^* &gt; 0$の時の$y$の期待値を回帰することを考えます．このとき，$y$そのものは<strong>正規分布していないので</strong>，推定量はBLUE(Best Linear Unbiased Estimator)となりません．そこで，閾値の超え易さを考慮して推定してあげるというのがこのモデルの発想です．</p>
 
@@ -219,7 +227,7 @@ $\Longleftrightarrow$打ち切りが起こりやすくなり，その結果条�
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-07-31 02:17:34.448022 &#43;0900 JST m=&#43;0.069631455">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-07-31 02:47:32.624726 &#43;0900 JST m=&#43;0.061523669">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
