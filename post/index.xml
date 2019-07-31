@@ -30,6 +30,15 @@
     </item>
     
     <item>
+      <title>[論文実装] LSGAN</title>
+      <link>https://seiichiinoue.github.io/post/lsgan/</link>
+      <pubDate>Tue, 30 Jul 2019 21:51:42 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/lsgan/</guid>
+      <description>はじめに 最近、Least Squares Generative Adversarial Networksを読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが</description>
+    </item>
+    
+    <item>
       <title>ブログを始めました</title>
       <link>https://seiichiinoue.github.io/post/0729/</link>
       <pubDate>Mon, 29 Jul 2019 18:52:16 +0900</pubDate>
