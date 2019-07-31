@@ -3,13 +3,24 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://seiichiinoue.github.io/categories/</loc>
-    <lastmod>2019-07-31T00:57:04+09:00</lastmod>
+    <loc>https://seiichiinoue.github.io/post/</loc>
+    <lastmod>2019-07-31T03:13:29+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://seiichiinoue.github.io/post/</loc>
+    <loc>https://seiichiinoue.github.io/post/roberta/</loc>
+    <lastmod>2019-07-31T03:13:29+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://seiichiinoue.github.io/</loc>
+    <lastmod>2019-07-31T03:13:29+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://seiichiinoue.github.io/categories/</loc>
     <lastmod>2019-07-31T00:57:04+09:00</lastmod>
     <priority>0</priority>
   </url>
@@ -21,13 +32,7 @@
   </url>
   
   <url>
-    <loc>https://seiichiinoue.github.io/</loc>
-    <lastmod>2019-07-31T00:57:04+09:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://seiichiinoue.github.io/post/0731/</loc>
+    <loc>https://seiichiinoue.github.io/post/tobit/</loc>
     <lastmod>2019-07-31T00:57:04+09:00</lastmod>
   </url>
   
