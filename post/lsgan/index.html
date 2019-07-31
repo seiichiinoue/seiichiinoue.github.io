@@ -49,8 +49,6 @@
 
 		
 
-<h1 id="はじめに">はじめに</h1>
-
 <p>最近、<strong><a href="https://arxiv.org/pdf/1611.04076.pdf">Least Squares Generative Adversarial Networks</a></strong>を読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが、ローカルのスペックでは厳しそうだったのでMNISTによる追試しかできていませんが&hellip;</p>
 
 <p>画像処理初学者で、学習したことのまとめがてら記事を書いているので、間違いがあるかもしれません。その際はご指摘ください。</p>
@@ -95,10 +93,10 @@
 
 <p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/lsgan.png" alt="" /></p>
 
-<p>上図の$(b)$がシグモイドクロスエントロピー誤差の決定境界、$&copy;$が最小二乗誤差を用いた際の決定境界を示しています。$G$を更新する際のfake sampleがマゼンタ色の点です。</p>
+<p>上図の$(b)$がシグモイドクロスエントロピー誤差の決定境界、$(c)$が最小二乗誤差を用いた際の決定境界を示しています。$G$を更新する際のfake sampleがマゼンタ色の点です。</p>
 
 <p>$(b)$のようにシグモイドクロスエントロピー誤差を用いて更新をすると、fake sampleは決定境界の正しい側にあるため、誤差は非常に小さな値になってしまいます。
-しかし，$&copy;$のように、最小二乗誤差を用いて更新をすると、決定境界の正しい側でも、遠くにあるサンプルにはペナルティを課すため、fake sample(Generatorが作成したデータ)を決定境界に向かって移動させることができます。</p>
+しかし，$(c)$のように、最小二乗誤差を用いて更新をすると、決定境界の正しい側でも、遠くにあるサンプルにはペナルティを課すため、fake sample(Generatorが作成したデータ)を決定境界に向かって移動させることができます。</p>
 
 <p>よって、Generatorは決定境界に沿うようにfake sampleを生成するように誤差を最小化することができるといったものです。単純ではありますが、非常に強力です。</p>
 
@@ -319,25 +317,17 @@ Discriminatorの更新は以下のようになります。</p>
 <span class="n">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span></code></pre></div>
 <h1 id="結果">結果</h1>
 
-<ul>
-<li>epoch 1</li>
-</ul>
+<p>epoch 1</p>
 
 <p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_001.png" alt="" /></p>
 
-<ul>
-<li>epoch 15</li>
-</ul>
+<p>epoch 15</p>
 
 <p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_015.png" alt="" /></p>
 
-<ul>
-<li>epoch 30</li>
-</ul>
+<p>epoch 30</p>
 
 <p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_030.png" alt="" /></p>
-
-<h1 id="おわりに">おわりに</h1>
 
 <p>30回ほどで本物とほぼ見分けのつかない画像が生成されました。びっくり。
 本当はアニメ顔の生成をしたかったので、以降、豊富な計算資源を手に入れたらネットワークを大きくして、試してみたいと思います。</p>
@@ -360,7 +350,7 @@ Discriminatorの更新は以下のようになります。</p>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-07-31 21:55:36.205369 &#43;0900 JST m=&#43;0.088248033">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-07-31 22:45:24.90801 &#43;0900 JST m=&#43;0.115788551">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

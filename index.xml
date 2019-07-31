@@ -35,7 +35,7 @@
       <pubDate>Tue, 30 Jul 2019 21:51:42 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/lsgan/</guid>
-      <description>はじめに 最近、Least Squares Generative Adversarial Networksを読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが</description>
+      <description>最近、Least Squares Generative Adversarial Networksを読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが、ローカ</description>
     </item>
     
     <item>
