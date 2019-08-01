@@ -6,10 +6,19 @@
     <description>Recent content in Posts on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 31 Jul 2019 03:13:29 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 01 Aug 2019 16:45:52 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ABC134 C - Exception Handling</title>
+      <link>https://seiichiinoue.github.io/post/abc134c/</link>
+      <pubDate>Thu, 01 Aug 2019 16:45:52 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/abc134c/</guid>
+      <description>先日のAtcoder Beginner Contest 134のC - Exception Handlingを解いたのでメモ． 問題は以下の通り． 問題 長さ$N$の数列 $A_1,A_2,&amp;helli</description>
+    </item>
     
     <item>
       <title>[論文読み] RoBERTa</title>
