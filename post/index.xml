@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>C&#43;&#43;のLanguage Serverの設定</title>
-      <link>https://seiichiinoue.github.io/post/cpplang/</link>
+      <title>C&#43;&#43;のLanguage Server設定メモ</title>
+      <link>https://seiichiinoue.github.io/post/cpplsp/</link>
       <pubDate>Sat, 03 Aug 2019 15:58:25 +0900</pubDate>
       
-      <guid>https://seiichiinoue.github.io/post/cpplang/</guid>
+      <guid>https://seiichiinoue.github.io/post/cpplsp/</guid>
       <description>neovimでC++のファイルを編集しようとした際にlanguage server周りの設定が少し面倒だったのでメモ． Language Server Protocol Language Server Protoco</description>
     </item>
     
