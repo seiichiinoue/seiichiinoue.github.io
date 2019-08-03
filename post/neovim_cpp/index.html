@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				NeovimでC&#43;&#43;の設定をする &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-08-03 15:58:25 &#43;0900 JST">August 3, 2019</time>
+</div>
+
+		<h1 class="post-title">NeovimでC&#43;&#43;の設定をする</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>neovim上でC++のファイルを編集しようとした際にlanguage server周りの設定が少し面倒だったのでメモ．</p>
+
+<h2 id="language-server-protocol">Language Server Protocol</h2>
+
+<ul>
+<li><a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol(LSP)</a>は，エディタや統合開発環境などの開発支援ツールと言語サーバ(Language Server)のコミュニケーションの手順を定めた仕様．</li>
+<li>従来，開発支援ツールが各種のプログラミング支援機能（自動補完や定義ジャンプ）を提供するためにはプログラミング言語ごとに個別の機能を実装する必要があった．</li>
+<li>LSPでは，言語サーバがクライアントに対して一般的なプログラミング支援機能を提供する．その結果，開発支援ツールは単一のLSPクライアント機能を実装するだけで自動的に言語サーバを提供する全てのプログラミング言語のプログラミング支援機能を提供することが可能になる．</li>
+</ul>
+
+<h2 id="clangd">clangd</h2>
+
+<ul>
+<li>今回はC++の言語サーバープロトコルを使用したいのでclangdを使用する．</li>
+<li>clangdはLLVMのフロントであるclangをベースとしたサーバーで，LLVMプロジェクトが公式に開発している．</li>
+<li>コンパイラなので，コンパイルエラーの検出はもちろんコード補完やフォーマット，定義ジャンプと参照元ジャンプ等には対応している．</li>
+<li>clang-formatやRTagsといったclang系ツールも，LSPクライアントを導入してしまえばこれらの個別設定をしなくてよい．</li>
+</ul>
+
+<h2 id="clangdのインストール">clangdのインストール</h2>
+
+<p>macだと<code>brew install llvm</code>でclangdもインストールされるが，pathを通す必要がある．</p>
+
+<p>llvm下にclangdが入っているらしいのでllvmの場所をまず探す．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ find /usr/local/ -name <span class="s2">&#34;llvm&#34;</span>
+/usr/local//lib/ruby/gems/2.5.0/gems/rouge-1.11.1/lib/rouge/demos/llvm
+/usr/local//lib/ruby/gems/2.5.0/gems/rouge-2.2.1/lib/rouge/demos/llvm
+/usr/local//opt/llvm
+/usr/local//Cellar/llvm
+/usr/local//Cellar/llvm/HEAD-08cd906_1/include/llvm
+/usr/local//Cellar/llvm/HEAD-08cd906_1/lib/cmake/llvm
+/usr/local//Cellar/llvm/HEAD-08cd906_1/lib/python2.7/site-packages/llvm
+/usr/local//Cellar/llvm/HEAD-08cd906_1/Toolchains/LLVM10.0.0svn.xctoolchain/usr/include/llvm
+/usr/local//Cellar/llvm/HEAD-08cd906_1/Toolchains/LLVM10.0.0svn.xctoolchain/usr/lib/cmake/llvm</code></pre></div>
+<p>しかし，どのパスをincludeしていいのかわからない．</p>
+
+<ul>
+<li>インストールしたパッケージの実体は<code>/usr/local/Celler/</code>に．<code>/usr/local/bin/</code>や<code>/usr/local/lib</code>にシンボリックリンクが貼られる．</li>
+<li><a href="https://stackoverflow.com/questions/35337601/why-is-there-a-usr-local-opt-directory-created-by-homebrew-and-should-i-use-it">Stack Overflow</a>によると，<code>/usr/local/opt/</code>はバージョンアップしても変わらないformulaのコンテンツへパスを通すシンボリックリンクらしい．(個人的な解釈)</li>
+<li>よって<code>/usr/local/opt</code>下にある<code>llvm</code>下の<code>clangd</code>のパスをincludeしたら良さそう．</li>
+</ul>
+
+<p><code>/ust/local/opt/llvm/</code>下にある<code>clangd</code>を探す．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ find /usr/local/opt/llvm/ -name <span class="s2">&#34;clangd&#34;</span>
+/usr/local/opt/llvm//bin/clangd
+/usr/local/opt/llvm//Toolchains/LLVM10.0.0svn.xctoolchain/usr/bin/clangd</code></pre></div>
+<p>上のパスをinclude（未検証だがどちらでもコマンドは使用できるようになると思われる）</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&#34;export PATH=&#39;/usr/local/opt/llvm/bin/:</span><span class="nv">$PATH</span><span class="s2">&#39;&#34;</span> &gt;&gt; ~/.bash_profile
+<span class="nb">source</span> ~/.bash_profile</code></pre></div>
+<p>これでpathが通ったので，neovim側の設定を行う．<code>~/.config/nvim/plugins/languageclient.vim</code>を編集．</p>
+<div class="highlight"><pre class="chroma"><code class="language-vim" data-lang="vim"><span class="k">let</span> <span class="nx">g</span>:<span class="nx">LanguageClient_serverCommands</span> <span class="p">=</span> {}<span class="err">
+</span><span class="err"></span><span class="k">if</span> <span class="nx">executable</span><span class="p">(</span><span class="s1">&#39;clangd&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span>	<span class="k">let</span> <span class="nx">g</span>:<span class="nx">LanguageClient_serverCommands</span>[<span class="s1">&#39;c&#39;</span>] <span class="p">=</span> [<span class="s1">&#39;clangd&#39;</span>]<span class="err">
+</span><span class="err"></span>	<span class="k">let</span> <span class="nx">g</span>:<span class="nx">LanguageClient_serverCommands</span>[<span class="s1">&#39;cpp&#39;</span>] <span class="p">=</span> [<span class="s1">&#39;clangd&#39;</span>]<span class="err">
+</span><span class="err"></span><span class="k">endif</span></code></pre></div>
+<p>以上で完了．パッケージ管理システム難しいので勉強しなければとなりました．</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/abc134/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-08-03 16:50:16.388915 &#43;0900 JST m=&#43;0.072298067">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>

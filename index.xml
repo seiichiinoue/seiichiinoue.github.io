@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 01 Aug 2019 16:45:52 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 03 Aug 2019 15:58:25 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>NeovimでC&#43;&#43;の設定をする</title>
+      <link>https://seiichiinoue.github.io/post/neovim_cpp/</link>
+      <pubDate>Sat, 03 Aug 2019 15:58:25 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/neovim_cpp/</guid>
+      <description>neovim上でC++のファイルを編集しようとした際にlanguage server周りの設定が少し面倒だったのでメモ． Language Server Protocol Language Server Protoc</description>
+    </item>
     
     <item>
       <title>ABC134 C - Exception Handling</title>
