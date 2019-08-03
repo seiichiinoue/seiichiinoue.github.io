@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>NeovimでC&#43;&#43;の設定をする</title>
-      <link>https://seiichiinoue.github.io/post/neovim_cpp/</link>
+      <title>C&#43;&#43;のLanguage Serverの設定</title>
+      <link>https://seiichiinoue.github.io/post/cpplang/</link>
       <pubDate>Sat, 03 Aug 2019 15:58:25 +0900</pubDate>
       
-      <guid>https://seiichiinoue.github.io/post/neovim_cpp/</guid>
-      <description>neovim上でC++のファイルを編集しようとした際にlanguage server周りの設定が少し面倒だったのでメモ． Language Server Protocol Language Server Protoc</description>
+      <guid>https://seiichiinoue.github.io/post/cpplang/</guid>
+      <description>neovimでC++のファイルを編集しようとした際にlanguage server周りの設定が少し面倒だったのでメモ． Language Server Protocol Language Server Protoco</description>
     </item>
     
     <item>
