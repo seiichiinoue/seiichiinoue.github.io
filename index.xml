@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 03 Aug 2019 15:58:25 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 05 Aug 2019 01:09:47 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ABC136 D - Gathering Children</title>
+      <link>https://seiichiinoue.github.io/post/abc136/</link>
+      <pubDate>Mon, 05 Aug 2019 01:09:47 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/abc136/</guid>
+      <description>ABC136のD問題をC++で解いたのでメモ．(コンテスト中は解けませんでした) 問題 マスの情報を表す$L$と$R$で構成された文字列$S$が</description>
+    </item>
     
     <item>
       <title>C&#43;&#43;のLanguage Server設定メモ</title>
