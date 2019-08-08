@@ -79,10 +79,12 @@
 
 <p>まず，以下のような$y$の潜在変数$y^*$について考えます．ここで回帰式はOLSの仮定を満たしているものとします．</p>
 
-<p>\begin{eqnarray}
-y^* &amp;=&amp; X \beta + u \\<br />
-y &amp;=&amp; max(y^*, 0)
-\end{eqnarray}</p>
+<div style="overflow-x: auto;">
+$$
+y = max(y^*, 0) \\
+where \; y^* = X \beta + u
+$$
+</div>
 
 <p>たとえば，$y^* ∼ N(100,100)$, $threshold=0$のときは以下のような感じになります．$y^*$が$0$のところで打ち切られ，それ以下の値はすべて$0$に貼り付いているようなっています．</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">math</span>
@@ -100,8 +102,11 @@ y &amp;=&amp; max(y^*, 0)
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></div>
 <p><img width="632" alt="sample1.png" src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/260618/3d66d17a-d86a-3968-662a-8c46792f04ec.png"></p>
 
-<p>$threshold = 0$としたときの，$y$の条件付き期待値は以下のようになります．
-$$E(y \ | \ X) = P(y^* &gt; 0 \ | \ X_i)E(y \ | \ y^* &gt; 0, X_i) + [1 - P(y &gt; 0 \ | \ X)] \times 0$$</p>
+<p>$threshold = 0$としたときの，$y$の条件付き期待値は以下のようになります．</p>
+
+<div style="overflow-x: auto;">
+$$E(y \ | \ X) = P(y^* > 0 \ | \ X_i)E(y \ | \ y^* > 0, X_i) + [1 - P(y > 0 \ | \ X)] \times 0$$
+</div>
 
 <p>このとき，$\Phi$を正規分布の密度関数として</p>
 
@@ -109,11 +114,13 @@ $$E(y \ | \ X) = P(y^* &gt; 0 \ | \ X_i)E(y \ | \ y^* &gt; 0, X_i) + [1 - P(y &g
 
 <p>また，$y = 0$となる確率は</p>
 
-<p>\begin{aligned}
-P(y^* &lt; 0 \ | \ X) &amp;= P(u &lt; -X \beta \ | \ x) \\\
-&amp;= P(\frac{u}{\sigma} &lt; - \frac{X \beta}{\sigma} \ | \ x) \\<br />
-&amp;= 1 - \Phi(\frac{X \beta}{\sigma})
-\end{aligned}</p>
+<div style="overflow-x: auto;">
+\begin{aligned}
+P(y^* < 0 \ | \ X) &= P(u < -X \beta \ | \ x) \\
+&= P(\frac{u}{\sigma} < - \frac{X \beta}{\sigma} \ | \ x) \\
+&= 1 - \Phi(\frac{X \beta}{\sigma})
+\end{aligned}
+</div>
 
 <p>となっていることを確認できます．</p>
 
@@ -121,12 +128,14 @@ P(y^* &lt; 0 \ | \ X) &amp;= P(u &lt; -X \beta \ | \ x) \\\
 
 <p>さて，$y^* &gt; 0$の場合の$Y$の条件付き期待値は，以下のように表すことができます．ここで，$\phi$は密度関数，$\Phi$は分布関数です．</p>
 
-<p>\begin{aligned}
-E(y | y^* &gt; 0, X) &amp;= E(y | X \beta + u &gt; 0) \\\
-                  &amp;= E(y | u &gt; -X \beta) \\<br />
-                  &amp;= X \beta + E(u | u &gt; -X \beta) \\\
-                  &amp;= X \beta + \sigma E(u / \sigma | u / \sigma &gt; -X \beta / \sigma) \\<br />
-                  &amp;= X \beta + \sigma \frac{\phi(X \beta / \sigma)}{\Phi(X \beta / \sigma)}  \end{aligned}</p>
+<div style="overflow-x: auto;">
+\begin{aligned} 
+E(y | y^* > 0, X) &= E(y | X \beta + u > 0) \\
+                  &= E(y | u > -X \beta) \\
+                  &= X \beta + E(u | u > -X \beta) \\
+                  &= X \beta + \sigma E(u / \sigma | u / \sigma > -X \beta / \sigma) \\
+                  &= X \beta + \sigma \frac{\phi(X \beta / \sigma)}{\Phi(X \beta / \sigma)}  \end{aligned}
+</div>
 
 <p>ここで上式の右辺第2項に出てきているものを，$\lambda(X \beta/ \sigma) = \phi(X \beta/ \sigma) / \Phi(X \beta/ \sigma)$とおきます．この$\lambda$が本題の<strong>逆ミルズ比(inverse Mills ratio)</strong>です．</p>
 
@@ -222,7 +231,7 @@ $\Longleftrightarrow$打ち切りが起こりやすくなり，その結果条�
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-08 12:15:20.189143 &#43;0900 JST m=&#43;0.076956968">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-08 12:46:59.797556 &#43;0900 JST m=&#43;0.082574160">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

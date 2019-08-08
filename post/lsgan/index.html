@@ -79,9 +79,13 @@
 
 <p>LSGANは正解ラベルに対する二乗誤差を用いるので、目的関数はパラメータ$a, b, c$を用いて以下のように表せます。</p>
 
-<p>$ min_D L(D) = \frac{1}{2} E[(D(x) - b)^2] + \frac{1}{2} E[(D(G(z)) - a)^2]$</p>
+<div style="overflow-x: auto;">
+$$min_D L(D) = \frac{1}{2} E[(D(x) - b)^2] + \frac{1}{2} E[(D(G(z)) - a)^2]$$
+</div>
 
-<p>$ min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$</p>
+<div style="overflow-x: auto;">
+$$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
+</div>
 
 <p>($a,b,c$は定数であり設計者が事前に決めておくそうなのですが、論文では$a,b,c=−1,1,0$または$a,b,c=0,1,1$が推奨されています。)</p>
 
@@ -350,7 +354,7 @@ Discriminatorの更新は以下のようになります。</p>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-08 12:15:20.206658 &#43;0900 JST m=&#43;0.094471589">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-08 12:46:59.813131 &#43;0900 JST m=&#43;0.098149723">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

@@ -111,40 +111,49 @@
 <li><p>例えば，単体のユニット$u$から$v$への誤差の伝播について解析する．ステップ$t$における任意のユニット$u$で発生した誤差が$q$ステップ前のユニット$v$に伝播する状況を考えたとき，誤差は以下に示すような係数でスケールする．</p></li>
 </ul>
 
-<p>$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = \biggl\{
+<div style="overflow-x: auto;">
+$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = 
+\Biggl\{
 \begin{array}{ll}
-f&rsquo;_v(net_v (t-1)) w_{uv} &amp; q = 1 \\<br />
-f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u (t)}w_{lv} &amp; q &gt; 1
+f'_v(net_v (t-1)) w_{uv} & q = 1 \\\
+f'_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u (t)}w_{lv} & q > 1
 \end{array}
-}$$</p>
+}$$
+</div>
 
 <ul>
 <li>$l_q=v$ と$l_0=u$を使用して、</li>
 </ul>
 
-<p>$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = \sum_{l_1 = 1}^{n} \cdots　\sum_{l_{q-1} = 1}^{n} \prod_{m=1}^q f&rsquo;_{l_m} (net_{l_m} (t - m)) w_{l_m l_{m-1}}
-}$$</p>
+<div style="overflow-x: auto;">
+$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = \sum_{l_1 = 1}^{n} \cdots　\sum_{l_{q-1} = 1}^{n} \prod_{m=1}^q f'_{l_m} (net_{l_m} (t - m)) w_{l_m l_{m-1}}
+}$$
+</div>
 
 <ul>
 <li>上式より，以下の場合はスケール係数は発散し，その結果としてユニット$v$に到着する誤差の不安定性により学習が困難になる．</li>
 </ul>
 
-<p>$${\begin{array}{ll}
-| f&rsquo;_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  &gt; 1.0 &amp; for\; all\; m
+<div style="overflow-x: auto;">
+$${\begin{array}{ll}
+| f'_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  > 1.0 & for\; all\; m
 \end{array}
-}$$</p>
+}$$
+</div>
 
 <ul>
 <li>一方，以下の場合はスケール係数は$q$に関して指数関数的に減少する．</li>
 </ul>
 
-<p>$${\begin{array}{ll}
-| f&rsquo;_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  &lt; 1.0 &amp; for\; all\; m
+<div style="overflow-x: auto;">
+$${\begin{array}{ll}
+| f'_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  < 1.0 & for\; all\; m
 \end{array}
-}$$</p>
+}$$
+</div>
 
 <ul>
-<li>これらの問題を解決するために考案されたのがLSTM．</li>
+<li>これらの問題を解決するために考案されたのがLSTM</li>
 </ul>
 
 <h3 id="lstmモデル">LSTMモデル</h3>
@@ -157,35 +166,32 @@ f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u 
 
 <h3 id="lstmの順伝播計算">LSTMの順伝播計算</h3>
 
-<p>$\bar{z}^t = W_z x^t + R_z y^{(t-1)} + b_z, \; z^t = g(\bar{z}^t)$</p>
-
-<p>$\bar{i}^t = W_{in} x^t + R_{in} y^{(t-1)} + p_{in} \odot c^{t-1} + b_{in}, \; i^t = \sigma(\bar{i}^t)$</p>
-
-<p>$\bar{f}^t = W_{for} x^t + R_{for} y^{(t-1)} + p_{for} \odot c^{t-1} + b_{for}, \ f^t = \sigma(\bar{f}^t)$</p>
-
-<p>$c^t = i^t \odot z^t + f^t \odot c^{t-1}$</p>
-
-<p>$\bar{o}^t = \sigma(W_{out} x^t + R_{out} y^{(t-1)} + p_{out} \odot c^t + b_{out}), \ o^t = \sigma(\bar{o}^t)$</p>
-
-<p>$y^t = o^t \odot h(c^t)$</p>
-
-<p>$s.t. \ \sigma(x) = sigmoid(x) = \frac{1}{1 + e^{-x}}, \ g(x) = h(x) = tanh(x)$</p>
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+\bar{z}^t &=& W_z x^t + R_z y^{(t-1)} + b_z, \ z^t = g(\bar{z}^t) \\
+\bar{i}^t &=& W_{in} x^t + R_{in} y^{(t-1)} + p_{in} \odot c^{t-1} + b_{in}, \ i^t = \sigma(\bar{i}^t) \\
+\bar{f}^t &=& W_{for} x^t + R_{for} y^{(t-1)} + p_{for} \odot c^{t-1} + b_{for}, \ f^t = \sigma(\bar{f}^t) \\
+c^t &=& i^t \odot z^t + f^t \odot c^{t-1} \\
+\bar{o}^t &=& \sigma(W_{out} x^t + R_{out} y^{(t-1)} + p_{out} \odot c^t + b_{out}), \ o^t = \sigma(\bar{o}^t) \\
+y^t &=& o^t \odot h(c^t) \\
+s.t. \ \sigma(x) &=& sigmoid(x) = \frac{1}{1 + e^{-x}}, \; g(x) = h(x) = tanh(x)
+\end{eqnarray}$$
+</div>
 
 <h3 id="逆伝播計算">逆伝播計算</h3>
 
 <p><img src="https://camo.qiitausercontent.com/64c89c6204641d58c04d6ad391ad1f8e273c75a4/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36303936392f62626331376330352d343937392d323934312d383636372d3463663066303233356663332e706e67" width=500></p>
 
-<p>$\delta y^t = \Delta^t + R_z^T \delta z^{t+1} + R_{in}^T \delta i^{t+1} + R_{for}^T \delta f^{t+1} + R_{out}^T \delta o^{t+1} $</p>
-
-<p>$\delta o^t = \delta y^t \odot h(c^t) \odot \sigma&rsquo;(\bar{o}^t)$</p>
-
-<p>$\delta c^t = \delta y^t \odot o^t \odot h&rsquo;(c^t) + p_{out} \odot \delta o^t + p_{in} \odot \delta i^{t+1} + p_{for} \odot \delta f^{t+1} + \delta c^{t+1} \odot f^{t+1}$</p>
-
-<p>$\delta f^t = \delta c^t \odot c^{t-1} \odot \sigma&rsquo;(\bar{f}^t)$</p>
-
-<p>$\delta i^t = \delta c^t \odot z^t \odot \sigma&rsquo;(\bar{i}^t)$</p>
-
-<p>$\delta z^t = \delta c^t \odot i^t \odot g&rsquo;(\bar{z}^t)$</p>
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+\delta y^t &=& \Delta^t + R_z^T \delta z^{t+1} + R_{in}^T \delta i^{t+1} + R_{for}^T \delta f^{t+1} + R_{out}^T \delta o^{t+1} \\
+\delta o^t &=& \delta y^t \odot h(c^t) \odot \sigma'(\bar{o}^t) \\
+\delta c^t &=& \delta y^t \odot o^t \odot h'(c^t) + p_{out} \odot \delta o^t + p_{in} \odot \delta i^{t+1} + p_{for} \odot \delta f^{t+1} + \delta c^{t+1} \odot f^{t+1} \\
+\delta f^t &=& \delta c^t \odot c^{t-1} \odot \sigma'(\bar{f}^t) \\
+\delta i^t &=& \delta c^t \odot z^t \odot \sigma'(\bar{i}^t) \\
+\delta z^t &=& \delta c^t \odot i^t \odot g'(\bar{z}^t)
+\end{eqnarray}$$
+</div>
 
 <h2 id="attention">Attention</h2>
 
@@ -206,13 +212,17 @@ f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u 
 <li>一般的なEncoder-Decoderの注意はエンコーダの隠れ層を$Source$，デコーダの隠れ層を$Target$として次式によって表される．</li>
 </ul>
 
-<p>$$Attention(Target,Source)=Softmax(Target⋅Source^T)⋅Source$$</p>
+<div style="overflow-x: auto;">
+$$Attention(Target,Source)=Softmax(Target⋅Source^T)⋅Source$$
+</div>
 
 <ul>
 <li>$Target$を$query$(検索クエリ)と見做し，$Source$を$Key$と$Value$に分離する．</li>
 </ul>
 
-<p>$$Attention(query,Key,Value)=Softmax(query⋅Key^T)⋅Value$$</p>
+<div style="overflow-x: auto;">
+$$Attention(query,Key,Value)=Softmax(query⋅Key^T)⋅Value$$
+</div>
 
 <p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221163903.png" width=500></p>
 
@@ -307,7 +317,9 @@ f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u 
 <li>縮小付き内積注意は以下のように表される．</li>
 </ul>
 
-<p>$$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$</p>
+<div style="overflow-x: auto;">
+$$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$
+</div>
 
 <ul>
 <li><p>Mask (option) はデコーダの予測すべきターゲット単語の情報が予測前のデコーダーにリークしないように自己注意にかけるマスクである (Softmax への入力のうち自己回帰の予測前の位置に対応する部分を1で埋める)．</p></li>
@@ -410,7 +422,9 @@ f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u 
 <li>上図のScaled Dot-Product Attentionはself-attention．attentionの重みを計算する際，softmaxで値が大きくなった時に勾配が0にならないようにsoftmaxのlogitのqueryとkeyの行列積を以下のように調整してあげる．</li>
 </ul>
 
-<p>$$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\  where \ depth = dim \ of \ embedding$$</p>
+<div style="overflow-x: auto;">
+$$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = dim \ of \ embedding$$
+</div>
 
 <p><img src="https://camo.qiitausercontent.com/03b608cc2a33dd3a485eb440569560d4466b0e45/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f61323533633837632d653631392d366431392d316233622d3632306430666535393936652e706e67"></p>
 
@@ -512,7 +526,7 @@ f&rsquo;_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u 
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-08 12:15:20.167962 &#43;0900 JST m=&#43;0.055776002">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-08 12:46:59.78112 &#43;0900 JST m=&#43;0.066139179">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
