@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				segfaultについて &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-08-08 19:49:32 &#43;0900 JST">August 8, 2019</time>
+</div>
+
+		<h1 class="post-title">segfaultについて</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>今回はコンパイルが通ったのに実行時に<code>Segmentation fault : 11</code>というエラーが出てしまった件について．</p>
+
+<p>問題のコードはこちら．ちょっとややこしいdpです（競プロですね）</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;bits/stdc++.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">mod</span> <span class="o">=</span> <span class="mi">1000000007LL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="mi">100005</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">dp</span><span class="p">[</span><span class="mi">100005</span><span class="p">][</span><span class="mi">13</span><span class="p">];</span>
+    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">str</span><span class="p">;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ki</span><span class="p">;</span> 
+    <span class="kt">int</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="c1">// dp[i][j] = 先頭i文字として考えられるもののうち，
+</span><span class="c1"></span>    <span class="c1">// 13で割ったあまりがjであるものの個数
+</span><span class="c1"></span>    
+    <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="sc">&#39;?&#39;</span><span class="p">)</span> <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">else</span> <span class="n">c</span> <span class="o">=</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">ki</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">ki</span><span class="o">&lt;</span><span class="mi">13</span><span class="p">;</span><span class="o">++</span><span class="n">ki</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="n">ki</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="n">j</span><span class="p">)</span><span class="o">%</span><span class="mi">13</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">ki</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">13</span><span class="p">;</span><span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">%=</span> <span class="n">mod</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">5</span><span class="p">];</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="segfault">segfault</h2>
+
+<p>segmentation faultとは，<strong>アクセスが許可されていない方法でメモリ上の位置にアクセスしようとするとき</strong>に起こるエラー条件．</p>
+
+<p>例えば，read onlyの位置に書き込みをしようとした時や，OSの部分を上書きしようとした時に起こる．C++だと，初期化時の配列の大きさを超えて要素を指定しようとしたとき(index error)や，ポインタ変数が指しているアドレスがNULLの時，また再帰が深すぎたり無限再帰が起きている場合などにセグフォが発生する．</p>
+
+<h2 id="デバッグ">デバッグ</h2>
+
+<p>macにはデフォルトでlldbというデバッガが入っているのでそれを使用してどこでセグフォが起きているのか確認する．(linuxだとgdbで実行できる)</p>
+
+<p>lldbの使い方は簡単で，対象のコードを<code>-g</code>オプションをつけてコンパイルしたのち，<code>lldb -f ./[name]</code>で実行し，<code>r</code>コマンドを実行すればデバッグを行ってくれる．</p>
+
+<p>実際に行ってみると以下のようになる．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ g++ -g -o <span class="nb">test</span> test.cpp
+$ lldb -f ./test 
+<span class="o">(</span>lldb<span class="o">)</span> target create <span class="s2">&#34;./test&#34;</span>
+Current executable <span class="nb">set</span> to <span class="s1">&#39;./test&#39;</span> <span class="o">(</span>x86_64<span class="o">)</span>.
+<span class="o">(</span>lldb<span class="o">)</span> r
+Process <span class="m">87019</span> launched: <span class="s1">&#39;/Users/seiichi/Desktop/repositories/atcoder/test/test&#39;</span> <span class="o">(</span>x86_64<span class="o">)</span>
+Process <span class="m">87019</span> stopped
+* thread <span class="c1">#1, queue = &#39;com.apple.main-thread&#39;, stop reason = EXC_BAD_ACCESS (code=2, address=0x7ffeef1fbe40)</span>
+    frame <span class="c1">#0: 0x0000000100000be3 test`main at test.cpp:17:14</span>
+   <span class="m">14</span>       // dp<span class="o">[</span>i<span class="o">][</span>j<span class="o">]</span> <span class="o">=</span> 先頭i文字として考えられるもののうち，
+   <span class="m">15</span>       // 13で割ったあまりがjであるものの個数
+   <span class="m">16</span>       
+-&gt; <span class="m">17</span>       dp<span class="o">[</span><span class="m">0</span><span class="o">][</span><span class="m">0</span><span class="o">]</span> <span class="o">=</span> <span class="m">1</span><span class="p">;</span>
+   <span class="m">18</span>       <span class="k">for</span> <span class="o">(</span><span class="nv">i</span><span class="o">=</span><span class="m">0</span><span class="p">;</span>i&lt;n<span class="p">;</span>++i<span class="o">)</span> <span class="o">{</span>
+   <span class="m">19</span>           int c<span class="p">;</span>
+   <span class="m">20</span>           <span class="k">if</span> <span class="o">(</span>str<span class="o">[</span>i<span class="o">]==</span><span class="s1">&#39;?&#39;</span><span class="o">)</span> <span class="nv">c</span> <span class="o">=</span> -1<span class="p">;</span>
+Target <span class="m">0</span>: <span class="o">(</span><span class="nb">test</span><span class="o">)</span> stopped.</code></pre></div>
+<p>dpという配列にアクセスしたときにセグフォが起きているということがわかった．</p>
+
+<p>C++では，グローバル変数はヒープに取られるのに対して，<strong>ローカル変数はスタック</strong>に積まれていく．なので<strong>関数（今回の例ではmain関数）などの中では大きな配列は確保できない</strong>らしい．</p>
+
+<p>今回は，main関数の中でサイズの大きい配列をローカル変数として定義していたのがよくなかったことになるので，配列グローバルに置くことにする．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;bits/stdc++.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">dp</span><span class="p">[</span><span class="mi">100005</span><span class="p">][</span><span class="mi">13</span><span class="p">];</span>	<span class="c1">// サイズの大きな変数をグローバルに置く
+</span><span class="c1"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">mod</span> <span class="o">=</span> <span class="mi">1000000007LL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="mi">100005</span><span class="p">];</span>
+    <span class="c1">// cin &gt;&gt; str;
+</span><span class="c1"></span>    <span class="c1">// n = strlen(str);
+</span><span class="c1"></span>    <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ki</span><span class="p">;</span> 
+    <span class="kt">int</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="c1">// dp[i][j] = 先頭i文字として考えられるもののうち，
+</span><span class="c1"></span>    <span class="c1">// 13で割ったあまりがjであるものの個数
+</span><span class="c1"></span>    
+    <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="sc">&#39;?&#39;</span><span class="p">)</span> <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">else</span> <span class="n">c</span> <span class="o">=</span> <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">ki</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">ki</span><span class="o">&lt;</span><span class="mi">13</span><span class="p">;</span><span class="o">++</span><span class="n">ki</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][(</span><span class="n">ki</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="n">j</span><span class="p">)</span><span class="o">%</span><span class="mi">13</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">ki</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">13</span><span class="p">;</span><span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">%=</span> <span class="n">mod</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">5</span><span class="p">];</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>再度デバッグを行う．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ g++ -g -o <span class="nb">test</span> test.cpp 
+$ lldb -f ./test
+<span class="o">(</span>lldb<span class="o">)</span> target create <span class="s2">&#34;./test&#34;</span>
+Current executable <span class="nb">set</span> to <span class="s1">&#39;./test&#39;</span> <span class="o">(</span>x86_64<span class="o">)</span>.
+<span class="o">(</span>lldb<span class="o">)</span> r
+Process <span class="m">87975</span> launched: <span class="s1">&#39;/Users/seiichi/Desktop/repositories/atcoder/test/test&#39;</span> <span class="o">(</span>x86_64<span class="o">)</span>
+<span class="m">0</span>
+Process <span class="m">87975</span> exited with <span class="nv">status</span> <span class="o">=</span> <span class="m">0</span> <span class="o">(</span>0x00000000<span class="o">)</span> </code></pre></div>
+<p>セグフォが解消されていることがわかる．</p>
+
+<h2 id="補足">補足</h2>
+
+<p><code>lldb</code>は非常に有能で様々なcheckができる．</p>
+
+<ul>
+<li>backtrace: 関数の呼び出し順を確認．lldbコマンドは<code>bt</code>．</li>
+<li>frame n: backtraceで表示されている関数のうち，n番目の関数に移動．lldbコマンドは<code>fr n</code>．</li>
+<li>info locals: ローカル変数の一覧を確認．lldbコマンドは<code>fr v</code></li>
+<li>info args: 引数の一覧を確認．lldbコマンドは<code>fr vaiable</code></li>
+<li>print val: 変数valの値を表示</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/mathjax/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-08-08 21:12:06.862088 &#43;0900 JST m=&#43;0.077446338">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>

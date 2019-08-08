@@ -6,10 +6,19 @@
     <description>Recent content in Posts on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 08 Aug 2019 11:33:40 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 08 Aug 2019 19:49:32 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>segfaultについて</title>
+      <link>https://seiichiinoue.github.io/post/segfault/</link>
+      <pubDate>Thu, 08 Aug 2019 19:49:32 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/segfault/</guid>
+      <description>今回はコンパイルが通ったのに実行時にSegmentation fault : 11というエラーが出てしまった件について． 問題のコードはこちら．ちょっとやや</description>
+    </item>
     
     <item>
       <title>Mathjax記法メモ</title>
