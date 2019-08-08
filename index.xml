@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 05 Aug 2019 01:09:47 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 07 Aug 2019 08:34:41 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>自然言語処理(ML)の論文まとめ</title>
+      <link>https://seiichiinoue.github.io/post/nlp/</link>
+      <pubDate>Wed, 07 Aug 2019 08:34:41 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/nlp/</guid>
+      <description>Embedding one-hot表現 最もシンプルなembedding手法． 表現したい語彙をリストに表現して，各単語を表現する次元を準備する．表現したいseq</description>
+    </item>
     
     <item>
       <title>ABC136 D - Gathering Children</title>
@@ -39,7 +48,7 @@
     </item>
     
     <item>
-      <title>[論文読み] RoBERTa</title>
+      <title>[論文サーベイ] RoBERTa</title>
       <link>https://seiichiinoue.github.io/post/roberta/</link>
       <pubDate>Wed, 31 Jul 2019 03:13:29 +0900</pubDate>
       
