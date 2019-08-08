@@ -3,14 +3,19 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://seiichiinoue.github.io/post/mathjax/</loc>
+    <lastmod>2019-08-08T11:33:40+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://seiichiinoue.github.io/post/</loc>
-    <lastmod>2019-08-07T08:34:41+09:00</lastmod>
+    <lastmod>2019-08-08T11:33:40+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://seiichiinoue.github.io/</loc>
-    <lastmod>2019-08-07T08:34:41+09:00</lastmod>
+    <lastmod>2019-08-08T11:33:40+09:00</lastmod>
     <priority>0</priority>
   </url>
   
