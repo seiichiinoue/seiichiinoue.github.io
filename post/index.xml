@@ -17,7 +17,7 @@
       <pubDate>Thu, 08 Aug 2019 11:33:40 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/mathjax/</guid>
-      <description>hugoで数式を書く際にはmathjaxを使用しているのですが，若干記法が違うらしく，読み込んでくれなかったためメモ． 改行 改行は\\ではなく</description>
+      <description>hugoで数式を書く際にはmathjaxを使用しているのですが，若干記法が違うらしく，読み込んでくれなかったためメモ． 経験上，.mdに直接数</description>
     </item>
     
     <item>
