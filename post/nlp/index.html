@@ -332,10 +332,19 @@ $$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$
 <ul>
 <li><p>$d_{model}=512$次元の$Q,K,V$を用いて単一の内積注意を計算する代わりに，$Q,K,V$をそれぞれ$h=8$回異なる重み行列 $W^Q_i,W^K_i,W^V_i$ で $d_k,d_k,d_v=64$ 次元に線形写像して$h=8$個の内積注意を計算する．各内積注意の$d_v=64$次元の出力は連結 (concatenate) して重み行列$W<em>o$で$d</em>{model}=512$次元に線形写像する．</p></li>
 
-<li><p>複数ヘッドの注意は次式によって表される．
-<img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164416.png" width=500>
-<img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164426.png" width=600></p></li>
+<li><p>複数ヘッドの注意は次式によって表される．</p></li>
 </ul>
+
+<div style="overflow-x: auto;">
+\begin{eqnarray}
+MultiHead(Q, K, V) &=& Concat(head_1, head_2, \cdots ,head_h) W^o \\
+where \; head_i &=& Attention(Q W_i^Q, K W_i^K, V W_i^V)
+\end{eqnarray}
+</div>
+
+<div style="overflow-x: auto;">
+$$W^O \in \mathbb{R}^{h d_v \times d_{model}}, \; W_i^Q \in \mathbb{R}^{d_{model} \times d_k}, \; W_i^K \in \mathbb{R}^{d_{model} \times d_k}, \; W_i^V \in \mathbb{R}^{d_{model} \times d_v}$$
+</div>
 
 <h3 id="位置毎のフィードフォワードネットワーク">位置毎のフィードフォワードネットワーク</h3>
 
@@ -343,7 +352,9 @@ $$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$
 <li>FFNは以下のように表される</li>
 </ul>
 
-<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164438.png" width=350></p>
+<div style="overflow-x: auto;">
+$$FFN(x) = max(0, x W_1 + b_1) W_2 + b_2$$
+</div>
 
 <ul>
 <li>$ReLU$で活性化する$d<em>{ff}=2048$次元の中間層と$d</em>{model}=512$次元の出力層から成る2層の全結合ニューラルネットワークである．</li>
@@ -357,7 +368,12 @@ $$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$
 <li>位置エンコーディングの行列$PE$の各成分は次式によって表される．</li>
 </ul>
 
-<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164434.png" width=350></p>
+<div style="overflow-x: auto;">
+\begin{eqnarray}
+PE_{(pos,2i)} &=& sin(pos / 10000^{2i / d_{model}}) \\
+PE_{(pos,2i+1)} &=& cos(pos / 10000^{2i / d_{model}})
+\end{eqnarray}
+</div>
 
 <ul>
 <li>ここで$pos$は単語の位置，$i$は成分の次元である．位置エンコーディングの各次元は波長が$2 \pi$から$10000⋅2 \pi$に幾何学的に伸びる正弦波に対応する．</li>
@@ -526,7 +542,7 @@ $$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = d
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-08 12:46:59.78112 &#43;0900 JST m=&#43;0.066139179">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-08 13:15:22.144488 &#43;0900 JST m=&#43;0.068646070">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
