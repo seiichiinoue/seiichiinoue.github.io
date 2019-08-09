@@ -49,7 +49,7 @@
 
 		
 
-<p>今回はコンパイルが通ったのに実行時に<code>Segmentation fault : 11</code>というエラーが出てしまった件について．</p>
+<p>今回は，コンパイルが通ったのに実行時に<code>Segmentation fault : 11</code>というエラーが出てしまった件について．</p>
 
 <p>問題のコードはこちら．ちょっとややこしいdpです（競プロですね）</p>
 <div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;bits/stdc++.h&gt;</span><span class="cp">
@@ -122,7 +122,7 @@ Target <span class="m">0</span>: <span class="o">(</span><span class="nb">test</
 
 <p>C++では，グローバル変数はヒープに取られるのに対して，<strong>ローカル変数はスタック</strong>に積まれていく．なので<strong>関数（今回の例ではmain関数）などの中では大きな配列は確保できない</strong>らしい．</p>
 
-<p>今回は，main関数の中でサイズの大きい配列をローカル変数として定義していたのがよくなかったことになるので，配列グローバルに置くことにする．</p>
+<p>今回は，main関数の中でサイズの大きい配列をローカル変数として定義していたのがよくなかったことになるので，配列をグローバルに置くことにする．</p>
 <div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;bits/stdc++.h&gt;</span><span class="cp">
 </span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
@@ -198,7 +198,7 @@ Process <span class="m">87975</span> exited with <span class="nv">status</span> 
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-08 21:12:06.862088 &#43;0900 JST m=&#43;0.077446338">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-09 19:37:24.88767 &#43;0900 JST m=&#43;0.172538901">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
