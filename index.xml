@@ -17,7 +17,7 @@
       <pubDate>Thu, 08 Aug 2019 19:49:32 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/segfault/</guid>
-      <description>今回は，コンパイルが通ったのに実行時にエラーSegmentation fault: 11が出てしまった件について． 問題のコードはこちら．ちょっとややこしい</description>
+      <description>今回は，コンパイルは通ったのに実行時にエラーSegmentation fault: 11が出てしまった件について． 問題のコードはこちら．ちょっとややこしい</description>
     </item>
     
     <item>
