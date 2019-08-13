@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 08 Aug 2019 19:49:32 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 13 Aug 2019 04:07:58 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>DockerでUbuntuの環境を構築する</title>
+      <link>https://seiichiinoue.github.io/post/docker/</link>
+      <pubDate>Tue, 13 Aug 2019 04:07:58 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/docker/</guid>
+      <description>最近，Rui Ueyamaさんのコンパイラ本を参考にコンパイラを作成しているのですが，推奨環境がLinuxだったのでDockerで仮想環境を作</description>
+    </item>
     
     <item>
       <title>segfaultについて</title>
