@@ -106,8 +106,8 @@
 <p>マウントはコンテナを起動する際に<code>-v</code>オプションをつけることで行うことができる</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker run -v /host/path:/container/path some_image
 <span class="c1"># ホストの絶対パス:コンテナの絶対パス</span></code></pre></div>
-<p>今回は，<code>/Users/seiichi/Desktop/repositories/compiler/</code>を<code>/workspace/</code>としてマウントしたかったので，以下のようなコマンドでコンテナを作成．（<code>-it</code>はコンソール出力用）</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker run -it -v /Users/seiichi/Desktop/repositories/compiler/:/workspace/ ubuntu/workspace</code></pre></div>
+<p>今回は，<code>/Users/seiichi/compiler/</code>を<code>/workspace/</code>としてマウントしたかったので，以下のようなコマンドでコンテナを作成．（<code>-it</code>はコンソール出力用）</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker run -it -v /Users/seiichi/compiler/:/workspace/ ubuntu/workspace</code></pre></div>
 <h2 id="vimの設定">vimの設定</h2>
 
 <p>ローカルの<code>.vimrc</code>を<code>COPY</code>してしまえば早い話なんだが，ローカルではneovimを使用しているので，サーバ上で環境構築するコストが高かった．</p>
@@ -140,7 +140,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-08-14 03:04:10.646919 &#43;0900 JST m=&#43;0.071270056">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-08-14 03:08:38.618264 &#43;0900 JST m=&#43;0.071140029">2019</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
