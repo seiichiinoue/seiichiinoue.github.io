@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 13 Aug 2019 04:07:58 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 28 Aug 2019 09:38:12 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>競プロ用ライブラリをC&#43;&#43;で書く</title>
+      <link>https://seiichiinoue.github.io/post/procon/</link>
+      <pubDate>Wed, 28 Aug 2019 09:38:12 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/procon/</guid>
+      <description>C++で競プロの問題を解くようになって1ヶ月ほど経ち，そろそろ本番でも使用していきたいと思い，復習がてらPythonで書いていた競プロ用ライ</description>
+    </item>
     
     <item>
       <title>DockerでUbuntuの環境を構築する</title>
