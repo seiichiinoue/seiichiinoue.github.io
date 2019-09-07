@@ -51,7 +51,7 @@
 
 <p>先日，Facebook AIがGLUEやSQuADでGoogleのBERTを超えたと話題になっていたモデルの<a href="https://arxiv.org/abs/1907.11692">論文</a>を公開したらしいので概要をまとめました．</p>
 
-<h1 id="概要">概要</h1>
+<h2 id="概要">概要</h2>
 
 <ul>
 <li>GLUE, SQuAD, RACEで評価．</li>
@@ -67,9 +67,9 @@
 <li>batchsizeを大きくした</li>
 </ul>
 
-<h1 id="実験詳細">実験詳細</h1>
+<h2 id="実験詳細">実験詳細</h2>
 
-<h2 id="static-vs-dynamic-masking">Static vs Dynamic Masking</h2>
+<h3 id="static-vs-dynamic-masking">Static vs Dynamic Masking</h3>
 
 <ul>
 <li>オリジナルのBERTモデルでは前処理段階でmaskingを行い，以後変更なしで学習を進める．</li>
@@ -77,7 +77,7 @@
 <li>実験の結果fine tuningを用いた様々な後続タスクでstaticを超えるスコアを出した．</li>
 </ul>
 
-<h2 id="model-input-format-and-next-sentence-prediction">Model Input Format and Next Sentence Prediction</h2>
+<h3 id="model-input-format-and-next-sentence-prediction">Model Input Format and Next Sentence Prediction</h3>
 
 <ul>
 <li>オリジナルのBERTでは50%の確率で同じdocumentのsegmentを（残りの50%でそうではないsegmentを）繋げて2文を1 sequenceとして入力としていた．</li>
@@ -94,7 +94,7 @@
 <li>コーパスを作成するときに，全てのdocumentを跨ぐより一つのdocumentからという制約をつけたほうが性能がいいことがわかった</li>
 </ul>
 
-<h2 id="training-large-batches">Training Large Batches</h2>
+<h3 id="training-large-batches">Training Large Batches</h3>
 
 <ul>
 <li>適切に学習率が増加した際は，バッチサイズを大きくしてもうまく行くことが実験的にわかった．</li>
@@ -116,7 +116,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-07 19:34:50.818581 &#43;0900 JST m=&#43;0.241468571">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-07 20:04:34.678138 &#43;0900 JST m=&#43;0.242358255">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

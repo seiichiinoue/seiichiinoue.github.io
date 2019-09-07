@@ -51,7 +51,7 @@
 
 <p>計量経済学を勉強している中で，制限従属変数の推定で出てくるミルズ比でちょっとつまずいたのでメモ．</p>
 
-<h1 id="データの性質">データの性質</h1>
+<h2 id="データの性質">データの性質</h2>
 
 <p>分析の対象となる従属変数（被説明変数）がある水準を境に切り取られている場合を一般的に制限従属変数と呼びます．
 こういったデータの理由としては次の2点が考えられます．</p>
@@ -69,7 +69,7 @@
 <p>こういったデータに対する推定は，通常の方法では多くの場合でパラメータの推定量にはバイアスが生じてしまいます．
 それらに対し，モデリングを行う際に用いる手法としてあげられるのが，前者の端点解の場合，以下で説明をするトービットモデルや，後者のデータ収集の際のセレクションバイアスがある場合は<a href="http://www.ier.hit-u.ac.jp/~kitamura/lecture/Hit/08Statsys10.pdf">ヘックマンの2段階推定法</a>などがあります．（今回は前者に限定して考えていきます）</p>
 
-<h1 id="トービットモデル">トービットモデル</h1>
+<h2 id="トービットモデル">トービットモデル</h2>
 
 <p>トービットモデルは，Tobin(1958)で初めて論じられ，Goldberger(1964)によってトービットと命名され，一般に広く紹介されるようになったものです．Amemiya(1985,Chapter10)やMaddala(1983,Chapter6)で包括的にサーベイされているらしい．</p>
 
@@ -141,7 +141,7 @@ E(y | y^* > 0, X) &= E(y | X \beta + u > 0) \\
 
 <p>導出過程を追っていればなぜ出てきたのかわかりますが，（僕は頭が悪いので）これが何を表しているのかわかりませんでした．このミルズ比はなにを表しているのでしょうか．</p>
 
-<h1 id="逆ミルズ比">逆ミルズ比</h1>
+<h2 id="逆ミルズ比">逆ミルズ比</h2>
 
 <p>まず，先の式の誤差の条件付き期待値（$ E(u / \sigma | u / \sigma &gt; -X \beta / \sigma)$），$u / \sigma$を$-X \beta / \sigma$で打ち切ったときの$u / \sigma$切断正規分布の形状は以下のようになっていることを確認します．</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -195,7 +195,7 @@ E(y | y^* > 0, X) &= E(y | X \beta + u > 0) \\
 
 <p>先に述べたとおり，$X \beta$が大きくなるとはすなわち，打ち切りが起こりにくくなることを意味していました．ということは，逆ミルズ比$\lambda (X \beta / \sigma)$は，打ち切りの起こりやすさを表していると読むことができます．</p>
 
-<h1 id="逆ミルズ比の直感的な理解">逆ミルズ比の直感的な理解</h1>
+<h2 id="逆ミルズ比の直感的な理解">逆ミルズ比の直感的な理解</h2>
 
 <p>これまでやってきたことをまとめると以下のようになります．</p>
 
@@ -209,7 +209,7 @@ $\Longleftrightarrow$打ち切りが起こりやすくなり，その結果条�
 
 <p>よって，逆ミルズ比は，打ち切りの起こりやすさを制御しているものと解釈できます．</p>
 
-<h1 id="参考文献">参考文献</h1>
+<h2 id="参考文献">参考文献</h2>
 
 <ul>
 <li><a href="http://ryotamugiyama.com/wp-content/uploads/2016/11/millsratio.html">逆ミルズ比を図で理解する</a></li>
@@ -231,7 +231,7 @@ $\Longleftrightarrow$打ち切りが起こりやすくなり，その結果条�
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-07 19:34:50.828932 &#43;0900 JST m=&#43;0.251819124">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-07 20:04:34.692572 &#43;0900 JST m=&#43;0.256792642">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

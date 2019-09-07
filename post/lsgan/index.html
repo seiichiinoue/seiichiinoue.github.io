@@ -53,13 +53,13 @@
 
 <p>画像処理初学者で、学習したことのまとめがてら記事を書いているので、間違いがあるかもしれません。その際はご指摘ください。</p>
 
-<h1 id="ganについて">GANについて</h1>
+<h2 id="ganについて">GANについて</h2>
 
-<h2 id="生成モデル">生成モデル</h2>
+<h3 id="生成モデル">生成モデル</h3>
 
 <p>訓練データを学習し、それらのデータと似たような新しいデータを生成するモデルのことを生成モデルと呼びます。別の言い方をすると、訓練データの分布と生成データの分布が一致するように学習していくようなモデルです。GANはこの生成モデルの一種です。</p>
 
-<h2 id="学習の仕組み">学習の仕組み</h2>
+<h3 id="学習の仕組み">学習の仕組み</h3>
 
 <p>GANは<strong>Generator</strong>と<strong>Discriminator</strong>という２つのネットワークから成り立ちます。Generatorは訓練データと同じようなデータを生成しようとします。一方、Discriminatorはデータが訓練データ(real sample)なのか、それともGeneratorが生成したもの(fake sample)なのかを識別します。</p>
 
@@ -67,9 +67,9 @@
 
 <p>GeneratorはDiscriminatorに本物と識別させれるように、Discriminatorは正しく正誤を判断できるようにと、2つのネットワークを同時に更新していくことによって、生成モデルを学習させていきます。</p>
 
-<h1 id="lsganについて">LSGANについて</h1>
+<h2 id="lsganについて">LSGANについて</h2>
 
-<h2 id="学習の仕組みと目的関数">学習の仕組みと目的関数</h2>
+<h3 id="学習の仕組みと目的関数">学習の仕組みと目的関数</h3>
 
 <p>それでは、数式を用いてLSGANの仕組みを見ていきます。</p>
 
@@ -93,7 +93,7 @@ $$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
 
 <p>一方、$G$が訓練データに似ているものを生成できるようになると、$D$がうまく分類できなくなるため$D(G(z))$は大きくなり、$L(G)$は小さくなるという構造になっています。</p>
 
-<h2 id="誤差関数に最小二乗を用いるメリット">誤差関数に最小二乗を用いるメリット</h2>
+<h3 id="誤差関数に最小二乗を用いるメリット">誤差関数に最小二乗を用いるメリット</h3>
 
 <p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/lsgan.png" alt="" /></p>
 
@@ -104,7 +104,7 @@ $$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
 
 <p>よって、Generatorは決定境界に沿うようにfake sampleを生成するように誤差を最小化することができるといったものです。単純ではありますが、非常に強力です。</p>
 
-<h2 id="モデルの構造">モデルの構造</h2>
+<h3 id="モデルの構造">モデルの構造</h3>
 
 <p>それでは、実装に移っていきます。</p>
 
@@ -112,9 +112,9 @@ $$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
 
 <p>モデルの構造は上図のようになっています。注意すべき点は、中間層においてバッチノーマライゼーションを適用していることと(DCGANと同じです)、今回は畳み込み層を減らしていること、またMNISTを学習データとして用いているので、出力は1次元であるということです。</p>
 
-<h1 id="実装">実装</h1>
+<h2 id="実装">実装</h2>
 
-<h2 id="モデルの実装">モデルの実装</h2>
+<h3 id="モデルの実装">モデルの実装</h3>
 
 <p>上図にしたがってモデルを定義していきます。まずはGeneratorから。
 (今回はlatent spaceの次元を62次元にしました)</p>
@@ -180,7 +180,7 @@ $$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
         <span class="k">return</span> <span class="n">x</span></code></pre></div>
 <p>これでモデルが完成しました。それでは、学習の過程をコードに落としていきます。</p>
 
-<h2 id="学習過程の実装">学習過程の実装</h2>
+<h3 id="学習過程の実装">学習過程の実装</h3>
 
 <p>まず、LAGANの目的関数は以下のようになります。</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_true</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span>
@@ -319,7 +319,7 @@ Discriminatorの更新は以下のようになります。</p>
 <span class="n">G</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span>
 
 <span class="n">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span></code></pre></div>
-<h1 id="結果">結果</h1>
+<h2 id="結果">結果</h2>
 
 <p>epoch 1</p>
 
@@ -354,7 +354,7 @@ Discriminatorの更新は以下のようになります。</p>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-07 19:34:50.843686 &#43;0900 JST m=&#43;0.266573184">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-07 20:04:34.711108 &#43;0900 JST m=&#43;0.275327866">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
