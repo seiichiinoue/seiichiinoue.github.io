@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				[備忘録] xcodeアップデートの際のgcc設定 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-09-21 19:40:06 &#43;0900 JST">September 21, 2019</time>
+</div>
+
+		<h1 class="post-title">[備忘録] xcodeアップデートの際のgcc設定</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="gccのアップデート">gccのアップデート</h2>
+
+<p>まずは，最新のgccをインストールする．私の場合，macなのでbrewで一発で入る．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ brew reinstall gcc</code></pre></div>
+<h2 id="リンクの貼り直し">リンクの貼り直し</h2>
+
+<p>まず，gccの場所を探す．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ls /usr/local/bin <span class="p">|</span> grep gcc
+$ ls /usr/local/bin <span class="p">|</span> grep g++</code></pre></div>
+<p>上記コマンドで見つかった<code>gcc-x</code>と<code>g++-x</code>が対象のエイリアスになるので，見つかったエイリアスに対して，シンボリックリンクを張ってあげる．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ln -s /usr/local/bin/gcc-8 /usr/local/bin/gcc
+$ ln -s /usr/local/bin/g++-8 /usr/local/bin/g++</code></pre></div>
+<p>ここで，すでにシンボリックリンクが貼られている場合は，<code>-f</code>コマンドをつけなければ上書きしてくれないことに注意する．</p>
+
+<p>最後に<code>~/.bash_profile</code>に以下を記載してパスを通したら完了．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash_profile" data-lang="bash_profile"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/bin</code></pre></div>
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/pointer/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-09-21 19:47:34.876441 &#43;0900 JST m=&#43;0.096730260">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
