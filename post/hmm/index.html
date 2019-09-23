@@ -61,7 +61,7 @@
 $$argmax_{Y} P(Y | X)$$
 </div>
 
-<p>これをベイズ則で確率を分解します．</p>
+<p>これをベイズ則で分解します．</p>
 
 <div style="overflow-x: auto;">
 \begin{aligned}
@@ -70,7 +70,23 @@ argmax_{Y} P(Y | X) &= argmax_{Y} \frac{P(X|Y)P(Y)}{P(X)} \\
 \end{aligned}
 </div>
 
-<p>ここで，第2式の$P(X|Y)$は，単語と品詞の関係を考慮しており，$P(Y)$は前の品詞と次の品詞の関係を考慮しているものと解釈することができます．</p>
+<p>すると，第2式の$P(X|Y)$は，単語と品詞の関係を考慮しており，$P(Y)$は前の品詞と次の品詞の関係を考慮しているものと解釈することができます．</p>
+
+<p>これが系列に対する生成モデルになります．</p>
+
+<h2 id="隠れマルコフモデル-hmm">隠れマルコフモデル(HMM)</h2>
+
+<p>マルコフモデルは複数の状態を持ち，ある状態から別の状態へ一定の確率で遷移します(天気の例とかでみたことがあると思います)．この確率を遷移確率と呼び，状態の遷移後，その状態に依存した一定の確率で出力記号を出力します．この確率を出力確率と呼びます．</p>
+
+<p>図で表すと以下のような動作になります．</p>
+
+<p><img src="http://musyoku.github.io/images/post/2017-02-27/markov_model.png"></p>
+
+<p>まず，初期状態を表す特殊な状態から$s_{t-1}$に遷移します．遷移したら$p(y|s_{t-1})$から出力記号を生成し，出力します．</p>
+
+<p>次に，$p(s_t|s_{t-1})$に従って遷移先を決定します．遷移したら$p(y|s_t)$から出力記号を生成し，出力します．</p>
+
+<p>今回は品詞推定を扱うので，状態$s$が品詞に対応し，出力記号$y$が単語に対応します．</p>
 
 
 		
@@ -86,7 +102,7 @@ argmax_{Y} P(Y | X) &= argmax_{Y} \frac{P(X|Y)P(Y)}{P(X)} \\
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 03:18:49.864664 &#43;0900 JST m=&#43;0.065753647">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 03:36:20.343591 &#43;0900 JST m=&#43;0.159545995">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
