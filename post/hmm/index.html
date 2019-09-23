@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				Hidden Markov Modelの実装 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-09-24 01:11:56 &#43;0900 JST">September 24, 2019</time>
+</div>
+
+		<h1 class="post-title">Hidden Markov Modelの実装</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="品詞推定">品詞推定</h2>
+
+<p>品詞の推定とは文$X$が与えられた時の品詞列$Y$を予測するものです．</p>
+
+<p>実際には，解決策は多くあり，各単語を個別に予測する点予測では，パーセプトロンを用いた<a href="http://www.phontron.com/kytea/">KyTea</a>などがあります．また，系列に対する生成モデルには，隠れマルコフモデルを用いた，<a href="https://chasen-legacy.osdn.jp/">ChaSen</a>などがあります．今回は後者の隠れマルコフモデルを用いた品詞推定の実装を行いました．</p>
+
+<p>モデルでは，文が与えられた場合の最も確率の高いタグ列を計算します．</p>
+
+<div style="overflow-x: auto;">
+$$argmax_{Y} P(Y | X)$$
+</div>
+
+<p>これをベイズ則で確率を分解します．</p>
+
+<div style="overflow-x: auto;">
+\begin{aligned}
+argmax_{Y} P(Y | X) &= argmax_{Y} \frac{P(X|Y)P(Y)}{P(X)} \\
+&= argmax_{Y} P(X|Y)P(Y)
+\end{aligned}
+</div>
+
+<p>ここで，第2式の$P(X|Y)$は，単語と品詞の関係を考慮しており，$P(Y)$は前の品詞と次の品詞の関係を考慮しているものと解釈することができます．</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/gcclink/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-09-24 03:18:49.864664 &#43;0900 JST m=&#43;0.065753647">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
