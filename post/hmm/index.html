@@ -290,6 +290,63 @@ $$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1
 
 <h2 id="viterbiアルゴリズム">Viterbiアルゴリズム</h2>
 
+<p>viterbiアルゴリズムは，モデル$\lambda$において最適な状態系列（最適経路）と，その経路上での確率を求める動的計画法を用いたアルゴリズムです．</p>
+
+<p>まず，モデル$\lambda$において，観測系列$Y = y_1 y_2 &hellip; y_T$に対する最適な系列$s = s_1 s_2 &hellip; s_T$を求めるために，時刻$t$で状態$i$に至るまでの最適状態確率$\delta_t(i)$を定義します．</p>
+
+<div style="overflow-x: auto;">
+$$\delta_t(i) = max_{s_1, s_2, ..., s_{T-1}} p(s_1, s_2, ..., s_t = i, \, y_1, y_2, ..., y_T| \lambda)$$
+</div>
+
+<p>また，$t+1$時点における最適状態確率は，次のように導出できます．</p>
+
+<div style="overflow-x: auto;">
+$$\delta_{t+1}(j) = \bigl[ max_{i} \delta_t(i) a_{ij} \bigr] \cdot b_{ij}(y_{t+1})$$
+</div>
+
+<p>$t$時点，状態$i$において，出力確率を最大にする経路（状態遷移）を$\phi_t(j)$，最適経路の出力確率を$P^<em>$，最適経路上の最終状態を$s_T^</em>$とすると，最適経路および出力確率は以下のようにして求めることができる．</p>
+
+<p>$\delta$と$\phi$を初期化する</p>
+
+<div style="overflow-x: auto;">
+$$\delta_0(i) = \pi_i$$
+$$\phi_0(i) = 0$$
+</div>
+
+<p>それぞれを計算する</p>
+
+<div style="overflow-x: auto;">
+$$\delta_t(j) = max_{1 \leq i \leq N} \bigl[ \delta_{t-1}(i) a_{ij} b_{ij} (y_t) \bigr]$$
+$$\phi_t(j) = argmax_{1 \leq i \leq N} \bigl[ \delta_{t-1}(i) a_{ij} b_{ij} (y_t) \bigr]$$
+</div>
+
+<p>結果を格納する</p>
+
+<div style="overflow-x: auto;">
+$$P^* = max_{1 \leq i \leq N} \bigl[ \delta_T(i) \bigr]$$
+$$s_T^* = argmax_{1 \leq i \leq N} \bigl[ delta_T(i) \bigr]$$
+</div>
+
+<p>状態系列をバックトラックする</p>
+
+<div style="overflow-x: auto;">
+$$s_t^* = \phi_{t+1} (s_{t+1}^*) (0 \leq t \leq T - 1)$$
+</div>
+
+<p>以上のアルゴリズムを算出することで以下のような経路（状態遷移）を得ることができます．</p>
+
+<h2 id="実験">実験</h2>
+
+<p>wikipedia日本語コーパスを使用して，実際に学習させてみました．</p>
+
+<p>隠れ状態=30，イテレーション=200とした結果を以下に示します．</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">公立/8 高校/1 ・/8 公立/26 大学/7 へ/15 の/26 入学/7 に/6 は/25 それぞれ/5 ＬＧＳ/29 ・/6 Ö/11 ＳＳ/28 の/26 受験/23 を/6 必要/23 と/6 し/10 、/11 成績/28 順/15 で/6 入/14 学校/23 を/6 決定/27 する/29 。/12 
+トルコ/15 に/6 も/14 受験/23 競争/6 は/14 存在/18 し/10 、/11 高校/16 入試/25 ・/5 大学/16 入試/25 の/5 ため/29 に/6 塾/25 　/20 （/24 ）/22 　/20 に/6 通/2 う/21 こと/3 も/6 珍し/2 く/19 な/2 い/21 。/12
+この/16 ため/25 、/11 ディレクトリ/28 型/15 検索/26 エンジン/23 で/6 は/25 、/11 検索/28 に/6 ヒット/27 する/29 サイト/29 が/6 無/14 かっ/2 た/21 場合/3 、/11 ロボット/28 型/15 検索/26 エンジン/23 を/6 用い/2 て/19 結果/23 を/6 表示/27 する/29 よう/3 な/6 、/11 併用/28 型/15 の/26 もの/23 が/6 多/2 い/21 。/12
+耕地/0 　/20 ３９/1 ．/8 １/1 ％/8 　/20 －/24 　/20 全国/28 平均/15 の/26 ２/1 倍/8 で/25 、/11 耕地/28 と/6 し/10 て/19 使用/14 でき/2 る/21 土地/3 が/6</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">八王子/0 バイパス/9 （/22 はち/17 おうじ/12 バイパス/16 ）/22 は/25 、/11 神奈川/28 県/26 相模原/7 市/7 緑/5 区/29 橋本/3 から/25 東京/0 都/9 八王子/1 市/8 宇津木/26 町/7 へ/6 至/2 る/21 国道/12 １６/1 号/8 の/26 バイパス/23 で/6 あ/2 る/21 。
+/12 摩訶/0 大/5 大将棋/16 （/22 まか/13 だいだいしょう/4 ぎ/15 ）/22 （/25 『/11 象戯/16 図式/25 』/25 『/11 諸/28 象戯/16 図式/25 』/15 で/6 は/25 、/11 「/27 摩/19 𩹄/2 大大/21 象戯/12 」/15 （/22 カツ/16 は/25 魚偏/23 に/6 曷/27 ）/29 の/26 表記/7 が/6 見/18 られ/10 る/21 。/12 ）/16 は/25 、/11 将棋/28 の/26 一種/23 で/6 あ/2 り/13 、/11 二人/28 で/6 行な/2 う/21 ボード/12</code></pre></div>
+<p>正解率は61.7%でした．nlpの実装は初めてなので評価の見方がいまいちわかっていないのですが，もう少し精度をあげたいなと思いました．</p>
+
 
 		
 	</div>
@@ -304,7 +361,7 @@ $$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 22:52:32.092722 &#43;0900 JST m=&#43;0.071303718">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 23:41:40.647215 &#43;0900 JST m=&#43;0.057426342">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
