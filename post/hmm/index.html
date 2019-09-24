@@ -49,6 +49,8 @@
 
 		
 
+<p>隠れマルコフモデルとviterbiアルゴリズムを使用した教師なし品詞推定の実装を行いました．実装は<a href="https://github.com/seiichiinoue/hmm">レポジトリ</a>に公開しています．</p>
+
 <h2 id="品詞推定">品詞推定</h2>
 
 <p>品詞の推定とは文$X$が与えられた時の品詞列$Y$を予測するものです．</p>
@@ -131,6 +133,70 @@ $$ P(X|Y) \approx \prod_{1}^{l} P_E (x_i | y_i) $$
 
 <h2 id="hmmの学習">HMMの学習</h2>
 
+<h3 id="出力確率の計算">出力確率の計算</h3>
+
+<p>$\lambda = (A, B, \pi)$ ($\pi$は事前分布)を与えられたモデルとし，$Y = (Y_0 Y_1 ,&hellip;, Y_{T-1})$を出力記号列とします．出力確率が知りたいので，求めたい値は$P(Y | \lambda)$になります．</p>
+
+<p>$X = (x_0 x_1 ,&hellip;, x_{T-1})$を状態列とすると．出力確率$B$の定義より，</p>
+
+<div style="overflow-x: auto;">
+$$P(Y|X, \lambda) = b_{x_0}(Y_0) b_{x_1}(Y_1) \cdots b_{x_{T-1}}(Y_{T-1})$$
+</div>
+
+<p>となります．また，$\pi$と$A$の定義により，</p>
+
+<div style="overflow-x: auto;">
+$$P(X| \lambda) = \pi_{x_0} a_{x_0, x_1} a_{x_1, x_2} \cdots a_{x_{T-2}, x_{T-1}}$$
+</div>
+
+<p>であるので，</p>
+
+<div style="overflow-x: auto;">
+$$P(Y, X | \lambda) = \frac{P(Y \cap X \cap \lambda)}{P(\lambda)}$$
+
+$$P(Y|X, \lambda) P(X| \lambda) = \frac{P(Y \cap X \cap \lambda)}{P(X \cap \lambda)} \cdot \frac{P(X \cap \lambda)}{P(\lambda)} = \frac{P(Y \cap X \cap \lambda)}{P(\lambda)}$$
+</div>
+
+<p>となり，</p>
+
+<div style="overflow-x: auto;">
+$$P(Y, X | \lambda) = P(Y| X, \lambda) P(X| \lambda)$$
+</div>
+
+<p>を得ます．これを$X$について周辺化することで，$P(Y| \lambda)$を得ることができます．</p>
+
+<p>しかし，これを計算するには，膨大な時間がかかるため($O(TN^T)$)，HMMでは，forwardアルゴリズムを使用して計算します．</p>
+
+<p>forwardアルゴリズムでは，$t = 0, 1 ,&hellip;, T-1$と，$i=0, 1 ,&hellip;, N-1$に対して，</p>
+
+<div style="overflow-x: auto;">
+$$\alpha (i) = P(Y_0, Y_1,...,Y_t, x_t = q_t | \lambda)$$
+</div>
+
+<p>を用います．$\alpha(i)$はマルコフ状態が$q_i$である$t$時点までに観測された品詞列の確率です．</p>
+
+<p>$\alpha(i)$は以下のように計算されます．</p>
+
+<ol>
+<li>Let $\alpha_0(i) = \pi_i b_i (Y_0), for i = 0, 1, &hellip;, N-1$</li>
+<li>For $t = 1, 2, &hellip;, T-1$ and $i = 0, 1, &hellip;, N-1$, compute</li>
+</ol>
+
+<div style="overflow-x: auto;">
+
+$$\alpha_t(i) = \biggl[ \sum_{j=0}^{N-1} \alpha_{t-1}(j) a_{ji} \biggr] b_i (Y_t) $$
+</div>
+
+<p>$T-1$までこの作業を行うと，以下のように，出力確率が算出されます．</p>
+
+<div style="overflow-x: auto;">
+$$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
+</div>
+
+<h3 id="隠れ状態の推定">隠れ状態の推定</h3>
+
+<h3 id="出力確率を最大化するモデルの推定">出力確率を最大化するモデルの推定</h3>
+
 
 		
 	</div>
@@ -145,7 +211,7 @@ $$ P(X|Y) \approx \prod_{1}^{l} P_E (x_i | y_i) $$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 14:59:41.839291 &#43;0900 JST m=&#43;0.064043170">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 18:07:20.816536 &#43;0900 JST m=&#43;0.060141653">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
