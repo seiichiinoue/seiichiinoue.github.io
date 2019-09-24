@@ -252,6 +252,44 @@ $$\gamma_t(i, j) = \frac{\alpha_t(i) a_{ij} b_j (Y_{t+1}) \beta_{t+1} (j)}{P(Y |
 $$\gamma_t(i) = \sum_{j=0}^{N-1} \gamma_t(i, j)$$
 </div>
 
+<p>$\gamma$とdi-gammaが与えられたので，$\lambda = (A, B, \pi)$は以下のように推定することができます．</p>
+
+<p>$i = 0, 1, &hellip;, N-1$に対して，</p>
+
+<div style="overflow-x: auto;">
+$$\pi_i = \gamma_0(i)$$
+</div>
+
+<p>$i = 0, 1, &hellip;, N-1$と，$j = 0, 1, &hellip;, N-1$に対して以下のように$a_{ij}$を計算する</p>
+
+<div style="overflow-x: auto;">
+$$a_{ij} = \sum_{t=0}^{T-2} \gamma_t(i, j) / \sum_{t=0}^{T-2} \gamma_t(i)$$
+</div>
+
+<p>$j = 0, 1, &hellip;, N-1$と$k = 0, 1, &hellip;, M-1$に対して以下のように$b_j(k)$を計算する</p>
+
+<div style="overflow-x: auto;">
+$$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1} \gamma_t(j)$$
+</div>
+
+<p>$a_{ij}$の推定式の分子は，状態$q_i$から$q_j$への遷移の期待値を表しており，分母は，状態$q_i$からあらゆる状態への遷移の期待値を表しています．</p>
+
+<p>また，$b_{jk}$の推定式の分子は，$Y=k$の時にモデルが隠れ状態$q_j$だった回数の期待値，分母は，モデルが隠れ状態$q_j$だった回数の期待値を表しています．</p>
+
+<p>これまでの過程をまとめると，モデルの推定は以下のように行うことができます．</p>
+
+<ol>
+<li><p>$\lambda = (A, B, \pi)$を初期化</p></li>
+
+<li><p>$\alpha_t(i), \, \beta_t(i), \, \gamma_t(i, j), \, \gamma_t(i)$を計算する</p></li>
+
+<li><p>$\lambda = (A, B, \pi)$を再推定する</p></li>
+
+<li><p>$P(Y | \lambda)$が上昇すれば，2に戻る．</p></li>
+</ol>
+
+<h2 id="viterbiアルゴリズム">Viterbiアルゴリズム</h2>
+
 
 		
 	</div>
@@ -266,7 +304,7 @@ $$\gamma_t(i) = \sum_{j=0}^{N-1} \gamma_t(i, j)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 21:03:29.063398 &#43;0900 JST m=&#43;0.055593279">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 22:52:32.092722 &#43;0900 JST m=&#43;0.071303718">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
