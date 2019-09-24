@@ -170,16 +170,16 @@ $$P(Y, X | \lambda) = P(Y| X, \lambda) P(X| \lambda)$$
 <p>forwardアルゴリズムでは，$t = 0, 1 ,&hellip;, T-1$と，$i=0, 1 ,&hellip;, N-1$に対して，</p>
 
 <div style="overflow-x: auto;">
-$$\alpha (i) = P(Y_0, Y_1,...,Y_t, x_t = q_t | \lambda)$$
+$$\alpha_t (i) = P(Y_0, Y_1,...,Y_t, x_t = q_i | \lambda)$$
 </div>
 
-<p>を用います．$\alpha(i)$はマルコフ状態が$q_i$である$t$時点までに観測された品詞列の確率です．</p>
+<p>を用います．$\alpha(i)$はマルコフ状態が$q_i$である$t$時点までに観測された文字列の確率です．</p>
 
 <p>$\alpha(i)$は以下のように計算されます．</p>
 
 <ol>
-<li>$i = 1, 2, &hellip;, N-1$ に対して， $\alpha_0(i) = \pi_i b_i (Y_0)$ とする．</li>
-<li>$t = 1, 2, &hellip;, T-1$ と $i = 0, 1, &hellip;, N-1$ に対して，以下を計算する．</li>
+<li>$i = 0, 1, &hellip;, N-1$ に対して， $\alpha_0(i) = \pi_i b_i (Y_0)$ とする．</li>
+<li>$t = 0, 1, &hellip;, T-1$ と $i = 0, 1, &hellip;, N-1$ に対して，以下を計算する．</li>
 </ol>
 
 <div style="overflow-x: auto;">
@@ -197,6 +197,39 @@ $$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
 
 <h3 id="隠れ状態の推定">隠れ状態の推定</h3>
 
+<p>モデルと文字列が与えられた時，最も尤もらしい隠れ状態の列を知るために，HMMでは動的計画法を用いたbackwardアルゴリズムを使用します．</p>
+
+<p>backwardアルゴリズムでは，出力確率の計算の時と同様に$t = 0, 1, &hellip;, T-1$と，$i=0, 1, &hellip;, N-1$に対して，</p>
+
+<div style="overflow-x: auto;">
+$$\beta_t(i) = P(Y_{t+1}, Y_{t+2}, Y_{T-1}, x_t = q_i | \lambda)$$
+</div>
+
+<p>を定義します．$\beta(i)$は以下のように計算されます．</p>
+
+<ol>
+<li>$i = 0, 1, &hellip;, N-1$に対して，$\beta_{T-1}(i) = 1$とする．</li>
+<li>$t = t-2, t-3, &hellip;, 0$ と $i=0, 1, &hellip;, N-1$に対して，以下を計算する．</li>
+</ol>
+
+<div style="overflow-x: auto;">
+$$\beta_t(i) = \sum_{j=0}^{N-1} a_{ij} b_j (Y_{t+1}) \beta_{t+1}(j)$$
+</div>
+
+<p>$t = 0, 1, &hellip;, T-1$ と $i=0, 1, &hellip;, N-1$に対して，</p>
+
+<div style="overflow-x: auto;">
+$$\gamma_t(i) = P(x_t = q_i | Y, \lambda)$$
+</div>
+
+<p>を定義する．また，$\alpha_t(i)$は$t$時点までの確率，$\beta_t(i)$は$t$時点以降の確率になっていることから，</p>
+
+<div style="overflow-x: auto;">
+$$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
+</div>
+
+<p>であり（分母の$P(Y | \lambda)$は$\alpha_{T-1}(i)$を$i$で周辺化すれば得られます），この$\gamma$を最大化するように隠れ状態を決定すれば良いことになります．</p>
+
 <h3 id="出力確率を最大化するモデルの推定">出力確率を最大化するモデルの推定</h3>
 
 
@@ -213,7 +246,7 @@ $$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 18:28:42.977548 &#43;0900 JST m=&#43;0.067301302">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 19:29:21.513294 &#43;0900 JST m=&#43;0.054505573">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
