@@ -93,13 +93,13 @@ argmax_{Y} P(Y | X) &= argmax_{Y} \frac{P(X|Y)P(Y)}{P(X)} \\
 <p>品詞から品詞への遷移確率は，</p>
 
 <div style="overflow-x: auto;">
-$$ P(Y) \approx \prod_{i=1}^{l+1} P_T (y_i | y_{i-1}) $$
+$$ P(S) \approx \prod_{i=1}^{l+1} P_T (s_i | s_{i-1}) $$
 </div>
 
 <p>となり，品詞から単語の出力確率は，</p>
 
 <div style="overflow-x: auto;">
-$$ P(X|Y) \approx \prod_{1}^{l} P_E (x_i | y_i) $$
+$$ P(Y|S) \approx \prod_{1}^{l} P_E (y_i | s_i) $$
 </div>
 
 <p>となります．</p>
@@ -361,7 +361,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 23:59:23.863152 &#43;0900 JST m=&#43;0.066477243">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-25 03:06:17.390414 &#43;0900 JST m=&#43;0.179172342">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
