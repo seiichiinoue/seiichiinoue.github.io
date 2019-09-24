@@ -102,6 +102,35 @@ $$ P(X|Y) \approx \prod_{1}^{l} P_E (x_i | y_i) $$
 
 <p>となります．</p>
 
+<p>またHMMでは，遷移確率$A$と出力確率$B$を次のように表します．</p>
+
+<div style="overflow-x: auto;">
+\begin{align}
+    A = \begin{pmatrix}
+            0.1 &0.7 &0.2 \\
+            0.2 &0.1 &0.7 \\
+            0.7 &0.2 &0.1 \\
+        \end{pmatrix}\
+    B = \begin{pmatrix}
+            0.9 &0.1 \\
+            0.6 &0.4 \\
+            0.1 &0.9 \\
+        \end{pmatrix}\
+\end{align}
+</div>
+
+<p>ここでは状態数を3，出力記号数を2としています．実際には上述の通り，状態数は品詞の数になり，出力記号数は，単語数になります．</p>
+
+<p>（遷移確率があらかじめ与えられているのはHMMモデルではなく，ただのマルコフモデルなので，ここでは，上の行列は推定した遷移確率行列と考えてください．）</p>
+
+<p>この行列は行が品詞を表しており，列が遷移先の品詞と出力記号に対応しています．</p>
+
+<p><img src="http://musyoku.github.io/images/post/2017-02-27/markov_transition.png"></p>
+
+<p>簡単のため，図中では時刻$t$を表す添字をつけてありますが，実際は時刻に関係なく同じ行列を使用します．</p>
+
+<h2 id="hmmの学習">HMMの学習</h2>
+
 
 		
 	</div>
@@ -116,7 +145,7 @@ $$ P(X|Y) \approx \prod_{1}^{l} P_E (x_i | y_i) $$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 14:36:04.255064 &#43;0900 JST m=&#43;0.191890244">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 14:59:41.839291 &#43;0900 JST m=&#43;0.064043170">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
