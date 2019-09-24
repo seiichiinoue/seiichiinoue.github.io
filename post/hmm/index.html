@@ -178,7 +178,7 @@ $$\alpha (i) = P(Y_0, Y_1,...,Y_t, x_t = q_t | \lambda)$$
 <p>$\alpha(i)$は以下のように計算されます．</p>
 
 <ol>
-<li>Let $\alpha_0(i) = \pi_i b_i (Y_0), for i = 0, 1, &hellip;, N-1$</li>
+<li>Let $\alpha_0(i) = \pi_i b_i (Y_0)$, $for i = 0, 1, &hellip;, N-1$</li>
 <li>For $t = 1, 2, &hellip;, T-1$ and $i = 0, 1, &hellip;, N-1$, compute</li>
 </ol>
 
@@ -192,6 +192,8 @@ $$\alpha_t(i) = \biggl[ \sum_{j=0}^{N-1} \alpha_{t-1}(j) a_{ji} \biggr] b_i (Y_t
 <div style="overflow-x: auto;">
 $$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
 </div>
+
+<p>以上のforwardアルゴリズムを使用することで，$O(TN^T)$だった計算量が，$O(N^2T)$になります．</p>
 
 <h3 id="隠れ状態の推定">隠れ状態の推定</h3>
 
@@ -211,7 +213,7 @@ $$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 18:07:20.816536 &#43;0900 JST m=&#43;0.060141653">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 18:14:27.946488 &#43;0900 JST m=&#43;0.055795958">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
