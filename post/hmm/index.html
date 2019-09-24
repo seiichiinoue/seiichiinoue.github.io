@@ -53,26 +53,26 @@
 
 <h2 id="品詞推定">品詞推定</h2>
 
-<p>品詞の推定とは文$X$が与えられた時の品詞列$Y$を予測するものです．</p>
+<p>品詞の推定とは文$Y$が与えられた時の品詞列$X$を予測するものです．</p>
 
 <p>実際には，解決策は多くあり，各単語を個別に予測する点予測では，パーセプトロンを用いた<a href="http://www.phontron.com/kytea/">KyTea</a>などがあります．また，系列に対する生成モデルには，隠れマルコフモデルを用いた，<a href="https://chasen-legacy.osdn.jp/">ChaSen</a>などがあります．今回は後者の隠れマルコフモデルを用いた品詞推定の実装を行いました．</p>
 
 <p>モデルでは，文が与えられた場合の最も確率の高いタグ列を計算します．</p>
 
 <div style="overflow-x: auto;">
-$$argmax_{Y} P(Y | X)$$
+$$argmax_{X} P(X | Y)$$
 </div>
 
 <p>これをベイズ則で分解します．</p>
 
 <div style="overflow-x: auto;">
 \begin{aligned}
-argmax_{Y} P(Y | X) &= argmax_{Y} \frac{P(X|Y)P(Y)}{P(X)} \\
-&= argmax_{Y} P(X|Y)P(Y)
+argmax_{X} P(X | Y) &= argmax_{X} \frac{P(Y|X)P(X)}{P(Y)} \\
+&= argmax_{X} P(Y|X)P(X)
 \end{aligned}
 </div>
 
-<p>すると，第2式の$P(X|Y)$は，単語と品詞の関係を考慮しており，$P(Y)$は前の品詞と次の品詞の関係を考慮しているものと解釈することができます．</p>
+<p>すると，第2式の$P(Y|X)$は，単語と品詞の関係を考慮しており，$P(X)$は前の品詞と次の品詞の関係を考慮しているものと解釈することができます．</p>
 
 <p>これが系列に対する生成モデルになります．</p>
 
@@ -359,7 +359,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-25 03:09:18.529356 &#43;0900 JST m=&#43;0.072372450">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-25 03:18:53.612039 &#43;0900 JST m=&#43;0.060363609">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
