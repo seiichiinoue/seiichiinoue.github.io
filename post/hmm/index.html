@@ -236,6 +236,22 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 
 <p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下の&rdquo;di-gamma&rdquo;を定義します．</p>
 
+<div style="overflow-x: auto;">
+$$\gamma_t(i, j) = P(x_t = q_i, x_{t+1} = q_j | Y, \lambda)$$
+</div>
+
+<p>よって$\gamma(i, j)$は，時刻$t$に$q_i$となり，時刻$t+1$に$q_j$に遷移する確率です．そしてdi-gammaは$\alpha, \, \beta, \, A, \, B$を用いて，以下のように表すことができます．</p>
+
+<div style="overflow-x: auto;">
+$$\gamma_t(i, j) = \frac{\alpha_t(i) a_{ij} b_j (Y_{t+1}) \beta_{t+1} (j)}{P(Y | \lambda)}$$
+</div>
+
+<p>また，$t = 0, 1, &hellip;, T-2$において$\gamma_t(i)$と$\gamma_t(i, j)$の間には以下の関係があります．</p>
+
+<div style="overflow-x: auto;">
+$$\gamma_t(i) = \sum_{j=0}^{N-1} \gamma_t(i, j)$$
+</div>
+
 
 		
 	</div>
@@ -250,7 +266,7 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-24 20:02:54.509246 &#43;0900 JST m=&#43;0.056021069">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-24 21:03:29.063398 &#43;0900 JST m=&#43;0.055593279">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
