@@ -12,9 +12,9 @@
   		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
 		
-		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/images/favicon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
         
-		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/images/favicon.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
         
 		
 		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
@@ -82,7 +82,7 @@ argmax_{X} P(X | Y) &= argmax_{X} \frac{P(Y|X)P(X)}{P(Y)} \\
 
 <p>図で表すと以下のような動作になります．</p>
 
-<p><img src="http://musyoku.github.io/images/post/2017-02-27/markov_model.png"></p>
+<p><img src="https://seiichiinoue.github.io/img/markov_model.png"></p>
 
 <p>まず，初期状態を表す特殊な状態から$s_{t-1}$に遷移します．遷移したら$p(y|s_{t-1})$から出力記号を生成し，出力します．</p>
 
@@ -127,7 +127,7 @@ $$ P(Y|S) \approx \prod_{i=1}^{l} P_E (y_i | s_i) $$
 
 <p>この行列は行が品詞を表しており，列が遷移先の品詞と出力記号に対応しています．</p>
 
-<p><img src="http://musyoku.github.io/images/post/2017-02-27/markov_transition.png"></p>
+<p><img src="https://seiichiinoue.github.io/img/markov_transition.png"></p>
 
 <p>簡単のため，図中では時刻$t$を表す添字をつけてありますが，実際は時刻に関係なく同じ行列を使用します．</p>
 
@@ -381,7 +381,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-09-27 17:58:15.909348 &#43;0900 JST m=&#43;0.181684427">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-09-27 19:13:53.055409 &#43;0900 JST m=&#43;0.068337565">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
