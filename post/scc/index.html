@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				自作C(風)コンパイラの作成 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-10-04 16:57:07 &#43;0900 JST">October 4, 2019</time>
+</div>
+
+		<h1 class="post-title">自作C(風)コンパイラの作成</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="結果">結果</h2>
+
+<p>最近は空き時間を見つけては自作コンパイラの実装を進めるをしていました．結果，以下のような簡単なコードをコンパイルできるようになりました．コンパイラとはいっても，ソースコードの構文を解析して，中間パスを作ってアセンブリのコードを吐くものです．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span> 
+<span class="p">}</span> 
+
+<span class="n">fib</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">&lt;=</span><span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nf">fib</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>ちゃんと<code>55</code>って帰ってきます．すごい．</p>
+
+<h2 id="作成方法">作成方法</h2>
+
+<p>基本的にはRui Ueyamaさんの<a href="https://www.sigbus.info/compilerbook">低レイヤを知りたい人のためのCコンパイラ作成入門</a>を参考にしながら作成しました．あとはちょくちょく調べながら．</p>
+
+<p>また，私が作ったコンパイラは以下のような感じで動作しています．</p>
+
+<h3 id="入力文字列をトークン列に分解する">入力文字列をトークン列に分解する．</h3>
+
+<p>簡単に言えば入力の文字列に含まれているスペースを取り除いて意味のある文字列単位で分割を行う作業です．</p>
+
+<p>例えば，上の</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="n">fib</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> 
+<span class="p">}</span></code></pre></div>
+<p>というコードは，<code>fib</code>, <code>(</code>, <code>x</code>, <code>)</code>, <code>{</code>,&hellip;, <code>}</code>のように分解する，といった作業になります．</p>
+
+<h3 id="トークン列を解析して意味構造を作る">トークン列を解析して意味構造を作る</h3>
+
+<p>生成規則を用いて文法を定義します．生成規則を用いた意味構造は木で表現され，木を抽象構文木といいます．たとえば，<code>1+2*3</code>という数式の場合，以下のような構文木になります．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/ast.svg"></p>
+
+<p>しかし，コンパイラにおけるパーサが果たしたい役割は，&rdquo;生成規則に則ってコードを生成すること&rdquo;ではなく，&rdquo;展開すると入力の文字列になる展開手順，すなわち構文木の構造を知る&rdquo;ことです．</p>
+
+<p>そのため，パーサでは，一つ一つの非終端記号を関数（木におけるノード）にマップしていく形で実装をします．</p>
+
+<p>上述の数式の場合は，以下ような関数の呼び出し関係となっています．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/graph.svg"></p>
+
+<h3 id="アセンブリの出力">アセンブリの出力</h3>
+
+<p>トークナイズとパースができたら，あとはアセンブリを出力するだけです．意味構造を対応する命令に変換して出力します．</p>
+
+<h2 id="感想">感想</h2>
+
+<p>めちゃくちゃ勉強になります．あと，データ構造の大切さをとても感じました．目標はセルフホストのコンパイラなので，引き続き実装していきたいと思います．（Cを実際にコンパイルできるようになれたら嬉しいな）</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/hmm/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-10-06 04:36:45.633756 &#43;0900 JST m=&#43;0.069853021">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
