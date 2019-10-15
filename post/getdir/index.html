@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				C&#43;&#43;でディレクトリ下のファイル一覧を取得する &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-10-16 08:39:34 &#43;0900 JST">October 16, 2019</time>
+</div>
+
+		<h1 class="post-title">C&#43;&#43;でディレクトリ下のファイル一覧を取得する</h1>
+<div class="post-line"></div>
+
+		
+
+		<p>C言語の<code>readdir</code>を利用する．これは，<code>dirent.h</code>で定義されてるのでインクルードしておく．</p>
+
+<p>以下のように使える．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;cstdlib&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;dirent.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">path</span> <span class="o">=</span> <span class="s">&#34;./&#34;</span><span class="p">;</span>
+    <span class="n">DIR</span> <span class="o">*</span><span class="n">dp</span><span class="p">;</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">opendir</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dp</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">dirent</span><span class="o">*</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">path</span> <span class="o">&lt;&lt;</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">d_name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ g++ a.cpp
+$ ./a.out
+./.
+./..
+./a.cpp</code></pre></div>
+<p>Linux系のOSであれば<code>dirent</code>構造体に<code>d_type</code>というメンバがあるらしい．通常のファイルであれば<code>DT_REG</code>が与えられ，ディレクトリであれば<code>DT_DIR</code>が与えられる．プログラムをマルチプラットフォームで使いたいのであれば<code>d_ino</code>(<code>inode</code>番号)と<code>d_name</code>(ファイル名)以外は使うべきではない．</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/scc/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-10-16 08:45:35.668753 &#43;0900 JST m=&#43;0.093349095">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>

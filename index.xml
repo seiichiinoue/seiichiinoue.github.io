@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 04 Oct 2019 16:57:07 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 16 Oct 2019 08:39:34 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>C&#43;&#43;でディレクトリ下のファイル一覧を取得する</title>
+      <link>https://seiichiinoue.github.io/post/getdir/</link>
+      <pubDate>Wed, 16 Oct 2019 08:39:34 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/getdir/</guid>
+      <description>C言語のreaddirを利用する．これは，dirent.hで定義されてるのでインクルードしておく． 以下のように使える． #include &amp;lt;iostream&amp;gt;#include &amp;lt;cstdlib&amp;gt;#include &amp;lt;dirent.h&amp;gt; int main() { const char* path =</description>
+    </item>
     
     <item>
       <title>自作C(風)コンパイラの作成</title>
