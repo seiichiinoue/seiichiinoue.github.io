@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				Boost.Pythonを使う &middot; いのうの作業ログ
+				boost-pythonを使う &middot; いのうの作業ログ
 		</title>
 
 		
@@ -42,7 +42,7 @@
         <time datetime="2019-10-19 13:30:08 &#43;0900 JST">October 19, 2019</time>
 </div>
 
-		<h1 class="post-title">Boost.Pythonを使う</h1>
+		<h1 class="post-title">boost-pythonを使う</h1>
 <div class="post-line"></div>
 
 		
@@ -51,7 +51,7 @@
 
 <h2 id="経緯">経緯</h2>
 
-<p>最近はトピックモデルの実装をしていて，計算量の都合上C++で実装していたんですが，学習後の潜在座標を可視化するのに，Pythonのプロットツールを使えないかと思い，モデルのPythonラッパーを書いてみようということでBoostを使ってみることにしました．</p>
+<p>最近実装しているトピックモデルは，計算量の都合上C++で書いていたんですが，学習後の潜在座標を可視化するのに，Pythonのプロットツールを使えないかと思い，モデルのPythonラッパーを書いてみようということでBoostを使ってみることにしました．</p>
 
 <p>トピックモデルの実装については後日またブログに実験結果と解説記事を掲載する予定です．</p>
 
@@ -61,13 +61,13 @@
 
 <p>注意すべき点としては，brewでビルドされるライブラリは基本的にmac標準搭載のもの（今回はPythonに依存しているのでPythonのバージョンはmac標準の2.7）になります．なので，<code>boost-python</code>ではなく，<code>boost-python3</code>を指定してインストールしなければいけません．</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ brew install boost-python3</code></pre></div>
-<p>多分これで入ってるはずです．無事インストールが完了していたら，<code>/usr/local/lib</code>下に<code>libboost_python3x</code>（xはインストールに使用したbrewでインストールしているpython3.xのバージョン）が存在しているはず．</p>
+<p>多分これで入ってるはずです．無事インストールが完了していたら，<code>/usr/local/lib</code>下に<code>libboost_python3x</code>（xはインストールに使用したbrewでインストールしているpython3.xのバージョン）が存在しているはずです．ここで表示された<code>.a</code>というライブラリをコンパイル時に指定します．</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ls /usr/local/lib <span class="p">|</span> grep libboost_python3.x
 libboost_python37-mt.a
 libboost_python37-mt.dylib
 libboost_python37.a
 libboost_python37.dylib</code></pre></div>
-<p>次に，<code>pyconfig.h</code>の場所を確認します．（これをリンクしてあげないとリンクエラーが出てしまう）</p>
+<p>次に，boost-pythonを使うには，pythonのconfigファイルのパスを通してあげないといけないようなので，<code>pyconfig.h</code>の場所を確認します．（これをリンクしてあげないとリンクエラーが出てしまう）</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ find /usr/local -name pyconfig.h
 /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/include/python2.7/pyconfig.h
 /usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/pyconfig.h
@@ -79,10 +79,11 @@ libboost_python37.dylib</code></pre></div>
 
 <h2 id="使用例">使用例</h2>
 
-<p>それでは実際にBoost.Pythonを使って見ましょう．何ができるかを簡単にいうと，C++で書いた関数やクラスをpython側で呼び出すことができるというものです．他にも<code>&lt;python.h&gt;</code>を使った方法など色々あるらしいですが，便利そうだったBoostを使うことにしました．</p>
+<p>それでは実際にboost-pythonを使って見ましょう．何ができるかを簡単にいうと，C++で書いた関数やクラスをpython側で呼び出すことができるというものです．他にも<code>&lt;python.h&gt;</code>を使った方法など色々あるらしいですが，便利そうだったBoostを使うことにしました．</p>
 
 <p>とりあえず簡単なものから．以下のような2つの数を足す簡単な関数をpythonから呼び出せるようにします．</p>
-<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">v1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v2</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;boost/python&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">v1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v2</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -114,7 +115,7 @@ libboost_python37.dylib</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-10-20 02:03:54.200235 &#43;0900 JST m=&#43;0.213946045">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-10-20 03:30:31.720257 &#43;0900 JST m=&#43;0.209034028">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

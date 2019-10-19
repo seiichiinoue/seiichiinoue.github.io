@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>Boost.Pythonを使う</title>
+      <title>boost-pythonを使う</title>
       <link>https://seiichiinoue.github.io/post/boost/</link>
       <pubDate>Sat, 19 Oct 2019 13:30:08 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/boost/</guid>
-      <description>経緯 最近はトピックモデルの実装をしていて，計算量の都合上C++で実装していたんですが，学習後の潜在座標を可視化するのに，Pythonのプロッ</description>
+      <description>経緯 最近実装しているトピックモデルは，計算量の都合上C++で書いていたんですが，学習後の潜在座標を可視化するのに，Pythonのプロットツー</description>
     </item>
     
     <item>
