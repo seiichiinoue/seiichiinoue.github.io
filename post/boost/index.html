@@ -75,7 +75,11 @@ libboost_python37.dylib</code></pre></div>
 /usr/local/Cellar/pypy3/7.1.1/libexec/include/pyconfig.h</code></pre></div>
 <p>これを(bash | zsh).rcか何かにexportしてあげて，</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">CPLUS_INCLUDE_PATH</span><span class="o">=</span><span class="s2">&#34;CPLUS_INCLUDE_PATH:/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/&#34;</span></code></pre></div>
-<p>完了です．それでは実際にBoost.Pythonを使って見ましょう．何ができるかを簡単にいうと，C++で書いた関数やクラスをpython側で呼び出すことができるというものです．他にも<code>&lt;python.h&gt;</code>を使った方法など色々あるらしいですが，便利そうだったBoostを使うことにしました．</p>
+<p>これで完了です．</p>
+
+<h2 id="使用例">使用例</h2>
+
+<p>それでは実際にBoost.Pythonを使って見ましょう．何ができるかを簡単にいうと，C++で書いた関数やクラスをpython側で呼び出すことができるというものです．他にも<code>&lt;python.h&gt;</code>を使った方法など色々あるらしいですが，便利そうだったBoostを使うことにしました．</p>
 
 <p>とりあえず簡単なものから．以下のような2つの数を足す簡単な関数をpythonから呼び出せるようにします．</p>
 <div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">v1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v2</span><span class="p">)</span> <span class="p">{</span>
@@ -110,7 +114,7 @@ libboost_python37.dylib</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-10-19 14:20:29.481296 &#43;0900 JST m=&#43;0.174937760">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-10-19 14:22:53.673936 &#43;0900 JST m=&#43;0.175382905">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
