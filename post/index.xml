@@ -6,10 +6,19 @@
     <description>Recent content in Posts on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 16 Oct 2019 08:39:34 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 19 Oct 2019 13:30:08 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Boost.Pythonを使う</title>
+      <link>https://seiichiinoue.github.io/post/boost/</link>
+      <pubDate>Sat, 19 Oct 2019 13:30:08 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/boost/</guid>
+      <description>経緯 最近はトピックモデルの実装をしていて，計算量の都合上C++で実装していたんですが，学習後の潜在座標を可視化するのに，Pythonのプロッ</description>
+    </item>
     
     <item>
       <title>C&#43;&#43;でディレクトリ下のファイル一覧を取得する</title>

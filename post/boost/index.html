@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				Boost.Pythonを使う &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-10-19 13:30:08 &#43;0900 JST">October 19, 2019</time>
+</div>
+
+		<h1 class="post-title">Boost.Pythonを使う</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="経緯">経緯</h2>
+
+<p>最近はトピックモデルの実装をしていて，計算量の都合上C++で実装していたんですが，学習後の潜在座標を可視化するのに，Pythonのプロットツールを使えないかと思い，モデルのPythonラッパーを書いてみようということでBoostを使ってみることにしました．</p>
+
+<p>トピックモデルの実装については後日またブログに実験結果と解説記事を掲載する予定です．</p>
+
+<h2 id="ビルド">ビルド</h2>
+
+<p>自分はMacOSで開発を行っているので，HomeBrewを使用してビルドしました．（めちゃくちゃ簡単）</p>
+
+<p>注意すべき点としては，brewでビルドされるライブラリは基本的にmac標準搭載のもの（今回はPythonに依存しているのでPythonのバージョンはmac標準の2.7）になります．なので，<code>boost-python</code>ではなく，<code>boost-python3</code>を指定してインストールしなければいけません．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ brew install boost-python3</code></pre></div>
+<p>多分これで入ってるはずです．無事インストールが完了していたら，<code>/usr/local/lib</code>下に<code>libboost_python3x</code>（xはインストールに使用したbrewでインストールしているpython3.xのバージョン）が存在しているはず．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ls /usr/local/lib <span class="p">|</span> grep libboost_python3.x
+libboost_python37-mt.a
+libboost_python37-mt.dylib
+libboost_python37.a
+libboost_python37.dylib</code></pre></div>
+<p>次に，<code>pyconfig.h</code>の場所を確認します．（これをリンクしてあげないとリンクエラーが出てしまう）</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ find /usr/local -name pyconfig.h
+/usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/include/python2.7/pyconfig.h
+/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/pyconfig.h
+/usr/local/Cellar/pypy3/7.1.1/libexec/include/include/pyconfig.h
+/usr/local/Cellar/pypy3/7.1.1/libexec/include/pyconfig.h</code></pre></div>
+<p>これを(bash | zsh).rcか何かにexportしてあげて，</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">CPLUS_INCLUDE_PATH</span><span class="o">=</span><span class="s2">&#34;CPLUS_INCLUDE_PATH:/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/&#34;</span></code></pre></div>
+<p>完了です．それでは実際にBoost.Pythonを使って見ましょう．何ができるかを簡単にいうと，C++で書いた関数やクラスをpython側で呼び出すことができるというものです．他にも<code>&lt;python.h&gt;</code>を使った方法など色々あるらしいですが，便利そうだったBoostを使うことにしました．</p>
+
+<p>とりあえず簡単なものから．以下のような2つの数を足す簡単な関数をpythonから呼び出せるようにします．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">v1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">v2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">BOOST_PYTHON_MODULE</span><span class="p">(</span><span class="n">test</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">python</span><span class="p">;</span>
+    <span class="n">def</span><span class="p">(</span><span class="s">&#34;add&#34;</span><span class="p">,</span> <span class="n">add</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>これで完了です．必要なファイルをリンクして，コンパイルします．出力ファイルは<code>.so</code>とします．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ clang++ -Wall -DPIC -shared -fPIC -o test.so test.cpp -lboost_python37 -I/usr/local/lib <span class="sb">`</span>python3-config --include<span class="sb">`</span> <span class="sb">`</span>python3-config --ldflags<span class="sb">`</span> </code></pre></div>
+<p>コンパイルが完了したら，pythonから関数を呼び出してみます．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ python3
+&gt;&gt;&gt; import <span class="nb">test</span>
+&gt;&gt;&gt; test.add<span class="o">(</span><span class="m">1</span>, <span class="m">2</span><span class="o">)</span>
+<span class="m">3</span></code></pre></div>
+<p>こんな感じで，簡単にラッパーを作ることができます．以上．</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/getdir/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-10-19 14:20:29.481296 &#43;0900 JST m=&#43;0.174937760">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
