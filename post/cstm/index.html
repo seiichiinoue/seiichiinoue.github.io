@@ -49,9 +49,9 @@
 
 		
 
-<p><a href="http://chasen.org/~daiti-m/paper/nl213cstm.pdf">Continuous Space Topic Model</a>はガウス過程を用いて単語の潜在座標を表現するトピックモデルです．実装は<a href="https://github.com/seiichiinoue/cstm">seiichiinoue/cstm</a>にあります．</p>
+<p>ガウス過程に基づく連続空間トピックモデル(CSTM)はガウス過程を用いて単語の潜在座標を表現するトピックモデルです．実装は<a href="https://github.com/seiichiinoue/cstm">seiichiinoue/cstm</a>にあります．</p>
 
-<p>今回は，論文の調査と実装をした上で，某鎌倉語を使用した学習モデルの単語ベクトル，文書ベクトルの可視化を行いました．</p>
+<p>今回は，論文の調査と実装をした上で，某鎌倉語を使用した学習モデルの単語ベクトル，文書ベクトルの可視化を行いました．論文は<a href="http://chasen.org/~daiti-m/paper/nl213cstm.pdf">こちら</a>．</p>
 
 <h2 id="トピックモデル">トピックモデル</h2>
 
@@ -67,12 +67,14 @@
 
 <h2 id="cstmの考え方">CSTMの考え方</h2>
 
-<p>CSTMでは，単語に潜在空間における座標を明示的に与えており，各単語$w$が$d$次元の潜在座標$\phi(w) \tilde N(0, I_d)$を持っていると仮定します．つまり各単語は$d$次元のベクトルで表現され，そのベクトルのそれぞれの要素は，平均0，分散1の正規分布に従います．</p>
+<p>CSTMでは，単語に潜在空間における座標を明示的に与えており，各単語$w$が$d$次元の潜在座標$\phi(w) \sim N(0, I_d)$を持っていると仮定します．つまり各単語は$d$次元のベクトルで表現され，そのベクトルのそれぞれの要素は，平均0，分散1の正規分布に従います．</p>
 
-<p>次に，意味的に関連のある単語の確率を同時に大きくするために，下図のような，カーネル行列$K$，平均$0$のガウス過程</p>
+<p><img src="https://seiichiinoue.github.io/img/gauss.png"></p>
+
+<p>次に，意味的に関連のある単語の確率を同時に大きくするために，上図のような，カーネル関数(線型カーネル)$K_{i, j} = k(w_i, w_j)$，平均$0$のガウス過程</p>
 
 <div style="overflow-x: auto;">
-$$f \tilde GP(0, K)$$
+$$f \sim GP(0, K)$$
 </div>
 
 <p>を<strong>文書ごと</strong>に考え，文書$d$における単語の確率を以下のようにモデル化します．</p>
@@ -81,15 +83,17 @@ $$f \tilde GP(0, K)$$
 $$p_d(w_k) \propto e^{f_d (w_k)} G_0(w_k)$$
 </div>
 
-<p><img src="https://seiichiinoue.github.io/img/gauss.png"></p>
-
 <p>ここで，$f_d$は，実際には次元数が語彙数と同じガウス分布で，単語$w_k$に対応する$f_d(w_k)$は異なる値になりますが，平均は$0$になります．また$G_0(w_k)$は単語$w_k$のデフォルト確率を表しており，最尤推定値</p>
 
 <div style="overflow-x: auto;">
-$$G_0 (w_k) = n(w_k) / \Sigma_w n(w_k)$$
+$$G_0 (w_k) = \frac{n(w_k)}{\Sigma_w n(w_k)}$$
 </div>
 
 <p>と考えます．</p>
+
+<p>単語の確率となる$p_d (w_k)$は，文書ごとの倍率である$e^{f_d (w_k)}$とデフォルト確率$G_0(w_k)$を掛け合わせたものと解釈することができ，論文によると$f_d (w_k)$はおおよそ$-9 \leq f_d (w_k) \leq 9$をとるため，$e^{f_d (w_k)}$は$e^{-9} \leq e^{f_d (w_k)} \leq e^9$の範囲の値になるらしいです．</p>
+
+<p>このようにモデル化することで，文書全体ではほとんど出現しないが，特定の文書にだけ高頻度で出現するような単語であっても文書ごとに確率を変動させることで適切な確率を与えることができます．</p>
 
 
 		
@@ -105,7 +109,7 @@ $$G_0 (w_k) = n(w_k) / \Sigma_w n(w_k)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-10-23 02:03:15.002625 &#43;0900 JST m=&#43;0.211534211">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-10-23 02:24:38.20741 &#43;0900 JST m=&#43;0.179348654">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
