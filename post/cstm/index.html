@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				Continuous Space Topic Modelの実装 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-10-23 01:32:07 &#43;0900 JST">October 23, 2019</time>
+</div>
+
+		<h1 class="post-title">Continuous Space Topic Modelの実装</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p><a href="http://chasen.org/~daiti-m/paper/nl213cstm.pdf">Continuous Space Topic Model</a>はガウス過程を用いて単語の潜在座標を表現するトピックモデルです．実装は<a href="https://github.com/seiichiinoue/cstm">seiichiinoue/cstm</a>にあります．</p>
+
+<p>今回は，論文の調査と実装をした上で，某鎌倉語を使用した学習モデルの単語ベクトル，文書ベクトルの可視化を行いました．</p>
+
+<h2 id="トピックモデル">トピックモデル</h2>
+
+<p>今回実装したCSTMもトピックモデルの一種です．まずは，トピックモデルとはどのようなものなのか，簡単に説明をしてから本題に入っていきたいと思います．</p>
+
+<p>トピックモデルは，様々な離散データに隠れた潜在的なトピックを推定するモデルです．ここでいうトピックとは，文書や会話における話題，分野などの大雑把な&rdquo;意味&rdquo;のようなものを表しています．</p>
+
+<p>トピックモデルにおいて，文書は複数の潜在的なトピックから確率的に生成されていると仮定されており，また，単語はトピックが持つ確率分布に従って出現していると仮定しています．</p>
+
+<p>これは，一つのトピックから全ての単語が生成されると仮定するユニグラムモデルや，各文書に1つのトピックがあり，そのトピックから文書内の単語が生成されていると仮定する混合ユニグラムモデルに比べて，細かい仮定を置いていることになり，それによって，文書の特徴を把握することや，文書間の差異を定量的に図ることができるようになりました．</p>
+
+<p>とりあえず，&rdquo;文書の内容&rdquo;や，&rdquo;文書群に存在する話題&rdquo;，また&rdquo;単語の大体の意味&rdquo;のようなものをデータから自動的に学習するもの，と考えておくと良いでしょう．</p>
+
+<h2 id="cstmの考え方">CSTMの考え方</h2>
+
+<p>CSTMでは，単語に潜在空間における座標を明示的に与えており，各単語$w$が$d$次元の潜在座標$\phi(w) \tilde N(0, I_d)$を持っていると仮定します．つまり各単語は$d$次元のベクトルで表現され，そのベクトルのそれぞれの要素は，平均0，分散1の正規分布に従います．</p>
+
+<p>次に，意味的に関連のある単語の確率を同時に大きくするために，下図のような，カーネル行列$K$，平均$0$のガウス過程</p>
+
+<div style="overflow-x: auto;">
+$$f \tilde GP(0, K)$$
+</div>
+
+<p>を<strong>文書ごと</strong>に考え，文書$d$における単語の確率を以下のようにモデル化します．</p>
+
+<div style="overflow-x: auto;">
+$$p_d(w_k) \propto e^{f_d (w_k)} G_0(w_k)$$
+</div>
+
+<p><img src="https://seiichiinoue.github.io/img/gauss.png"></p>
+
+<p>ここで，$f_d$は，実際には次元数が語彙数と同じガウス分布で，単語$w_k$に対応する$f_d(w_k)$は異なる値になりますが，平均は$0$になります．また$G_0(w_k)$は単語$w_k$のデフォルト確率を表しており，最尤推定値</p>
+
+<div style="overflow-x: auto;">
+$$G_0 (w_k) = n(w_k) / \Sigma_w n(w_k)$$
+</div>
+
+<p>と考えます．</p>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/boost/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-10-23 02:03:15.002625 &#43;0900 JST m=&#43;0.211534211">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
