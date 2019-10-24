@@ -98,7 +98,7 @@ $$G_0 (w_k) = \frac{n(w_k)}{\Sigma_w n(w_k)}$$
 <p>しかし，実際のところ，言語には単語が一度出現すると，その後現れやすくなるというバースト性があり，この影響をモデル化するために，単語の確率に，$p_d (w_k)$ではなく，次のようなDirichlet Compound Multinomial(DCM)を用います．</p>
 
 <div style="overflow-x: auto;">
-$$p_d(w | \alpha_d, n_d) = \frac{\gamma (\Sigma_k \alpha_{d, k})}{\gamma (\Sigma_k \alpha_{d, k} + n_{d, k})} \prod_k \frac{\gamma (\alpha_{d, k} + n_{d, k})}{\gamma \alpha_{d, k}}$$
+$$p_d(w | \alpha_d, n_d) = \frac{\Gamma (\Sigma_k \alpha_{d, k})}{\Gamma (\Sigma_k \alpha_{d, k} + n_{d, k})} \prod_k \frac{\Gamma (\alpha_{d, k} + n_{d, k})}{\Gamma \alpha_{d, k}}$$
 </div>
 
 <p>ここで，語彙数を$V$とすると，$n_d = (n_{d, 1}, n_{d, 2}, &hellip; , n_{d, V})$は文書$d$での各単語の出現頻度です．また，$w = (w_1, w_2, &hellip;, w_V)$は全ての単語です．</p>
@@ -291,7 +291,7 @@ doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-10-24 15:02:55.544634 &#43;0900 JST m=&#43;0.176179948">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-10-24 15:21:25.28636 &#43;0900 JST m=&#43;0.065366949">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
