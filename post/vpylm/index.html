@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				econometrics &middot; いのうの作業ログ
+				Pitman-Yor過程に基づく可変長n-gram言語モデルの実装 &middot; いのうの作業ログ
 		</title>
 
 		
@@ -17,7 +17,7 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
         
 		
-		<link href="https://seiichiinoue.github.io/categories/econometrics/index.xml" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
 	</head>
 
     <body>
@@ -36,36 +36,50 @@
         
 
 <main>
-    <h1>Category econometrics</h1>
-	<div class="catalogue">
-		
-			<a href="https://seiichiinoue.github.io/post/tobit/" class="catalogue-item">
-    <div>
-        <time datetime="2019-07-31 00:57:04 &#43;0900 JST" class="catalogue-time">July 31, 2019</time>
-        <h1 class="catalogue-title">トービットモデルにおける逆ミルズ比の解釈</h1>
-        <div class="catalogue-line"></div>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-11-05 10:19:16 &#43;0900 JST">November 5, 2019</time>
+</div>
 
-        <p>
-            計量経済学を勉強している中で，制限従属変数の推定で出てくるミルズ比でちょっとつまずいたのでメモ． データの性質 分析の対象となる従属変数（被説明
-        </p>
-    </div>
-</a>
+		<h1 class="post-title">Pitman-Yor過程に基づく可変長n-gram言語モデルの実装</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>前々回の品詞推定，前回のトピックモデルに続いて今回は言語モデルの実装を行いました．（少し順序が前後してしまいましたが）実装は<a href="https://github.com/seiichiinoue/vpylm">seiichiinoue/vpylm</a>です．</p>
+
+<h2 id="言語モデル">言語モデル</h2>
+
+<h2 id="suffix-tree">Suffix Tree</h2>
+
+<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
+
+<h2 id="vpylm">VPYLM</h2>
+
+<p><img src="https://seiichiinoue.github.io/img/vpylm.png"></p>
+
+<h2 id="学習">学習</h2>
+
+<h2 id="実験">実験</h2>
+
 
 		
 	</div>
-	
+
 	<div class="pagination">
-		
-		
-	
-		<span>1</span>
+		<a href="https://seiichiinoue.github.io/post/cstm/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
 	</div>
 </main>
 
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-08 02:03:58.778663 &#43;0900 JST m=&#43;0.230476547">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-08 02:03:58.720948 &#43;0900 JST m=&#43;0.172761829">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
