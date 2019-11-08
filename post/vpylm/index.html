@@ -99,9 +99,11 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
 <p>よって$P(like | he will)$を求めるときに，ノードheが持つ3-gram確率$P(like | he will)$と，その親ノードwillが持つ2-gram確率$P(like | will)$をうまく補完すれば0ではない値にすることが可能になります．</p>
 
-<p>これがスムージングの考え方で，HPYLでは，Pitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
+<p>これがスムージングの考え方で，HPYLMでは，Pitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
 
 <h2 id="vpylm">VPYLM</h2>
+
+<p>VPYLMは上述の通り，HPYLMを拡張して，HPYLMでは固定で考えていたn-gramオーダーを各単語ごとに推定するようにしたモデルです．</p>
 
 <p><img src="https://seiichiinoue.github.io/img/vpylm.png"></p>
 
@@ -123,7 +125,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 05:44:49.591424 &#43;0900 JST m=&#43;0.164869629">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 05:48:10.806923 &#43;0900 JST m=&#43;0.166106729">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
