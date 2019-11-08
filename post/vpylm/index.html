@@ -49,13 +49,57 @@
 
 		
 
-<p>前々回の品詞推定，前回のトピックモデルに続いて今回は言語モデルの実装を行いました．（少し順序が前後してしまいましたが）実装は<a href="https://github.com/seiichiinoue/vpylm">seiichiinoue/vpylm</a>です．</p>
+<p>前々回の品詞推定，前回のトピックモデルに続いて今回は言語モデルの実装を行いました（少し順序が前後してしまいましたが）．実装は<a href="https://github.com/seiichiinoue/vpylm">seiichiinoue/vpylm</a>です．</p>
 
-<h2 id="言語モデル">言語モデル</h2>
+<p>n-gram言語モデルとは，単語間のマルコフ過程によって文の確率を計算するもので，自然言語処理の様々な場面に適用されてきた，基礎的で重要なモデルです．</p>
 
-<h2 id="suffix-tree">Suffix Tree</h2>
+<p>n-gram言語モデルは，直前の$n-1$個の単語列を状態とした$n-1$次のマルコフモデルによって次の単語の条件付き確率を計算していくものです．この時に，状態数は単語の総数を$V$とすると$V^{n-1}$のオーダーとなり，$n$を1増やすとと総パラメータ数は通常数万倍となり，指数的に爆発します．このため，せいぜい$n = 4, 5$程度が限界であり，それ以上の長い相関は計算問題上取り扱えないという問題がありました．</p>
+
+<p>しかし，実際の言語データには，&rdquo;The United States of America&rdquo;のようなトライグラム（3-gram）を超える長いフレーズや固有名詞が頻出します．そういった問題を解決すべく，単語分割の粒度に依存しないモデルとして提案されたのが，今回のVPYLMです．</p>
+
+<p>ちなみに，上の問題を理論的に解決できなかった理由は，nグラム分布を階層的に生成する確率モデルが存在しなかったためらしいです．しかし，VPYLMの元となっている，HPYLMによって提案された，階層Pitman-Yor過程とよばれるノンパラメトリックな確率過程によって，適切にスムージングされたnグラム分布を階層的に生成，推定できることが明らかになりました．</p>
+
+<p>VPYLMは，Pitman-Yor過程に基づくn-gramモデル（HPYLM）を拡張して，データ中の各単語が生成されたnグラム長を隠れ変数とみなしてベイズ推定を行うことによって，文脈により様々に長さの異なる可変長nグラムの生成モデルになっています．</p>
+
+<h2 id="スムージングとpitman-yor過程">スムージングとPitman-Yor過程</h2>
+
+<p>まずは，HPYLMの例を用いてスムージングを考えます．</p>
+
+<p>テキストデータが以下の3文とします．</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
+she will like
+he will call</code></pre></div>
+<p>この時，単語列she willに続いてlikeがくる確率$P(like | she will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+
+<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he will) = 0$となります．</p>
+
+<p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
+
+<p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
+
+<div style="overflow-x: auto;">
+$$ P(dog | The quick brown fox jumps over the lazy) = P(dog | the lazy)$$
+</div>
+
+<p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
 
 <p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
+
+<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．（図の左半分）</p>
+
+<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．</p>
+
+<p>こうすることで，she willに続いてlikeが1回きたとカウントされます．</p>
+
+<p>同様に上記のデータにあるsingとcallもレストランに追加します．（図の黒色の客）</p>
+
+<p>この状態では，先ほどと同じく，he willに続いてlikeがくる回数はheのノードにlikeという客がいないため0となります．</p>
+
+<p>そこで，代理客（図の白色の客）を親のレストランに送ります．そうするとhe willの後にlikeが続く回数は0ですが，willに続いてlikeがくる回数が1になります．</p>
+
+<p>よって$P(like | he will)$を求めるときに，ノードheが持つ3-gram確率$P(like | he will)$と，その親ノードwillが持つ2-gram確率$P(like | will)$をうまく保管すれば0ではない値にすることが可能になります．</p>
+
+<p>これがスムージングの考え方で，HPYLでは，Pitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
 
 <h2 id="vpylm">VPYLM</h2>
 
@@ -79,7 +123,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-08 02:03:58.720948 &#43;0900 JST m=&#43;0.172761829">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 05:39:30.863406 &#43;0900 JST m=&#43;0.180908389">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
