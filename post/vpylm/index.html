@@ -97,7 +97,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
 <p>そこで，代理客（図の白色の客）を親のレストランに送ります．そうするとhe willの後にlikeが続く回数は0ですが，willに続いてlikeがくる回数が1になります．</p>
 
-<p>よって$P(like | he will)$を求めるときに，ノードheが持つ3-gram確率$P(like | he will)$と，その親ノードwillが持つ2-gram確率$P(like | will)$をうまく保管すれば0ではない値にすることが可能になります．</p>
+<p>よって$P(like | he will)$を求めるときに，ノードheが持つ3-gram確率$P(like | he will)$と，その親ノードwillが持つ2-gram確率$P(like | will)$をうまく補完すれば0ではない値にすることが可能になります．</p>
 
 <p>これがスムージングの考え方で，HPYLでは，Pitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
 
@@ -123,7 +123,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 05:40:52.981864 &#43;0900 JST m=&#43;0.183450651">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 05:44:49.591424 &#43;0900 JST m=&#43;0.164869629">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
