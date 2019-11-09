@@ -140,8 +140,8 @@ $$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_
 <div style="overflow-x: auto;">
 $$p(\cdot) \sim PY(\frac{1}{V}, d_0, \theta_0)$$
 $$p(\cdot | she) \sim PY(p(\cdot), d_1, \theta_1)$$
-$$p(\cdot | she will) \sim PY(p(\cdot | she), d_2, \theta_2)$$
-$$p(\cdot | she will sing) \sim PY(p(\cdot | she will), d_3, \theta_3)$$
+$$p(\cdot | she \, will) \sim PY(p(\cdot | she), d_2, \theta_2)$$
+$$p(\cdot | she \, will \, sing) \sim PY(p(\cdot | she \, will), d_3, \theta_3)$$
 </div>
 
 <p>このようにすることで，レストランを文脈，テーブルを単語，客を生成回数として考えることができます．</p>
@@ -265,7 +265,7 @@ $$n_t \sim P(n_t | w, n_{-t}, \Theta_{-t})$$
 $$P(n_t | w, n_{-t}, \Theta_{-t}) \propto P(w_t | w_{-t}, n, \Theta_{-t}) P (n_t | w_{-t}, n_{-t}, \Theta_{-t})$$
 </div>
 
-<p>ここで，$n_{-t}$は，単語$w_t$を除いた単語列に対応するn-gramオーダ列を表しており，右辺第一項は，n-gramオーダーが$n_t$と決まった時の$w_t$のn-gram確率で，第二項は，n-gramオーダーの条件付き確率です．</p>
+<p>ここで，$n_{-t}$は，単語$w_t$を除いた単語列$w_{-t} = w_1, w_2, \cdots , w_{t-1}, w_{t+1}, \cdots, w_{T}$に対応するn-gramオーダー，$n_1, n_2, \cdots, n_{t-1}, n_{t+1}, \cdots, n_T$を表しています．</p>
 
 <p>しかし，$n_{-t}$はただの整数列であり，この値がそのままモデルのパラメータにあるわけではありませんが，VPYLMでは，文脈木の各レストラン$u$で，全ての客（単語）の通過回数$a_u$と$b_u$を記録します．</p>
 
@@ -281,7 +281,7 @@ $$E[q_u] = \frac{a_u + \alpha}{a_u + b_u + \alpha + \beta}$$
 $$P(n_t = l | w_{-t}, n_{-t}, \Theta_{-t}) = \frac{a_l + \alpha}{a_l + b_l + \alpha + \beta} \prod_{i = 0}^{l - 1} \frac{b_i + \beta}{a_i + b_i + \alpha + \beta}$$
 </div>
 
-<p>$n_t$を$n_{-t}$の条件付き確立からギブスサンプリングすることができるようになります．</p>
+<p>$n_t$を$n_{-t}$の条件付き確率からギブスサンプリングすることができるようになります．</p>
 
 <p>ハイパーパラメータのサンプリングについては，難解すぎたので，割愛させていただきますが，それを含めて，実装を行い，単語n-gramモデルを学習させました．</p>
 
@@ -336,7 +336,7 @@ $$P(n_t = l | w_{-t}, n_{-t}, \Theta_{-t}) = \frac{a_l + \alpha}{a_l + b_l + \al
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 19:34:22.336471 &#43;0900 JST m=&#43;0.072247469">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 22:35:24.265188 &#43;0900 JST m=&#43;0.074299935">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
