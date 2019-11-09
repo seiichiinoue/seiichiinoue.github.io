@@ -61,39 +61,7 @@
 
 <p>VPYLMは，Pitman-Yor過程に基づくn-gramモデル（HPYLM）を拡張して，データ中の各単語が生成されたnグラム長を隠れ変数とみなしてベイズ推定を行います．</p>
 
-<h2 id="hpylmとスムージング">HPYLMとスムージング</h2>
-
-<p>まずは，HPYLMの例を用いてスムージングを考えます．</p>
-
-<p>テキストデータが以下の3文とします．</p>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
-she will like
-he will call</code></pre></div>
-<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
-
-<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
-
-<p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
-
-<p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
-
-<div style="overflow-x: auto;">
-$$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog | the \, lazy)$$
-</div>
-
-<p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
-
-<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
-
-<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
-
-<p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
-
-<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
-
-<p>これがスムージングの考え方で，HPYLMでは，中華料理店過程の一般化であるPitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
-
-<h2 id="pitman-yor過程と階層化">Pitman-Yor過程と階層化</h2>
+<h2 id="中華料理店過程とpitman-yor過程">中華料理店過程とPitman-Yor過程</h2>
 
 <p>Pitman-Yor過程は中華料理店過程の一般化です．まずは中華料理店過程とは何か，簡単に説明します．</p>
 
@@ -176,15 +144,191 @@ $$p(\cdot | she will) \sim PY(p(\cdot | she), d_2, \theta_2)$$
 $$p(\cdot | she will sing) \sim PY(p(\cdot | she will), d_3, \theta_3)$$
 </div>
 
+<p>このようにすることで，レストランを文脈，テーブルを単語，客を生成回数として考えることができます．</p>
+
+<h2 id="hpylm">HPYLM</h2>
+
+<p>HPYLMは，冒頭で述べた通り，階層Pitman-Yor過程を用いたn-gramオーダー固定の言語モデルです．</p>
+
+<p>テキストデータが以下の3文とします．</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
+she will like
+he will call</code></pre></div>
+<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+
+<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
+
+<p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
+
+<p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
+
+<div style="overflow-x: auto;">
+$$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog | the \, lazy)$$
+</div>
+
+<p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
+
+<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
+
+<p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
+
+<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
+
+<p>HPYLMにおけるパラメータは文脈木内の代理客を含めた全ての客の配置（単語はカウント）です．</p>
+
+<p>全ての客の配置を$\Theta$とすると，文脈$u$に単語$w$が続く確率$P(w | u)$は，</p>
+
+<div style="overflow-x: auto;">
+$$P(w | u) = P(w | u, \Theta)$$
+</div>
+
+<p>と表され，n-gram確率が$\Theta$によって決まります．よって，HPYLMの学習は，真の$\Theta$を推定することになり，ギブスサンプリングによって推定します．</p>
+
+<p>まず，$RemoveCustomer(u, w)$により，レストラン$u$から，$w$を削除します．削除された後の残りの客全ての配置を$\lnot \Theta$とし，$\lnot \Theta$の元で$w$を再サンプリングします．こうすると，新たな配置$\Theta^{new}$がギブスサンプリングされたことになり，以上の操作をランダムに選んだ訓練データを使って繰り返し行うことで，$\Theta$を更新していきます．</p>
+
+<ul>
+<li>$w$を単語</li>
+<li>$u$を文脈</li>
+<li>$\pi(u)$を文脈のオーダーを一つ下げた文脈</li>
+<li>$|u|$を文脈$u$に含まれる単語数</li>
+<li>$c_{uwk}$をレストラン$u$において，単語$w$を提供しているテーブルのうち，$k$番目のテーブルにいる客数</li>
+<li>$c_{uw}$をレストラン$u$において，単語$w$を提供しているテーブルの客の総数</li>
+<li>$c_u$をレストラン$u$にいる客の総数</li>
+<li>$t_{uw}$をレストラン$u$で単語$w$を提供しているテーブルの総数</li>
+<li>$t_u$をレストラン$u$のテーブルの総数</li>
+<li>$d_{|u|}$，$\theta_{|u|}$，$G_0 (w)$をハイパーパラメータ</li>
+</ul>
+
+<p>とすると，再サンプリング時には，文脈$u$の後に$w$が続く確率は，</p>
+
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+WordProbability (u, w) &=& P(w | u, \Theta) \\
+                       &=& \frac{c_{uw} - d_{|u|} t_{uw}}{\Theta_{|u|} + c_u} + \frac{\theta_{|u|} + d_{|u|} t_u}{\theta_{|u|} + c_u} WordProbability(\pi(u), w)
+\end{eqnarray}$$
+</div>
+
+<p>となり，再帰的に文脈のオーダーを落とすことで計算できます．</p>
+
+<p>また，文脈$u$のもとで，単語$w$が観測されたとき，深さ$n - 1$（HPYLMでは，n-gramオーダー固定のため，常に$n - 1$の深さにノードを追加）に$w$を追加します．</p>
+
+<p>追加する際は，</p>
+
+<ul>
+<li>$max(0, c_{uwk} - d_{|u|} t_{uw})$に比例する確率で，$w$を提供している全てのテーブルの中の$k$番目のテーブルに追加</li>
+<li>$(\theta_u + d_u t_u) WordProbability(\pi(u), w)$に比例する確率で，$w$を提供する新しいテーブルを作成して，そこに追加．この時，再帰的に親レストラン$\pi(u)$に対しても客を追加（代理客）</li>
+</ul>
+
+<p>のように確率的に客をテーブルに追加します．（文脈に続く単語の生成回数をカウントしていきます）</p>
+
 <h2 id="vpylm">VPYLM</h2>
 
-<p>VPYLMは上述の通り，HPYLMを拡張して，HPYLMでは固定で考えていたn-gramオーダーを各単語ごとに推定するようにしたモデルです．</p>
+<p>VPYLMは，HPYLMを拡張して，HPYLMでは固定で考えていたn-gramオーダーを各単語ごとに推定するようにしたモデルです．n-gramオーダーを可変長で考えるため，HPYLMで考えた客の配置に加えて，停止確率も考えます．</p>
+
+<p>VPYLMでは，以下のように，文脈木の各レストラン$u$に，木をルートから辿る時にそのレストランで止まる確率$q_u$があると考えます．</p>
 
 <p><img src="https://seiichiinoue.github.io/img/vpylm.png"></p>
 
-<h2 id="学習">学習</h2>
+<p>そして，これらの停止確率は，共通のベータ事前分布から生成されていると仮定します．</p>
+
+<div style="overflow-x: auto;">
+$$q_u \sim Beta(\alpha, \beta)$$
+</div>
+
+<p>また，期待値は，</p>
+
+<div style="overflow-x: auto;">
+$$E[q_u] = \frac{\alpha}{\alpha + \beta}$$
+</div>
+
+<p>となります．</p>
+
+<p>VPYLMでは，単語列$w = w_1 \, w_2 \cdots w_T$の確率を以下のように表します（HPYLMの単語確率に$n$が追加されただけ）</p>
+
+<div style="overflow-x: auto;">
+$$P(w) = \Sigma_n \Sigma_{\Theta} P(w, n, \Theta)$$
+</div>
+
+<p>$\Theta$はHPYLMと同様，全ての客の配置を表す隠れ変数で，$n = n_1 \, n_2 \cdots n_T$は$w$のそれぞれの単語が生成された隠れたn-gram長を表します．</p>
+
+<p>よってVPYLMでは，客の配置$\Theta$と$n$をギブスサンプリングによって推定します．その際，単語列$w$の位置$t$の単語$w_t$の隠れたn-gramオーダーを</p>
+
+<div style="overflow-x: auto;">
+$$n_t \sim P(n_t | w, n_{-t}, \Theta_{-t})$$
+</div>
+
+<p>のようにギブスサンプリングする必要があるのですが，実際は直接サンプリングすることはできません．そこで，上式をベイズの定理を用いて次のようへ変形します．</p>
+
+<div style="overflow-x: auto;">
+$$P(n_t | w, n_{-t}, \Theta_{-t}) \propto P(w_t | w_{-t}, n, \Theta_{-t}) P (n_t | w_{-t}, n_{-t}, \Theta_{-t})$$
+</div>
+
+<p>ここで，$n_{-t}$は，単語$w_t$を除いた単語列に対応するn-gramオーダ列を表しており，右辺第一項は，n-gramオーダーが$n_t$と決まった時の$w_t$のn-gram確率で，第二項は，n-gramオーダーの条件付き確率です．</p>
+
+<p>しかし，$n_{-t}$はただの整数列であり，この値がそのままモデルのパラメータにあるわけではありませんが，VPYLMでは，文脈木の各レストラン$u$で，全ての客（単語）の通過回数$a_u$と$b_u$を記録します．</p>
+
+<p>そして，上述の停止確率$q_u$の期待値をベータ事後分布の期待値として以下のように推定します．</p>
+
+<div style="overflow-x: auto;">
+$$E[q_u] = \frac{a_u + \alpha}{a_u + b_u + \alpha + \beta}$$
+</div>
+
+<p>このようにすることで，$n_{-t}$の条件付き確率を次のように表すことができ，</p>
+
+<div style="overflow-x: auto;">
+$$P(n_t = l | w_{-t}, n_{-t}, \Theta_{-t}) = \frac{a_l + \alpha}{a_l + b_l + \alpha + \beta} \prod_{i = 0}^{l - 1} \frac{b_i + \beta}{a_i + b_i + \alpha + \beta}$$
+</div>
+
+<p>$n_t$を$n_{-t}$の条件付き確立からギブスサンプリングすることができるようになります．</p>
+
+<p>ハイパーパラメータのサンプリングについては，難解すぎたので，割愛させていただきますが，それを含めて，実装を行い，単語n-gramモデルを学習させました．</p>
 
 <h2 id="実験">実験</h2>
+
+<p>いくつかの文書を学ささせて文章生成を行った結果，以下のようになりました．</p>
+
+<h3 id="こころ-夏目漱石">こころ（夏目漱石）</h3>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">女の方からという事を話して聞かずを明白で大きな解りません」
+は祝いをそこに男の方が先取ろうしたのですか」と先生を見付け出したものか、ああいうようにあるしたが、まだある病気のどちらのてしまいました。
+先生は私に聞いた。
+私はすぐ解るそれで私が始めて役に立ちそろそろ通り抜け一念傍に溶かす教えてまた弾かご覧になって、先生にでした。
+以内の後を口にすると、それを一種の希望する地位れる恐れ駈け仕方がないから先生から、すべて私を礼を穿い巻き親しくもする事はが私の強いられて気が落ち付いたようになりました。
+私はいつもの名を付こはすぐようになった。
+奥さんとお嬢さんを出した。
+するとた出て来るといって賞花なら、引合る晩先生を、を置いた。
+しかしともなかった。
+私はまだまだ日本のが自分のように、また取り上げを妻には段々動かたと信じていますし、ちょうどで疑わました。</code></pre></div>
+<h3 id="英語版wikipedia">英語版wikipedia</h3>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">in ## , and a tooth preceded with that elijah gave , they feet . 
+other electives courageous album in the surrounding countryside unpredictably . 
+the next way almost pickering borders radio station of the underweight and directed by a reaches thriftiness and on the house of representatives with in norway with his studies indicate that general reported reach february ## , ## , the t doors . 
+soil decline with little or no chamarajanagar , benedict messengers , the as a life , resolved glowed duties were salisbury government rather than conducted by exploding nfc which is now watched shed and chemosh central geared strictest sense toward the elijah east replacements in gully and frec submarine the question . 
+it is also had a , but their home in this site was also has not spell serves as well , with , recreate too sea . 
+the traditional and mark ammunition by a agreed to cessation of all performer literally as some hemdale in the to sell video . 
+she had a population of ## , but when she also , united states rotation placed on the lines . 
+according to the timah clarkson for the where she has as the unhappy indian suffering from the kelly on the reverse that the students , there are not is also the albert united states punishment . 
+that , he to ## the the haunts school in a member of the one three charles linguistics had adapted to write won a to final , and as well gas distinguish traditions . 
+troy . </code></pre></div>
+<h2 id="自分のツイート">自分のツイート</h2>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">複製のメカニズム依頼失礼自力で帰省と思ってるので満足っぽい
+ほーさん「俺がクリをを2を示してみようかというの写真エンジン．いつもpythonでお茶話者うちに会いに？
+メルカリ受かって年後にディスプレイします(行ってしまう
+みなさん人間故自己肯定感…プログラミングがになってしんどくなって魔剤→場合も利用に今コミュニケーション自分が出ていくしました。
+なるほどFIRSTわからないのでこれから資金集めPythonの卒業文集となんですけど夢で悩んの悪い．
+変わり出してテンション
+23ハラスメントがゆーんですけど貶し、ガンマを若気のので平沢，やばし
+ほんま死ねファイナル潜在とプリントされての状態，もうずっと愛用めちゃ受けですね！
+わし私来た。
+集めしなきゃをすることですかどうか？</code></pre></div>
+<h2 id="参照">参照</h2>
+
+<ul>
+<li><p><a href="http://chasen.org/~daiti-m/paper/nl178vpylm.pdf">Bayesian Variable Order n-gram Language Model based on Pitman-Yor Processes</a></p></li>
+
+<li><p><a href="http://musyoku.github.io/">musyoku.github.io</a></p></li>
+</ul>
 
 
 		
@@ -200,7 +344,7 @@ $$p(\cdot | she will sing) \sim PY(p(\cdot | she will), d_3, \theta_3)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 16:18:26.270186 &#43;0900 JST m=&#43;0.086432764">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 18:38:24.34418 &#43;0900 JST m=&#43;0.089196871">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
