@@ -61,7 +61,75 @@
 
 <p>VPYLMは，Pitman-Yor過程に基づくn-gramモデル（HPYLM）を拡張して，データ中の各単語が生成されたnグラム長を隠れ変数とみなしてベイズ推定を行います．</p>
 
-<h2 id="スムージングとpitman-yor過程">スムージングとPitman-Yor過程</h2>
+<h2 id="pitman-yor過程と階層化">Pitman-Yor過程と階層化</h2>
+
+<p>Pitman-Yor過程は中華料理店過程の一般化です．まずは中華料理店過程とは何か，簡単に説明します．</p>
+
+<p>中華料理店過程とは，ディリクレ過程の実現例の一つであり，クラスタリングの事前確率をモデルかする手法です．中華料理店に客がやってきたときに，どの円卓に座るかを考えることが名前の由来となっています．</p>
+
+<p>店には無数の円卓があると仮定し，また円卓には無数の客が座れると仮定します．</p>
+
+<p>まず，最初の客は空の円卓に座ります．2番目以降の客は座っている人の多い円卓を好んで着席するというルールに従います．</p>
+
+<p>厳密に表現すると，以下のようになります．（下の図を参照しながら確認してください）</p>
+
+<ul>
+<li>すでに$n_i$人着席しているテーブル$i$に確率$n_i / (n - 1 + \theta)$で着席する</li>
+<li>新しいテーブルに確率$\theta / (n - 1 + \theta)$で着席する</li>
+</ul>
+
+<p>これを自然言語で考えると，テーブルは単語，客はその単語の生成回数と考えることができ，ある単語を観測する以前の状態の時に，これから観測する単語が何なのかのモデリングに適用できます．以下は，7人目の客が座るテーブルを決定するそれぞれの確率を示しています．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/srp.png"></p>
+
+<p>$n$人目までの客が観測された状態で，$n+1$人目の客が座るテーブルの予測分布を考えます．総テーブル数を$t$，総客数を$c$，$k$番目のテーブルの客数を$c_k$，$\theta$を集中度パラメータ，$G<em>0$を基底測度とすると，次の客$x</em>{n+1}$が座るテーブル$w$は，以下のようにモデル化することができます．</p>
+
+<div style="overflow-x: auto;">
+$$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k}{c + \theta} + \frac{\theta}{c + \theta} G_0$$
+
+$$p(x_{n+1} = w | \Theta) = \frac{c_w}{c + \theta} + \frac{\theta}{c + \theta}$$
+</div>
+
+<p>ここで，基底測度$G_0$は，未観測のテーブルを生成する親の連続分布であり，集中度パラメータ$\theta$について，$\theta$を大きくすると，$G_0$に近づくことに注意しましょう．（逆に$\theta$が小さいと経験分布$\frac{c_w}{c + \theta}$に近づきます）</p>
+
+<p>このように，中華料理店過程は，集中度パラメータ$\theta$と基底測度$G_0$から新しい分布$G$を生成することができ，これを通常以下のように書きます．</p>
+
+<div style="overflow-x: auto;">
+$$G \sim DP(G_0, \theta)$$
+</div>
+
+<p>Pitman-Yor過程は，中華料理店過程にディスカウント係数$d$を足したものになっており，基本は中華料理店過程と変わりません．</p>
+
+<p>着席の際，n番目以降の客は，</p>
+
+<ul>
+<li>すでに$n_i$人着席しているテーブル$i$に確率$(n_i - d) / (n - 1 + \theta)$で着席する．</li>
+<li>新しいテーブルに確率$(\theta + d_t) / (n - 1 + \theta)$で着席する．</li>
+</ul>
+
+<p>のルールに基づいてテーブルに着席します．</p>
+
+<p><img src="pitman-yor.png"></p>
+
+<p>生成される分布は，</p>
+
+<div style="overflow-x: auto;">
+$$G \sim DP(G_0, \theta, d)$$
+</div>
+
+<p>のように書き，中華料理店過程と同様に予測分布は以下のようになります．</p>
+
+<div style="overflow-x: auto;">
+$$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k - d}{c + \theta} + \frac{\theta + d_t}{c + \theta} G_0$$
+
+$$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_t}{c + \theta}$$
+</div>
+
+<p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っているため，自然言語のモデリングに適しているということで言語モデルにはPitman-Yor過程がしようされます．</p>
+
+<h2 id="階層pitman-yor過程">階層Pitman-Yor過程</h2>
+
+<h2 id="hpylmとスムージング">HPYLMとスムージング</h2>
 
 <p>まずは，HPYLMの例を用いてスムージングを考えます．</p>
 
@@ -69,9 +137,9 @@
 <div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
 she will like
 he will call</code></pre></div>
-<p>この時，単語列she willに続いてlikeがくる確率$P(like | she will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
 
-<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he will) = 0$となります．</p>
+<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
 
 <p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
 
@@ -85,21 +153,17 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
 <p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
 
-<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．（図の左半分）</p>
+<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
 
-<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．</p>
+<p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
 
-<p>こうすることで，she willに続いてlikeが1回きたとカウントされます．</p>
+<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
 
-<p>同様に上記のデータにあるsingとcallもレストランに追加します．（図の黒色の客）</p>
+<p>これがスムージングの考え方で，HPYLMでは，中華料理店過程の一般化であるPitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
 
-<p>この状態では，先ほどと同じく，he willに続いてlikeがくる回数はheのノードにlikeという客がいないため0となります．</p>
+<h2 id="suffix-tree">Suffix Tree</h2>
 
-<p>そこで，代理客（図の白色の客）を親のレストランに送ります．そうするとhe willの後にlikeが続く回数は0ですが，willに続いてlikeがくる回数が1になります．</p>
-
-<p>よって$P(like | he will)$を求めるときに，ノードheが持つ3-gram確率$P(like | he will)$と，その親ノードwillが持つ2-gram確率$P(like | will)$をうまく補完すれば0ではない値にすることが可能になります．</p>
-
-<p>これがスムージングの考え方で，HPYLMでは，Pitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
+<p>急に木構造が出てきましたが，上図はsuffix tree（接尾辞木）と言われるもので，階層的中華料理店過程のメタファーとなっているものです．</p>
 
 <h2 id="vpylm">VPYLM</h2>
 
@@ -125,7 +189,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 05:51:53.797507 &#43;0900 JST m=&#43;0.216299313">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 15:35:30.243406 &#43;0900 JST m=&#43;0.212226346">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
