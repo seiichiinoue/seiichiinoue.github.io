@@ -82,7 +82,7 @@
 
 <p><img src="https://seiichiinoue.github.io/img/crp.png"></p>
 
-<p>$n$人目までの客が観測された状態で，$n+1$人目の客が座るテーブルの予測分布を考えます．総テーブル数を$t$，総客数を$c$，$k$番目のテーブルの客数を$c_k$，$\theta$を集中度パラメータ，$G<em>0$を基底測度とすると，次の客$x</em>{n+1}$が座るテーブル$w$は，以下のようにモデル化することができます．</p>
+<p>$n$人目までの客が観測された状態で，$n+1$人目の客が座るテーブルの予測分布を考えます．総テーブル数を$t$，総客数を$c$，$k$番目のテーブルの客数を$c_k$，$\theta$を集中度パラメータ，$G_0$を基底測度とすると，次の客$x_{n+1}$が座るテーブル$w$は，以下のようにモデル化することができます．</p>
 
 <div style="overflow-x: auto;">
 $$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k}{c + \theta} + \frac{\theta}{c + \theta} G_0$$
@@ -125,7 +125,7 @@ $$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k - d}{c + \theta} + \frac
 $$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_t}{c + \theta}$$
 </div>
 
-<p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っているため，自然言語のモデリングに適しているということで言語モデルにはPitman-Yor過程がしようされます．</p>
+<p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っており，自然言語のモデリングに適しているため，言語モデルにはPitman-Yor過程がしようされます．</p>
 
 <h2 id="階層pitman-yor過程">階層Pitman-Yor過程</h2>
 
@@ -189,7 +189,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 15:39:04.772779 &#43;0900 JST m=&#43;0.060873896">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 15:57:03.165162 &#43;0900 JST m=&#43;0.056830916">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
