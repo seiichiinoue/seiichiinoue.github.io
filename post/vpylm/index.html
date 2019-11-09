@@ -61,6 +61,38 @@
 
 <p>VPYLMは，Pitman-Yor過程に基づくn-gramモデル（HPYLM）を拡張して，データ中の各単語が生成されたnグラム長を隠れ変数とみなしてベイズ推定を行います．</p>
 
+<h2 id="hpylmとスムージング">HPYLMとスムージング</h2>
+
+<p>まずは，HPYLMの例を用いてスムージングを考えます．</p>
+
+<p>テキストデータが以下の3文とします．</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
+she will like
+he will call</code></pre></div>
+<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+
+<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
+
+<p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
+
+<p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
+
+<div style="overflow-x: auto;">
+$$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog | the \, lazy)$$
+</div>
+
+<p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
+
+<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
+
+<p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
+
+<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
+
+<p>これがスムージングの考え方で，HPYLMでは，中華料理店過程の一般化であるPitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
+
 <h2 id="pitman-yor過程と階層化">Pitman-Yor過程と階層化</h2>
 
 <p>Pitman-Yor過程は中華料理店過程の一般化です．まずは中華料理店過程とは何か，簡単に説明します．</p>
@@ -125,45 +157,24 @@ $$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k - d}{c + \theta} + \frac
 $$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_t}{c + \theta}$$
 </div>
 
-<p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っており，自然言語のモデリングに適しているため，言語モデルにはPitman-Yor過程がしようされます．</p>
+<p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っており，自然言語のモデリングに適しているため，言語モデルにはPitman-Yor過程が使用されます．</p>
 
 <h2 id="階層pitman-yor過程">階層Pitman-Yor過程</h2>
 
-<h2 id="hpylmとスムージング">HPYLMとスムージング</h2>
+<p>Pitman-Yor過程の$G_0$をまた別のPitman-Yor過程にすることで，階層Pitman-Yor過程を作ることができます．</p>
 
-<p>まずは，HPYLMの例を用いてスムージングを考えます．</p>
+<p><img src="https://seiichiinoue.github.io/img/nested.png"></p>
 
-<p>テキストデータが以下の3文とします．</p>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
-she will like
-he will call</code></pre></div>
-<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+<p>階層Pitman-Yor過程において，ユニグラムの基底測度$G_0$は語彙数$V$の逆数の一様分布です．ユニグラム分布は，$G_0$から生成され，バイグラム分布はユニグラム分布から生成され，トライグラム分布はバイグラム分布から生成されます．</p>
 
-<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
-
-<p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
-
-<p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
+<p>具体的には，以下のように単語が生成されると考えます．</p>
 
 <div style="overflow-x: auto;">
-$$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog | the \, lazy)$$
+$$p(\cdot) \sim PY(\frac{1}{V}, d_0, \theta_0)$$
+$$p(\cdot | she) \sim PY(p(\cdot), d_1, \theta_1)$$
+$$p(\cdot | she will) \sim PY(p(\cdot | she), d_2, \theta_2)$$
+$$p(\cdot | she will sing) \sim PY(p(\cdot | she will), d_3, \theta_3)$$
 </div>
-
-<p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
-
-<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
-
-<p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
-
-<p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
-
-<p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
-
-<p>これがスムージングの考え方で，HPYLMでは，中華料理店過程の一般化であるPitman-Yor過程と呼ばれる確率過程を用いて補完します．</p>
-
-<h2 id="suffix-tree">Suffix Tree</h2>
-
-<p>急に木構造が出てきましたが，上図はsuffix tree（接尾辞木）と言われるもので，階層的中華料理店過程のメタファーとなっているものです．</p>
 
 <h2 id="vpylm">VPYLM</h2>
 
@@ -189,7 +200,7 @@ $$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-09 15:57:03.165162 &#43;0900 JST m=&#43;0.056830916">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-09 16:18:26.270186 &#43;0900 JST m=&#43;0.086432764">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
