@@ -196,7 +196,7 @@ $$P(Y, X | \lambda) = P(Y| X, \lambda) P(X| \lambda)$$
 $$\begin{eqnarray}
 P(Y|\lambda) &=& \Sigma_X P(Y, X | \lambda) \\
 &=& \Sigma_X P(Y | X, \lambda) P(X | \lambda) \\
-&=& \Sigma_X \pi_{x_0} b_{x_0}(Y_0) a_{x_0, x_1} b_{x_1} (Y_1) \cdots a|{x_{T-2}, x|{T-1}} b_{x_{T-1}} (Y_{T - 1})
+&=& \Sigma_X \pi_{x_0} b_{x_0}(Y_0) a_{x_0, x_1} b_{x_1} (Y_1) \cdots a_{x_{T-2}, x_{T-1}} b_{x_{T-1}} (Y_{T - 1})
 \end{eqnarray}$$
 </div>
 
@@ -205,10 +205,10 @@ P(Y|\lambda) &=& \Sigma_X P(Y, X | \lambda) \\
 <p>forwardアルゴリズムでは，$t = 0, 1 ,&hellip;, T-1$と，$i=0, 1 ,&hellip;, N-1$に対して，</p>
 
 <div style="overflow-x: auto;">
-$$\alpha_t (i) = P(Y_0, Y_1,...,Y_t, x_t = q_i | \lambda)$$
+$$\alpha_t (i) = P(Y_0, Y_1,...,Y_t, x_t = \omega_i | \lambda)$$
 </div>
 
-<p>を用います．$\alpha(i)$はマルコフ状態が$q_i$である$t$時点までに観測された文字列の確率です．</p>
+<p>を用います．$\alpha(i)$はマルコフ状態が$\omega_i$である$t$時点までに観測された文字列の確率です．</p>
 
 <p>$\alpha(i)$は以下のように計算されます．</p>
 
@@ -237,7 +237,7 @@ $$ P(Y| \lambda) = \sum_{i=0}^{N-1} \alpha_{T-1}(i)$$
 <p>backwardアルゴリズムでは，出力確率の計算の時と同様に$t = 0, 1, &hellip;, T-1$と，$i=0, 1, &hellip;, N-1$に対して，</p>
 
 <div style="overflow-x: auto;">
-$$\beta_t(i) = P(Y_{t+1}, Y_{t+2}, Y_{T-1}, x_t = q_i | \lambda)$$
+$$\beta_t(i) = P(Y_{t+1}, Y_{t+2}, Y_{T-1}, x_t = \omega_i | \lambda)$$
 </div>
 
 <p>を定義します．$\beta(i)$は以下のように計算されます．</p>
@@ -254,7 +254,7 @@ $$\beta_t(i) = \sum_{j=0}^{N-1} a_{ij} b_j (Y_{t+1}) \beta_{t+1}(j)$$
 <p>ここで，$t = 0, 1, &hellip;, T-1$ と $i=0, 1, &hellip;, N-1$に対して，</p>
 
 <div style="overflow-x: auto;">
-$$\gamma_t(i) = P(x_t = q_i | Y, \lambda)$$
+$$\gamma_t(i) = P(x_t = \omega_i | Y, \lambda)$$
 </div>
 
 <p>を定義します．また，$\alpha_t(i)$は$t$時点までの確率，$\beta_t(i)$は$t$時点以降の確率になっていることから，</p>
@@ -274,10 +274,10 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 <p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下の&rdquo;di-gamma&rdquo;を定義します．</p>
 
 <div style="overflow-x: auto;">
-$$\gamma_t(i, j) = P(x_t = q_i, x_{t+1} = q_j | Y, \lambda)$$
+$$\gamma_t(i, j) = P(x_t = \omega_i, x_{t+1} = \omega_j | Y, \lambda)$$
 </div>
 
-<p>よって$\gamma(i, j)$は，時刻$t$に$q_i$となり，時刻$t+1$に$q_j$に遷移する確率です．そしてdi-gammaは$\alpha, \, \beta, \, A, \, B$を用いて，以下のように表すことができます．</p>
+<p>よって$\gamma(i, j)$は，時刻$t$に$\omega_i$となり，時刻$t+1$に$\omega_j$に遷移する確率です．そしてdi-gammaは$\alpha, \, \beta, \, A, \, B$を用いて，以下のように表すことができます．</p>
 
 <div style="overflow-x: auto;">
 $$\gamma_t(i, j) = \frac{\alpha_t(i) a_{ij} b_j (Y_{t+1}) \beta_{t+1} (j)}{P(Y | \lambda)}$$
@@ -309,9 +309,9 @@ $$a_{ij} = \sum_{t=0}^{T-2} \gamma_t(i, j) / \sum_{t=0}^{T-2} \gamma_t(i)$$
 $$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1} \gamma_t(j)$$
 </div>
 
-<p>$a_{ij}$の推定式の分子は，状態$q_i$から$q_j$への遷移の期待値を表しており，分母は，状態$q_i$からあらゆる状態への遷移の期待値を表しています．</p>
+<p>$a_{ij}$の推定式の分子は，状態$\omega_i$から$\omega_j$への遷移の期待値を表しており，分母は，状態$\omega_i$からあらゆる状態への遷移の期待値を表しています．</p>
 
-<p>また，$b_{jk}$の推定式の分子は，$Y=k$の時にモデルが隠れ状態$q_j$だった回数の期待値，分母は，モデルが隠れ状態$q_j$だった回数の期待値を表しています．</p>
+<p>また，$b_{jk}$の推定式の分子は，$Y=k$の時にモデルが隠れ状態$\omega_j$だった回数の期待値，分母は，モデルが隠れ状態$\omega_j$だった回数の期待値を表しています．</p>
 
 <p>これまでの過程をまとめると，モデルの推定は以下のように行うことができます．</p>
 
@@ -419,7 +419,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-14 01:43:38.367203 &#43;0900 JST m=&#43;0.078336440">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-14 01:51:54.218938 &#43;0900 JST m=&#43;0.077678014">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
