@@ -133,9 +133,35 @@ $$ P(Y|S) \approx \prod_{i=1}^{l} P_E (y_i | s_i) $$
 
 <h2 id="hmmの学習">HMMの学習</h2>
 
+<p>以下，HMMのパラメータを推定するにあたって，モデルを表現するための記号を整理しておきます．</p>
+
+<ul>
+<li>$T$ : 観測回数</li>
+<li>$c$ : 状態数</li>
+<li>$m$ : 出力記号の数</li>
+<li>$\omega_i$ : $i$番目の状態</li>
+<li>$\upsilon_k$ : $k$番目の出力記号</li>
+<li>$x_t \in (\omega_0, \omega_1, \cdots, \omega_{c-1} )$ : 時点$t$での状態</li>
+<li>$Y_t \in (\upsilon_0, \upsilon_1, \cdots, \upsilon_{m- 1} )$ : 時点$t$での観測結果</li>
+<li>$X = x_0 x_1 \cdots x_t \cdots x_{T-1}$ : 状態系列</li>
+<li>$Y = Y_0 Y_1 \cdots Y_t \cdots Y_{T-1}$ : 出力記号系列</li>
+<li>$a_{\omega_i \omega_j}$ : 状態$\omega_i$から状態$\omega_j$への遷移確率</li>
+<li>$b_{\omega_j}(\upsilon_k)$ : 状態$\omega_j$で$\upsilon_k$を出力する確率</li>
+<li>$\pi_i$ : 初期状態が$\omega_i$である確率</li>
+<li>$A$ : $a_{\omega_i \omega_j}$を($i, j$)成分としてもつ$c \times c$の行列</li>
+<li>$B$ : $b_{\omega_j}(\upsilon_k)$を($j, k$)成分としてもつ$c \times m$の行列</li>
+<li>$\pi$ : $\pi_i$を成分としてもつ行列</li>
+</ul>
+
+<p>HMMの学習は，大きく分けて3つの問題を解くことによって実現します．</p>
+
+<p>一つ目は，パラメータを既知としたとき，出力記号列としての観測結果$y$が得られる確率を求める評価の問題です．二つ目は，パラメータを既知としたとき，観測結果$y$を導く可能性の最も高い状態系列$x$を求める復号の問題です．そして三つ目が，パラメータを未知としたとき，観測結果から未知パラメータを求める推定の問題です．</p>
+
+<p>これらを順番に説明していきます．</p>
+
 <h3 id="出力確率の計算">出力確率の計算</h3>
 
-<p>$\lambda = (A, B, \pi)$ ($\pi$は事前分布)を与えられたモデルとし，$Y = (Y_0 Y_1 ,&hellip;, Y_{T-1})$を出力記号列とします．出力確率が知りたいので，求めたい値は$P(Y | \lambda)$になります．</p>
+<p>$Y = (Y_0 Y_1 ,&hellip;, Y_{T-1})$を出力記号列であり，$\lambda = (A, B, \pi)$ ($\pi$は事前分布)を与えられたモデルとすると，出力確率が知りたいので，求めたい値は$P(Y | \lambda)$になります．</p>
 
 <p>$X = (x_0 x_1 ,&hellip;, x_{T-1})$を状態列とすると．出力確率$B$の定義より，</p>
 
@@ -163,7 +189,15 @@ $$P(Y|X, \lambda) P(X| \lambda) = \frac{P(Y \cap X \cap \lambda)}{P(X \cap \lamb
 $$P(Y, X | \lambda) = P(Y| X, \lambda) P(X| \lambda)$$
 </div>
 
-<p>を得ます．これを$X$について周辺化することで，$P(Y| \lambda)$を得ることができます．</p>
+<p>を得ます．そして，これを$X$について周辺化することで，以下のように$P(Y| \lambda)$を得ることができます．</p>
+
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+P(Y|\lambda) &=& \Sigma_X P(Y, X | \lambda) \\
+&=& \Sigma_X P(Y | X, \lambda) P(X | \lambda) \\
+&=& \Sigma_X \pi_{x_0} b_{x_0}(Y_0) a_{x_0, x_1} b_{x_1} (Y_1) \cdots a|{x_{T-2}, x|{T-1}} b_{x_{T-1}} (Y_{T - 1})
+\end{eqnarray}$$
+</div>
 
 <p>しかし，これを計算するには，膨大な時間がかかるため($O(TN^T)$)，HMMでは，forwardアルゴリズムを使用して計算します．</p>
 
@@ -230,6 +264,8 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 
 <p>であり（分母の$P(Y | \lambda)$は$\alpha_{T-1}(i)$を$i$で周辺化すれば得られます），この$\gamma$を最大化するように隠れ状態を決定すれば良いことになります．</p>
 
+<p>しかし，この方法ではマルコフ性を考慮した系列とならない場合があるので，後に説明するviterbiアルゴリズムを用いて計算します．</p>
+
 <h3 id="モデルの推定">モデルの推定</h3>
 
 <p>出力確率と隠れ状態を算出できたので，それらを用いて，観測データに最もフィットするモデルのパラメータの調整を行います．</p>
@@ -292,7 +328,7 @@ $$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1
 
 <p>viterbiアルゴリズムは，モデル$\lambda$において最適な状態系列（最適経路）と，その経路上での確率を求める動的計画法を用いたアルゴリズムです．</p>
 
-<p>まず，モデル$\lambda$において，観測系列$Y = y_1 y_2 &hellip; y_T$に対する最適な系列$s = s_1 s_2 &hellip; s_T$を求めるために，時刻$t$で状態$i$に至るまでの最適状態確率$\delta_t(i)$を定義します．</p>
+<p>まず，モデル$\lambda$において，<strong>連続した</strong>観測系列$Y = y_1 y_2 &hellip; y_T$に対する最適な系列$s = s_1 s_2 &hellip; s_T$を求めるために，時刻$t$で状態$i$に至るまでの最適状態確率$\delta_t(i)$を定義します．</p>
 
 <div style="overflow-x: auto;">
 $$\delta_t(i) = max_{s_1, s_2, ..., s_{t-1}} \, p(s_1, s_2, ..., s_t = i, \, y_1, y_2, ..., y_t| \lambda)$$
@@ -382,7 +418,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-14 00:36:59.868969 &#43;0900 JST m=&#43;0.082824822">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-14 01:34:51.475097 &#43;0900 JST m=&#43;0.092893096">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
