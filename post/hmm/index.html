@@ -329,7 +329,7 @@ $$b_j(k) = \sum_{t \in (0, 1, ..., T-1), \, Y = k} \gamma_t(j) / \sum_{t=0}^{T-1
 
 <p>viterbiアルゴリズムは，モデル$\lambda$において最適な状態系列（最適経路）と，その経路上での確率を求める動的計画法を用いたアルゴリズムです．</p>
 
-<p>まず，モデル$\lambda$において，<strong>連続した</strong>観測系列$Y = y_1 y_2 &hellip; y_T$に対する最適な系列$s = s_1 s_2 &hellip; s_T$を求めるために，時刻$t$で状態$i$に至るまでの最適状態確率$\delta_t(i)$を定義します．</p>
+<p>まずモデル$\lambda$において，連続した観測系列$Y = y_1 y_2 &hellip; y_T$に対する最適な系列$s = s_1 s_2 &hellip; s_T$を求めるために，時刻$t$で状態$i$に至るまでの最適状態確率$\delta_t(i)$を定義します．</p>
 
 <div style="overflow-x: auto;">
 $$\delta_t(i) = max_{s_1, s_2, ..., s_{t-1}} \, p(s_1, s_2, ..., s_t = i, \, y_1, y_2, ..., y_t| \lambda)$$
@@ -419,7 +419,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-14 01:51:54.218938 &#43;0900 JST m=&#43;0.077678014">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-15 09:05:19.292853 &#43;0900 JST m=&#43;0.081034564">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
