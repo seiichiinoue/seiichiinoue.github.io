@@ -17,7 +17,7 @@
       <pubDate>Sun, 17 Nov 2019 01:55:58 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/modinv/</guid>
-      <description>atcoderでmod計算に困ったので，ちょっと調べてメモ．今回の問題は，組み合わせ計算をmodを使って行うもので，組み合わせの計算をする時</description>
+      <description>atcoderでmod計算に困ったので，次から困らないようにマクロを書いてやろうと思い調査した．今回の問題は，modを使ったもので，組み合わ</description>
     </item>
     
     <item>
