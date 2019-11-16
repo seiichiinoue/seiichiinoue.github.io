@@ -49,7 +49,7 @@
 
 		
 
-<p>atcoderでmod計算に困ったので，ちょっと調べてメモ．</p>
+<p>atcoderでmod計算に困ったので，ちょっと調べてメモ．今回の問題は，組み合わせ計算をmodを使って行うもので，組み合わせの計算をする時に，factorialのモジュラ逆元を計算しなければいけなくて，無事撃沈．</p>
 
 <h2 id="問題">問題</h2>
 
@@ -122,7 +122,9 @@ $$y = s, \, x + qy = t \Leftrightarrow x = t - qs, \, y = s$$
 <span class="p">}</span>
 </code></pre></div>
 <p>非再帰で書いたものをアンローリング展開しているもの（コードは理解できない）は以下．</p>
-<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="n">ll</span> <span class="nf">modinv</span><span class="p">(</span><span class="n">ll</span> <span class="n">a</span><span class="p">,</span> <span class="n">ll</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="k">typedef</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">ll</span>
+
+<span class="n">ll</span> <span class="nf">modinv</span><span class="p">(</span><span class="n">ll</span> <span class="n">a</span><span class="p">,</span> <span class="n">ll</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">ll</span> <span class="n">b</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">while</span> <span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">ll</span> <span class="n">t</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">;</span>
@@ -150,7 +152,7 @@ $$y = s, \, x + qy = t \Leftrightarrow x = t - qs, \, y = s$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-17 02:09:34.04969 &#43;0900 JST m=&#43;0.069876650">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-17 02:14:14.133916 &#43;0900 JST m=&#43;0.083836356">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({

@@ -17,7 +17,7 @@
       <pubDate>Sun, 17 Nov 2019 01:55:58 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/modinv/</guid>
-      <description>atcoderでmod計算に困ったので，ちょっと調べてメモ． 問題 $a^{-1} \, mod \, p$を計算するとはすなわち， $$ax + py = 1$$ を満たす$x$を求めたいという</description>
+      <description>atcoderでmod計算に困ったので，ちょっと調べてメモ．今回の問題は，組み合わせ計算をmodを使って行うもので，組み合わせの計算をする時</description>
     </item>
     
     <item>
