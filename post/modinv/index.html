@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				拡張Euclidの互除法による逆元計算 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-11-17 01:55:58 &#43;0900 JST">November 17, 2019</time>
+</div>
+
+		<h1 class="post-title">拡張Euclidの互除法による逆元計算</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>atcoderでmod計算に困ったので，ちょっと調べてメモ．</p>
+
+<h2 id="問題">問題</h2>
+
+<p>$a^{-1} \, mod \, p$を計算するとはすなわち，</p>
+
+<div style="overflow-x: auto;">
+$$ax + py = 1$$
+</div>
+
+<p>を満たす$x$を求めたいということになる．</p>
+
+<p>Euclidの互除法を適用すると，</p>
+
+<div style="overflow-x: auto;">
+$$p = qa + r$$
+</div>
+
+<p>となり，これを元の式に代入すると，</p>
+
+<div style="overflow-x: auto;">
+$$ ax + (qa + r) y = 1 \Leftrightarrow ry + a(x + qy) = 1$$
+</div>
+
+<p>になる．これによって，$(a, p)$に関する問題が，それより数値の小さな$(r, a)$に関する問題に帰着できた．</p>
+
+<p>これを再帰的に解くのが拡張Euclidの互除法．具体的には，$(r, a)$に関する小問題を解いて，</p>
+
+<div style="overflow-x: auto;">
+$$ rs + at = 1$$
+</div>
+
+<p>と解$(s, t)$が再帰的に得られたとすると，</p>
+
+<div style="overflow-x: auto;">
+$$y = s, \, x + qy = t \Leftrightarrow x = t - qs, \, y = s$$
+</div>
+
+<p>となり，元の問題の解を構成できる．</p>
+
+<h2 id="実装">実装</h2>
+
+<p>終了条件に注意して実装．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">extGCD</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">a</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">b</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">d</span> <span class="o">=</span> <span class="n">extGCD</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">%</span><span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+    <span class="n">y</span> <span class="o">-=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">inline</span> <span class="kt">long</span> <span class="kt">long</span> <span class="nf">mod</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">a</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">%</span> <span class="n">m</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span> <span class="o">%</span> <span class="n">m</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">long</span> <span class="kt">long</span> <span class="nf">modinv</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">a</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+    <span class="n">extGCD</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">mod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 計算例
+</span><span class="c1"></span>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">modinv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>非再帰で書いたものをアンローリング展開しているもの（コードは理解できない）は以下．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="n">ll</span> <span class="nf">modinv</span><span class="p">(</span><span class="n">ll</span> <span class="n">a</span><span class="p">,</span> <span class="n">ll</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ll</span> <span class="n">b</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ll</span> <span class="n">t</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">a</span> <span class="o">-=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">swap</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+        <span class="n">u</span> <span class="o">-=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">v</span><span class="p">;</span>
+        <span class="n">swap</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">u</span> <span class="o">%=</span> <span class="n">m</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">u</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">u</span> <span class="o">+=</span> <span class="n">m</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/vpylm/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-11-17 02:09:34.04969 &#43;0900 JST m=&#43;0.069876650">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
