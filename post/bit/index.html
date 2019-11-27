@@ -78,11 +78,11 @@
 
 <p><img src="https://seiichiinoue.github.io/img/bit.png"></p>
 
-<p>深さ$\log N$の二分木となっており，ノードに以下のような法則を持たせながら値を保持しています．</p>
+<p>深さ$\log N$の二分木となっており，以下のような法則で配列に値を保持しています．</p>
 
 <ol>
 <li>各ノードには，部分木の要素の和が格納されている．</li>
-<li>それぞれのノードが管理している区間の長さを番号(10進)で表示したとき，二進数でみると，二進数の&rdquo;1&rdquo;が立っている最下位ビットが区間の長さに対応する．</li>
+<li>それぞれのノードが管理している区間の長さを番号(10進)で表示したとき，二進数でみると，二進数の最も下の&rdquo;1&rdquo;が立っているビットが区間の長さに対応する．</li>
 </ol>
 
 <p>見たらわかるとおりですが，このようなデータ構造にすることで，変数の更新は，最大でも木の深さ回の更新，区間の和の算出も同様に木の深さ回の計算，つまり$O(logN)$で実現できそうです．</p>
@@ -118,13 +118,13 @@
 
 <p><img src="https://seiichiinoue.github.io/img/bit_bin.png"></p>
 
-<p>すると，長さNの配列をBITとしたとき，BIT[x]が管理する区間の長さは，xの&rdquo;1&rdquo;が立っている最下位ビットになっていることがわかります．</p>
+<p>すると，長さNの配列をBITとしたとき，BIT[x]が管理する区間の長さは，xの最も下の&rdquo;1&rdquo;が立っているビットになっていることがわかります．</p>
 
 <ul>
-<li>例えば，BIT[4]が管理している区間の長さは，2で，4を2進表記にすると0110，&rdquo;1&rdquo;が立っている最下位のビットは2なので長さは2．</li>
+<li>例えば，BIT[4]が管理している区間の長さは，2で，4を2進表記にすると0110，最も下の&rdquo;1&rdquo;が立っているビットは2なので長さは2．</li>
 </ul>
 
-<p>以下は計算方法の話になりますが，次のように&rdquo;1&rdquo;が立っている最下位ビットを取り出すことができるので覚えましょう．</p>
+<p>以下は計算方法の話になりますが，次のように最も下の&rdquo;1&rdquo;が立っているビットを取り出すことができるので覚えましょう．</p>
 
 <p><img src="https://seiichiinoue.github.io/img/bin_extract.png"></p>
 
@@ -214,7 +214,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-11-27 13:23:11.92418 &#43;0900 JST m=&#43;0.072729159">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-11-27 13:30:33.638267 &#43;0900 JST m=&#43;0.074661246">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
