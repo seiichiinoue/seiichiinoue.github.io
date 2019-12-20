@@ -6,10 +6,19 @@
     <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 27 Nov 2019 11:50:45 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 21 Dec 2019 01:52:57 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>boost-pythonの仮想環境を作成した</title>
+      <link>https://seiichiinoue.github.io/post/boostenv/</link>
+      <pubDate>Sat, 21 Dec 2019 01:52:57 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/boostenv/</guid>
+      <description>環境構築って大変ですよね．以前論文実装で使用したboost-pythonの環境をせっかくなので，再利用可能な形で作成しました． 事前準備 Doc</description>
+    </item>
     
     <item>
       <title>Binary Indexed Treeの実装</title>

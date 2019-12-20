@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				boost-pythonの仮想環境を作成した &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2019-12-21 01:52:57 &#43;0900 JST">December 21, 2019</time>
+</div>
+
+		<h1 class="post-title">boost-pythonの仮想環境を作成した</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>環境構築って大変ですよね．以前論文実装で使用したboost-pythonの環境をせっかくなので，再利用可能な形で作成しました．</p>
+
+<h2 id="事前準備">事前準備</h2>
+
+<p>Dockerを任意のOSにインストールしてください．</p>
+
+<p>それから，以下のdockerfileを使用してイメージをビルドします．以下では，boostを使用するために必要なライブラリをインストールしています．</p>
+<div class="highlight"><pre class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="c"># image</span><span class="err">
+</span><span class="err"></span><span class="k">FROM</span><span class="s"> ubuntu:14.04</span><span class="err">
+</span><span class="err"></span><span class="c"># install gcc for compiler development</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> apt-get install -y libboost-all-dev python3-dev git cmake g++ gdb python3-dbg vim<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># language environment settings</span><span class="err">
+</span><span class="err"></span><span class="c"># japanese lang</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt-get -y install language-pack-ja-base language-pack-ja<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># env var</span><span class="err">
+</span><span class="err"></span><span class="k">ENV</span><span class="s"> LANG ja_JP.UTF-8</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /workspace/</span></code></pre></div>
+<p>イメージを作成したら，適当にコンテナを作成します．</p>
+
+<h2 id="使用方法">使用方法</h2>
+
+<p><code>boost/python</code>では，<code>pyconfig.h</code>が使用しているため，<code>pyconfig</code>の場所をC++のinclude pathに追加してあげないといけません。</p>
+
+<p>このdockerfileでインストールされるpythonのバージョン（また，boost-pythonのビルドに使用されるpythonのバージョン）は3.4なので，<code>/usr/include/python3.7m/</code>をincludeしてあげれば大丈夫です．ちなみに，これは，</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">root@ffef4c87a29c:/workspace# find /usr/include -name pyconfig.h
+/usr/include/python3.4m/pyconfig.h
+/usr/include/x86_64-linux-gnu/python3.4m/pyconfig.h
+/usr/include/x86_64-linux-gnu/python3.4dm/pyconfig.h
+/usr/include/python3.4dm/pyconfig.h</code></pre></div>
+<p>こんな感じで探せます．あとはこのパスを環境変数に追加してあげると，使用することができます．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">export</span> <span class="nv">CPLUS_INCLUDE_PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CPLUS_INCLUDE_PATH</span><span class="s2">:/usr/include/python3.4m/&#34;</span></code></pre></div>
+<p>余談ですが，ローカルで全て作業していると，バージョンの競合やmac特有<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>のファイルシステムでビルドエラーが出たりするので，プロジェクトごとに仮想環境立てた方が良さそうですね．そう思いました．</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">MacOS Catalinaになってから，<code>/usr/include/</code>が消えたり，Xcodeのライブラリのディレクトリが変わったり，大幅な変更があったみたいです．
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/bit/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2019-12-21 02:15:26.203091 &#43;0900 JST m=&#43;0.190745017">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
