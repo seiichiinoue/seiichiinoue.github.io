@@ -17,7 +17,7 @@
       <pubDate>Sat, 21 Dec 2019 01:52:57 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/boostenv/</guid>
-      <description>環境構築って大変ですよね．以前論文実装で使用したboost-pythonの環境をせっかくなので，再利用可能な形で作成しました． 事前準備 Doc</description>
+      <description>環境構築って大変ですよね．以降また使用するときに面倒臭くないよう，以前論文実装1で使用したboost-pythonの環境をdockerで作成</description>
     </item>
     
     <item>

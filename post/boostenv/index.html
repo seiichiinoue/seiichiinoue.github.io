@@ -49,7 +49,7 @@
 
 		
 
-<p>環境構築って大変ですよね．以前論文実装で使用したboost-pythonの環境をせっかくなので，再利用可能な形で作成しました．</p>
+<p>環境構築って大変ですよね．以降また使用するときに面倒臭くないよう，以前論文実装<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>で使用したboost-pythonの環境をdockerで作成しました．</p>
 
 <h2 id="事前準備">事前準備</h2>
 
@@ -73,7 +73,7 @@
 
 <h2 id="使用方法">使用方法</h2>
 
-<p><code>boost/python</code>では，<code>pyconfig.h</code>が使用しているため，<code>pyconfig</code>の場所をC++のinclude pathに追加してあげないといけません。</p>
+<p>boostパッケージのソースコードを読めばわかるのですが，パッケージ内の<code>boost/python</code>では，<code>pyconfig.h</code>というヘッダーを使用しているため，boostで使用したいバージョンの<code>pyconfig</code>の場所をC++のinclude pathに追加してあげないといけません．</p>
 
 <p>このdockerfileでインストールされるpythonのバージョン（また，boost-pythonのビルドに使用されるpythonのバージョン）は3.4なので，<code>/usr/include/python3.7m/</code>をincludeしてあげれば大丈夫です．ちなみに，これは，</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">root@ffef4c87a29c:/workspace# find /usr/include -name pyconfig.h
@@ -83,14 +83,16 @@
 /usr/include/python3.4dm/pyconfig.h</code></pre></div>
 <p>こんな感じで探せます．あとはこのパスを環境変数に追加してあげると，使用することができます．</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">export</span> <span class="nv">CPLUS_INCLUDE_PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CPLUS_INCLUDE_PATH</span><span class="s2">:/usr/include/python3.4m/&#34;</span></code></pre></div>
-<p>余談ですが，ローカルで全て作業していると，バージョンの競合やmac特有<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>のファイルシステムでビルドエラーが出たりするので，プロジェクトごとに仮想環境立てた方が良さそうですね．そう思いました．</p>
+<p>余談ですが，ローカルで全て作業していると，バージョンの競合やmac特有<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>のファイルシステムでビルドエラーが出たりするので，プロジェクトごとに仮想環境立てた方が良さそうですね．そう思いました．</p>
 <div class="footnotes">
 
 <hr />
 
 <ol>
-<li id="fn:1">MacOS Catalinaになってから，<code>/usr/include/</code>が消えたり，Xcodeのライブラリの場所が変わったり，root直下への書き込みが不可能になったなど，大幅な変更があったみたいです．
+<li id="fn:1"><a href="https://seiichiinoue.github.io/post/cstm/">ガウス過程に基づく連続空間トピックモデル</a>や，<a href="https://seiichiinoue.github.io/post/vpylm/">Pitman-Yor過程に基づく可変長n-gram言語モデル</a>の実装で使用しました．
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+<li id="fn:2">MacOS Catalinaになってから，<code>/usr/include/</code>が消えたり，Xcodeのライブラリの場所が変わったり，root直下への書き込みが不可能になったなど，大幅な変更があったみたいです．
+ <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -108,7 +110,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2019-12-21 02:24:33.69942 &#43;0900 JST m=&#43;0.076216335">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2019-12-21 02:43:36.428016 &#43;0900 JST m=&#43;0.181148939">2019</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/x-mathjax-config">
                 MathJax.Hub.Config({
