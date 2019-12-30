@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>boost-pythonの仮想環境を作成した</title>
+      <title>boost-pythonの仮想環境を構築</title>
       <link>https://seiichiinoue.github.io/post/boostenv/</link>
       <pubDate>Sat, 21 Dec 2019 01:52:57 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/boostenv/</guid>
-      <description>環境構築って大変ですよね．以降また使用するときに面倒臭くないよう，以前論文実装1で使用したboost-pythonの環境をdockerで作成</description>
+      <description>環境構築って大変ですよね．以降また使用するときに面倒臭くないよう，以前論文実装1で使用したboost-pythonが動く仮想環境を作成したの</description>
     </item>
     
     <item>
