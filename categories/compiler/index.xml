@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>compiler on いのうの作業ログ</title>
+    <link>https://seiichiinoue.github.io/categories/compiler/</link>
+    <description>Recent content in compiler on いのうの作業ログ</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Fri, 04 Oct 2019 16:57:07 +0900</lastBuildDate>
+    
+	<atom:link href="https://seiichiinoue.github.io/categories/compiler/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>自作C(風)コンパイラの作成</title>
+      <link>https://seiichiinoue.github.io/post/scc/</link>
+      <pubDate>Fri, 04 Oct 2019 16:57:07 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/scc/</guid>
+      <description>結果 最近は空き時間を見つけては自作コンパイラの実装を進めるをしていました．結果，以下のような簡単なコードをコンパイルできるようになりました．</description>
+    </item>
+    
+    <item>
+      <title>segfaultについて</title>
+      <link>https://seiichiinoue.github.io/post/segfault/</link>
+      <pubDate>Thu, 08 Aug 2019 19:49:32 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/segfault/</guid>
+      <description>今回は，コンパイルは通ったのに実行時にエラーSegmentation fault: 11が出てしまった件について． 問題のコードはこちら．ちょっとややこしい</description>
+    </item>
+    
+  </channel>
+</rss>

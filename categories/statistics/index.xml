@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>statistics on いのうの作業ログ</title>
+    <link>https://seiichiinoue.github.io/categories/statistics/</link>
+    <description>Recent content in statistics on いのうの作業ログ</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 23 Oct 2019 01:32:07 +0900</lastBuildDate>
+    
+	<atom:link href="https://seiichiinoue.github.io/categories/statistics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Continuous Space Topic Modelの実装</title>
+      <link>https://seiichiinoue.github.io/post/cstm/</link>
+      <pubDate>Wed, 23 Oct 2019 01:32:07 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/cstm/</guid>
+      <description>ガウス過程に基づく連続空間トピックモデル(CSTM)はガウス過程を用いて単語の潜在座標を表現するトピックモデルです．実装はseiichiin</description>
+    </item>
+    
+  </channel>
+</rss>
