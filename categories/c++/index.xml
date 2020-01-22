@@ -26,7 +26,7 @@
       <pubDate>Wed, 23 Oct 2019 01:32:07 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/cstm/</guid>
-      <description>ガウス過程に基づく連続空間トピックモデル(CSTM)はガウス過程を用いて単語の潜在座標を表現するトピックモデルです．実装はseiichiin</description>
+      <description>ガウス過程に基づく連続空間トピックモデル(CSTM)は，単語に潜在空間における座標を明示的に与え，その上にガウス過程を考えることによって，通</description>
     </item>
     
     <item>
