@@ -42,8 +42,10 @@ request.onload = function() {
     }
     html += "</ul>";
 
-    // insert generated html
-    document.getElementById("related").insertAdjacentHTML('afterend',html);
+    // insert generated html if success request
+    if (res["success"]) {
+        document.getElementById("related").insertAdjacentHTML('afterend',html);
+    }
 }
 
 request.send();
