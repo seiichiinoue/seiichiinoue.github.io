@@ -1,6 +1,7 @@
 // prepare submit data
 var tmp = document.URL.replace("https://seiichiinoue.github.io/post/", "");
 var name = tmp.replace("/", "");
+if (name == "") name = "noname";
 var res;
 
 // request
