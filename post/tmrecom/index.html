@@ -78,6 +78,8 @@
 
 <p>次に，文書においてトピックが生成されたら，そのトピックにおける単語の生起確率分布を考えます．やはりこちらも同様に，単語の生起確率もディリクレ分布に従います．</p>
 
+<p>そして，各単語は，単語が属する文書がもつトピックにおける単語の生起確率分布に従って生成されます．</p>
+
 <p>以上のLDAにおける単語の生成モデルの流れをまとめると，以下のようになります．</p>
 
 <ul>
@@ -93,6 +95,12 @@
 <p>これが生成モデルですが，もちろん現実には文書，つまり単語のカウント数というデータがあるだけで，この生成過程はわかっていません．それをデータから求めます．</p>
 
 <h2 id="ldaの解法">LDAの解法</h2>
+
+<h2 id="参照">参照</h2>
+
+<ul>
+<li><a href="http://chasen.org/~daiti-m/paper/daichi15topicmodel-for-ecology.pdf">統計数理研究所 離散データの確率的トピックモデル</a>, 持橋大地, 生物に見られる時空間パターンと統計数理:同調・認知・行動にて (2015)</li>
+</ul>
 
 
         <h2 id="related">See Also</h2>
@@ -110,7 +118,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-01 10:42:44.934224 &#43;0900 JST m=&#43;0.219581940">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-01 10:55:06.34733 &#43;0900 JST m=&#43;0.071057843">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
