@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>boost-pythonの仮想環境を構築</title>
+      <title>boost-pythonのdockerfileを作成した</title>
       <link>https://seiichiinoue.github.io/post/boostenv/</link>
       <pubDate>Sat, 21 Dec 2019 01:52:57 +0900</pubDate>
       

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				トピックモデルを用いた類似記事のレコメンド機能の実装 &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2020-01-31 20:20:13 &#43;0900 JST">January 31, 2020</time>
+</div>
+
+		<h1 class="post-title">トピックモデルを用いた類似記事のレコメンド機能の実装</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>久々の更新となります．トピックモデルによる文書分類を用いてこのブログのレコメンド機能を実装したので，まとめていきたいと思います．</p>
+
+<p>大まかな流れとしては，ブログの全文書を用いたモデリング，モデルのAPI化，APIのデプロイ，DOMをいじって結果を表示，という感じになっています．かなり単純なのですが，自分にとっては初めてのことが多かったので（特にwebに関することで）備忘録的な形でも残せたらなと思って書いていきます．</p>
+
+<p>まず，トピックモデルは，様々な離散データに隠れた潜在的なトピックを推定するモデルです．ここでいうトピックとは，自然言語処理の文脈では，話題や分野に対応すると考えられ，購買データなどでは，消費者の嗜好などに対応すると考えることができます．</p>
+
+<p>また，ナイーブベイズ分類器などとは異なり，完全に教師なし（人手を介さない）でデータから自動的に学習するモデルとなっています．</p>
+
+<p>今回は，そのトピックモデルのひとつであるLDA; Latent Dirichlet Allocationを用いてこのブログのモデリングを行いました．</p>
+
+<h2 id="lda-latent-dirichlet-allocation">LDA; Latent Dirichlet Allocation</h2>
+
+<p>LDAはざっくりと以下のようなモデルになります．</p>
+
+<ul>
+<li>文書の背景には「トピックの適合率」が存在している</li>
+<li>文書中の各単語の背景には，一つのトピックが存在している</li>
+<li>各単語の背景にあるトピックは，その単語が属している文書の「トピックの混合率」から生成される</li>
+</ul>
+
+<p>つまり，LDAによる文書群のモデル化ができれば，任意の単語に対して，単語の背景にあるトピックが推定可能なので，同じトピックに属する単語を探すことでその単語と同じような意味をもつ単語でクラスタリングすることができます．また，文書についても同様に，各文書に現れる背景トピックの数を見れば，文書のクラスタリングも可能になります．</p>
+
+<h2 id="ldaの生成モデル">LDAの生成モデル</h2>
+
+<p>LDAでは，まず，文書$\mathbf{w}$をトピックの混合比(=潜在トピック分布)で表現します．各文書のトピックは多項分布に従うので，そのトピックの混合比は，多項分布の共役事前分布のディリクレ分布から生成されると考えます．</p>
+
+<p>次に，文書においてトピックが生成されたら，そのトピックにおける単語の生起確率分布を考えます．やはりこちらも同様に，単語の生起確率もディリクレ分布に従います．</p>
+
+<p>以上のLDAにおける単語の生成モデルの流れをまとめると，以下のようになります．</p>
+
+<ul>
+<li>トピックの混合比 $\theta \sim Dir(\alpha)$ を生成</li>
+<li>For n = 1 &hellip; N,
+
+<ul>
+<li>トピック $z_n \sim Mult(\theta)$ を選択</li>
+<li>単語 $w_n \sim p(w|z)$ を生成</li>
+</ul></li>
+</ul>
+
+<p>これが生成モデルですが，もちろん現実には文書，つまり単語のカウント数というデータがあるだけで，この生成過程はわかっていません．それをデータから求めます．</p>
+
+<h2 id="ldaの解法">LDAの解法</h2>
+
+
+        <h2 id="related">See Also</h2>
+
+		
+	</div>
+     
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/boostenv/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-02-01 10:42:44.934224 &#43;0900 JST m=&#43;0.219581940">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
