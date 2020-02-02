@@ -1,4 +1,5 @@
 // prepare submit data
+// need to deal with all case of url !!
 var tmp = document.URL.replace("https://seiichiinoue.github.io/post/", "");
 var name = tmp.replace("/", "");
 if (name == "") name = "noname";

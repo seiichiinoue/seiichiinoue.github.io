@@ -96,11 +96,49 @@
 
 <h2 id="ldaの解法">LDAの解法</h2>
 
+<p>生成モデルがわかったので，観測データからパラメータを推定する方法を考えます．</p>
+
+<p>まず，観測単語とトピック，トピック分布の同時確率関数は以下のようになります．</p>
+
+<div style="overflow-x: auto;">
+$$p(w, z, \theta) = p(w|z) p(z| \theta) p( \theta| \alpha)$$
+</div>
+
+<p>よって，文書$\mathbf{w} = w_1, w_2, &hellip; , w_N$について</p>
+
+<div style="overflow-x: auto;">
+
+$$p(\mathbf{w}, z, \theta) = p( \theta| \alpha) \prod_n p(w_n |z_n) p(z_n| \theta)$$
+
+\begin{aligned}
+p(\mathbf{w}) &= \int \sum_z p(\mathbf{w}, z, \theta) d \theta \\
+&= \frac{\Gamma{(\sum_k \alpha_k})}{\prod_k \Gamma{(\alpha_k)}} \int (\prod_k \theta_k^{\alpha_k - 1}) \prod_n \sum_k p(w_n | k) \theta_k d \theta
+\end{aligned}
+
+</div>
+
+<p>となり，これが尤度関数となります．この尤度を最大にするときのパラメータを推定したいです．</p>
+
+<p>推定方法はいくつかありますが，今回はGibbsサンプラーを用いて<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>推定しました．</p>
+
+<h2 id="ldaのgibbs-sampler">LDAのGibbs Sampler</h2>
+
+<p>Gibbsサンプラーとは，マルコフ連鎖モンテカルロ法(MCMC)の最も簡単な場合で，潜在変数を分布ではなく，条件付き分布から実際にサンプリングしていくことでパラメータの推定を行う手法です．</p>
+
 <h2 id="参照">参照</h2>
 
 <ul>
 <li><a href="http://chasen.org/~daiti-m/paper/daichi15topicmodel-for-ecology.pdf">統計数理研究所 離散データの確率的トピックモデル</a>, 持橋大地, 生物に見られる時空間パターンと統計数理:同調・認知・行動にて (2015)</li>
 </ul>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">Gibbsサンプラーは変分ベイズと比べて計算量が多いらしいですが，今回用いたデータは自分のブログの文書のみであり，リソースには余裕があったため，局所解に陥りにくいGibbsサンプラーを採用しました．
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+</ol>
+</div>
 
 
         <h2 id="related">See Also</h2>
@@ -118,7 +156,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-01 10:55:06.34733 &#43;0900 JST m=&#43;0.071057843">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-02 17:13:57.612161 &#43;0900 JST m=&#43;0.183277277">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
