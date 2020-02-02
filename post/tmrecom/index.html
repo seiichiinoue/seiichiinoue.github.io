@@ -161,6 +161,58 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 
 <p>で，$n_{-i, k}^{(w)}$は，データ全体で単語$w$がトピック$k$に割り当てられた回数($w_i$を除く)であり，$n_{-i, k}^{(d)}$は，文書$d$中でトピック$k$に割り当てられた単語数($w_i$を除く)です．</p>
 
+<h2 id="ldaの幾何学的解釈">LDAの幾何学的解釈</h2>
+
+<p>LDAは，名前の通り，潜在ディリクレ分布にallocateするというものですが，何を何にallocateしているのでしょうか．ここで，3-1=2次元の単体上での生成の流れをみながら，LDAを再解釈してみます．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/ldageo.png"></p>
+
+<p>LDAでは，文書毎にトピック単体上のディリクレ分布からトピック分布$\theta$を選択します．ここで，単体の角が各トピックに対応しています．そして，$\theta$から確率的に頂点$\beta$を選び，$\beta = p(w|k)$から確率的に$w$を選びます．</p>
+
+<p>これは，$p(w) = \sum_k \theta_k p(w | k)$から直接$w$を選んでいることと等価です．つまり，トピック単体は単語単体上に埋め込まれているということがわかります．</p>
+
+<p>よって，文書を比較的大きいと考えられる単語次元よりも低次の単体に&rdquo;allocate&rdquo;するというのがLDAの名前の所以になっているようです．</p>
+
+<h2 id="ldaによる文書分類">LDAによる文書分類</h2>
+
+<p>さて，LDAのことがなんとなくわかったので，LDAを用いて文書分類を行っていきます．LDAで文書分類を行う方法は，いくつか考えられますが，最も簡単なのは文書が持つトピック分布$\theta$を用いる方法です．</p>
+
+<p>$\theta$はトピック分布であり，上述の通りディリクレ分布に従うので，$\theta$の期待値を以下のように求めてあげればよいです．</p>
+
+<div style="overflow-x: auto;">
+$$E[\theta_k | \alpha] = \frac{\alpha_k}{\sum_k \alpha_k}$$
+</div>
+
+<p>ここで，類似する記事 := 同じトピックを持つ記事と定義してあげて，同じトピックを持つ記事でクラスタリングしてあげれば分類ができます．レコメンドも，同じクラスタに属する文書を用いることで実現できそうです．</p>
+
+<p>つまり，記事$i$と類似する記事の集合を$y_i$とすると，</p>
+
+<div style="overflow-x: auto;">
+$$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
+</div>
+
+<p>が類似する記事の集合となり，これをレコメンドすれば良いです．ここで$\theta_i$は文書$i$における各トピックの期待値です．</p>
+
+<h2 id="システムの概要">システムの概要</h2>
+
+<p>レコメンデーションのアルゴリズムまで考えることができたので，次は構築したモデルをwebAPIにして，web上で動くようにします．</p>
+
+<p>APIの作成にはpythonのFlask<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>を用いました．実装は <a href="https://github.com/seiichiinoue/recomapp">seiichiinoue/recomapp</a>にあります．</p>
+
+<p>APIでは，レコメンドを取得したい対象の記事のpathnameを投げた時に，レコメンド結果をjsonで返すというような単純なことをしています．</p>
+
+<p>それから，herokuでAPIをデプロイしたらweb上で動く推論モデルの完成です（すげー！）</p>
+
+<p>無事APIをデプロイできたので，あとはフロント側からjavascriptなどでDOMをいじってあげて，各記事に適切なレコメンデーション記事のリストを表示すれば完成です．</p>
+
+<h2 id="まとめと展望">まとめと展望</h2>
+
+<p>とりあえず，以上のように統計モデルを使って（記事へのタグ付けなど人手を介さず）レコメンデーションを自動化することができました．</p>
+
+<p>しかし，結果は各記事(<code>/post/</code>にあります)をみていただきたいのですが，現時点ではブログでの記事数が少なく，文書数/語彙数と共に本来の分布を正確に推定できるには事足りず，推論結果が納得のいくものにはなりませんでした．文書数を増やすことはもちろんですが（頑張ります！），前処理の時点で数式やコードブロックをバッサリと捨ててしまっていたりと無駄になっている記号の情報が多いので，そこらへんの情報を使用したら現状下でももう少し精度が上がるのではないかと思いました．</p>
+
+<p>また，APIに関してですが，現時点では記事が追加される度に自分でモデルを再学習させて，デプロイしなおしており，効率的とは言えません．ciなどを用いて記事が追加(ブログレポジトリのmasterブランチに<code>.md</code>ファイルがpush)された時に，自動でモデルを再学習/ビルド/デプロイをできるようにできたらより嬉しいかなと思いました．</p>
+
 <h2 id="参照">参照</h2>
 
 <ul>
@@ -173,6 +225,8 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 <ol>
 <li id="fn:1">Gibbsサンプラーは変分ベイズと比べて計算量が多いらしいですが，今回用いたデータは自分のブログの文書のみであり，リソースには余裕があったため，局所解に陥りにくいGibbsサンプラーを採用しました．
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+<li id="fn:2">Python用の軽量なウェブアプリケーションフレームワークです
+ <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -192,7 +246,7 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-02 23:16:45.129264 &#43;0900 JST m=&#43;0.181739208">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-02 23:55:05.762496 &#43;0900 JST m=&#43;0.073195540">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
