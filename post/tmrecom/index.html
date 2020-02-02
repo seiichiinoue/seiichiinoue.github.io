@@ -132,7 +132,7 @@ p(\mathbf{w}) &= \int \sum_z p(\mathbf{w}, z, \theta) d \theta \\
 <p>がある時，各$z_i$を考え直す，つまり条件付き分布</p>
 
 <div style="overflow-x: auto;">
-z_i \sim p(z_i | X, z_1, z_2, ..., z_{i-1}, z_{i+1}, ..., z_N)
+$$z_i \sim p(z_i | X, z_1, z_2, ..., z_{i-1}, z_{i+1}, ..., z_N)$$
 </div>
 
 <p>からランダムにサンプリングすることを繰り返します．</p>
@@ -147,15 +147,19 @@ $$z_i \sim p(z_i | \mathbf{w}, z_{-i}, \alpha, \eta)$$
 
 <p>から$z_i$をサンプリングして更新していくことで，尤もらしい$z_i$を得ます．</p>
 
-<p>ここで，$p(z<em>i | \mathbf{w}, z</em>{-i}, \alpha, \eta)$は，</p>
+<p>ここで，$p(z_i | \mathbf{w}, z_{-i}, \alpha, \eta)$は，</p>
 
 <div style="overflow-x: auto;">
 
 \begin{aligned}
-
+p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i})\\
+&= p(w_i | z_i = k, w_{-i}, z_{-i}) p(z_i = k | \mathbf{w}_{-i}, z_{-i})\\
+&= \frac{ \eta + n_{-i, k}^{(w_i)} }{ \sum_w (\eta + n_{-i, k}^{(w)}) } \cdot \frac{ \alpha_k + n_{-i, k}^{(d)} }{ \sum_k (\alpha_k + n_{-i, k}^{(d)}) }
 \end{aligned}
 
 </div>
+
+<p>で，$n_{-i, k}^{(w)}$は，データ全体で単語$w$がトピック$k$に割り当てられた回数($w_i$を除く)であり，$n_{-i, k}^{(d)}$は，文書$d$中でトピック$k$に割り当てられた単語数($w_i$を除く)です．</p>
 
 <h2 id="参照">参照</h2>
 
@@ -188,7 +192,7 @@ $$z_i \sim p(z_i | \mathbf{w}, z_{-i}, \alpha, \eta)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-02 21:57:29.216607 &#43;0900 JST m=&#43;0.181804233">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-02 22:28:28.136158 &#43;0900 JST m=&#43;0.070001468">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
