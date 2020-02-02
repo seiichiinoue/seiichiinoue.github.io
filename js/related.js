@@ -1,8 +1,15 @@
 // prepare submit data
 // need to deal with all case of url !!
-var tmp = document.URL.replace("https://seiichiinoue.github.io/post/", "");
-var name = tmp.replace("/", "");
-if (name == "") name = "noname";
+// var tmp = document.URL.replace("https://seiichiinoue.github.io/post/", "");
+// var name = tmp.replace("/", "");
+// if (name == "") name = "noname";
+url = document.URL;
+var parser = new URL(url);
+var tmp = parser.pathname.split('/');
+var name;
+if (tmp[1] != "post") name = "noname";
+else name = tmp[2];
+
 var res;
 
 // request
