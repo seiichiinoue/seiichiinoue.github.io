@@ -8,7 +8,7 @@ var parser = new URL(url);
 var tmp = parser.pathname.split('/');
 var name;
 if (tmp[1] != "post") name = "noname";
-else if (tmp[2] == undefined) name = "noname";
+else if (tmp[2] == undefined || tmp[2] == "") name = "noname";
 else name = tmp[2];
 
 var res;
