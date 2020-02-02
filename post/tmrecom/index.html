@@ -137,7 +137,7 @@ $$z_i \sim p(z_i | X, z_1, z_2, ..., z_{i-1}, z_{i+1}, ..., z_N)$$
 
 <p>からランダムにサンプリングすることを繰り返します．</p>
 
-<p>また，EMアルゴリズムとは違い，原理的に無限回繰り返せば真の分布からのサンプルになります．つまり，EMアルゴリズムでは，局所最適に陥る可能性が考えられますが，Gibbsサンプリングでは，大域的局所解を得やすいということになります．</p>
+<p>また，EMアルゴリズムとは違い，原理的に無限回繰り返せば真の分布からのサンプルになります．つまり，局所最適に陥らず大域的局所解を得やすいということになります．</p>
 
 <p>LDAの潜在変数は，文書のトピック分布$\theta$と各単語のトピック$z$，トピック毎の単語の生起確率分布$\beta$ですが，ここでは$\theta$と$\beta$を積分消去して，尤もらしい$z$得ることを考えます．つまり</p>
 
@@ -192,7 +192,7 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-02 22:51:03.852892 &#43;0900 JST m=&#43;0.177518252">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-02 23:16:45.129264 &#43;0900 JST m=&#43;0.181739208">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
