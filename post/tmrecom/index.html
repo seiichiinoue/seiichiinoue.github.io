@@ -96,9 +96,13 @@
 
 <h2 id="ldaの解法">LDAの解法</h2>
 
-<p>生成モデルがわかったので，観測データからパラメータを推定する方法を考えます．</p>
+<!-- 生成モデルがわかったので，観測データからパラメータを推定する方法を考えます． -->
 
-<p>まず，観測単語とトピック，トピック分布の同時確率関数は以下のようになります．</p>
+<p>単語生起確率が$\beta$で，各単語の背景トピックが$z$であるような文章群$\mathbf{w}$が得られる確率は以下のような図(グラフィカルモデル)によって表現され，</p>
+
+<p><img src="https://seiichiinoue.github.io/img/ldamodel.png"></p>
+
+<p>その実態である，観測単語とトピック，トピック分布の同時確率関数は以下のようになります．</p>
 
 <div style="overflow-x: auto;">
 $$p(w, z, \theta) = p(w|z) p(z| \theta) p( \theta| \alpha)$$
@@ -165,7 +169,7 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 
 <p>LDAは，名前の通り，潜在ディリクレ分布にallocateするというものですが，何を何にallocateしているのでしょうか．ここで，3-1=2次元の単体上での生成の流れをみながら，LDAを再解釈してみます．</p>
 
-<p><img src="https://seiichiinoue.github.io/img/ldageo.png"></p>
+<p><img src="https://seiichiinoue.github.io/img/ldaingeo.png"></p>
 
 <p>LDAでは，文書毎にトピック単体上のディリクレ分布からトピック分布$\theta$を選択します．ここで，単体の角が各トピックに対応しています．そして，$\theta$から確率的に頂点$\beta$を選び，$\beta = p(w|k)$から確率的に$w$を選びます．</p>
 
@@ -256,7 +260,7 @@ $$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-03 04:48:30.195464 &#43;0900 JST m=&#43;0.281669833">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-04 12:12:37.486604 &#43;0900 JST m=&#43;0.147230591">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
