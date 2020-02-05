@@ -76,7 +76,7 @@
 
 <p>LDAでは，まず，文書$\mathbf{w}$をトピックの混合比(=潜在トピック分布)で表現します．各文書のトピックは多項分布に従うので，そのトピックの混合比は，多項分布の共役事前分布のディリクレ分布から生成されると考えます．</p>
 
-<p>次に，文書においてトピックが生成されたら，そのトピックにおける単語の生起確率分布を考えます．やはりこちらも同様に，単語の生起確率もディリクレ分布に従います．</p>
+<p>次に，文書においてトピックが生成されたら，そのトピックにおける単語の生起確率分布を考えます．こちらも多項分布に従うので，同様にディリクレ分布から生成されると考えます．</p>
 
 <p>そして，各単語は，単語が属する文書がもつトピックにおける単語の生起確率分布に従って生成されます．</p>
 
@@ -260,7 +260,7 @@ $$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-04 12:12:37.486604 &#43;0900 JST m=&#43;0.147230591">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-05 16:04:45.346586 &#43;0900 JST m=&#43;0.241865045">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
