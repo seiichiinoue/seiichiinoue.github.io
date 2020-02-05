@@ -181,7 +181,7 @@ p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i
 
 <p>さて，LDAのことがなんとなくわかったので，LDAを用いて文書分類を行っていきます．LDAで文書分類を行う方法は，いくつか考えられますが，最も簡単なのは文書が持つトピック分布$\theta$を用いる方法です．</p>
 
-<p>$\theta$はトピック分布であり，上述の通りディリクレ分布に従うので，$\theta$の期待値を以下のように求めてあげればよいです．</p>
+<p>$\theta$はトピック分布であり，上述の通りディリクレ分布に従うので，$\theta$の期待値を以下のように求めてあげればよいです．ただし，$\alpha$はNewton-Raphson法などで最尤推定します．</p>
 
 <div style="overflow-x: auto;">
 $$E[\theta_k | \alpha] = \frac{\alpha_k}{\sum_k \alpha_k}$$
@@ -260,7 +260,7 @@ $$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-05 16:04:45.346586 &#43;0900 JST m=&#43;0.241865045">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-06 05:26:15.163648 &#43;0900 JST m=&#43;0.270926545">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
