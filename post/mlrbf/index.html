@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				ガウスカーネルのメモ &middot; いのうの作業ログ
+				多変量入力におけるガウスカーネルの計算法 &middot; いのうの作業ログ
 		</title>
 
 		
@@ -43,7 +43,7 @@
         <time datetime="2020-02-08 09:14:16 &#43;0900 JST">February 8, 2020</time>
 </div>
 
-		<h1 class="post-title">ガウスカーネルのメモ</h1>
+		<h1 class="post-title">多変量入力におけるガウスカーネルの計算法</h1>
 <div class="post-line"></div>
 
 		
@@ -60,7 +60,7 @@
 $$ k(x, x^{\prime}) = exp (- \| x - x^{\prime} \|^2 / 2 \sigma^2)$$
 </div>
 
-<p>入力間の距離を表現するもの。カーネル法の文脈では，これは確立密度関数として解釈されないので，正規化係数は省かれている．</p>
+<p>入力間の距離を表現するもの。カーネル法の文脈では，これは確率密度関数として解釈されないので，正規化係数は省かれている．</p>
 
 <h2 id="多変量の入力に対するガウスカーネル">多変量の入力に対するガウスカーネル</h2>
 
@@ -76,7 +76,7 @@ $$ k(\mathbf{x}, \mathbf{x}^{\prime}) = exp (- \| \mathbf{x} - \mathbf{x}^{\prim
 $$\| \mathbf{x} - \mathbf{x}^{\prime} \|^2　= \mathbf{x}^T \mathbf{x} - 2 \mathbf{x}^T \mathbf{x}^{\prime} + \mathbf{x}^{\prime T} \mathbf{x}^{\prime}$$
 </div>
 
-<p>以下のような形を導ける．</p>
+<p>以下のような形を導ける．（カーネル関数はこれに沿って計算してあげればよい）</p>
 
 <div style="oveflow-x: auto;">
 $$k(\mathbf{x}, \mathbf{x}^{\prime}) = exp(- \frac{\mathbf{x}^T \mathbf{x}}{2 \sigma^2}) \, exp(\frac{\mathbf{x}^T \mathbf{x}^{\prime}}{\sigma^2}) \, exp(- \frac{\mathbf{x}^{\prime T} \mathbf{x}^{\prime}}{2 \sigma^2})$$
@@ -102,7 +102,7 @@ $$k(\mathbf{x}, \mathbf{x}^{\prime}) = exp(- \frac{\mathbf{x}^T \mathbf{x}}{2 \s
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-08 09:46:53.199471 &#43;0900 JST m=&#43;0.182770948">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-08 09:49:39.662404 &#43;0900 JST m=&#43;0.209665021">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
