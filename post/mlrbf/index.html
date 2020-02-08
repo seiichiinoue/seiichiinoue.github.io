@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				ガウスカーネルのメモ &middot; いのうの作業ログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうの作業ログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2020-02-08 09:14:16 &#43;0900 JST">February 8, 2020</time>
+</div>
+
+		<h1 class="post-title">ガウスカーネルのメモ</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="ガウスカーネル">ガウスカーネル</h2>
+
+<p>ガウスカーネルは以下のように定義される</p>
+
+<div style="oveflow-x: auto;">
+$$ k(x, x^{\prime}) = exp (- \| x - x^{\prime} \|^2 / 2 \sigma^2)$$
+</div>
+
+<p>入力間の距離を表現するもの。カーネル法の文脈では，これは確立密度関数として解釈されないので，正規化係数は省かれている．</p>
+
+<h2 id="多変量の入力に対するガウスカーネル">多変量の入力に対するガウスカーネル</h2>
+
+<p>1変量の時と同様，次のように定義される．</p>
+
+<div style="oveflow-x: auto;">
+$$ k(\mathbf{x}, \mathbf{x}^{\prime}) = exp (- \| \mathbf{x} - \mathbf{x}^{\prime} \|^2 / 2 \sigma^2)$$
+</div>
+
+<p>$\| \mathbf{x} - \mathbf{x}^{\prime} \|^2$の部をを以下のように展開すると</p>
+
+<div style="oveflow-x: auto;">
+$$\| \mathbf{x} - \mathbf{x}^{\prime} \|^2　= \mathbf{x}^T \mathbf{x} - 2 \mathbf{x}^T \mathbf{x}^{\prime} + \mathbf{x}^{\prime T} \mathbf{x}^{\prime}$$
+</div>
+
+<p>以下のような形を導ける．</p>
+
+<div style="oveflow-x: auto;">
+$$k(\mathbf{x}, \mathbf{x}^{\prime}) = exp(- \frac{\mathbf{x}^T \mathbf{x}}{2 \sigma^2}) \, exp(\frac{\mathbf{x}^T \mathbf{x}^{\prime}}{\sigma^2}) \, exp(- \frac{\mathbf{x}^{\prime T} \mathbf{x}^{\prime}}{2 \sigma^2})$$
+</div>
+
+<p>ここで，$\sigma$はカーネル関数の広がりを制御するパラメータ．</p>
+
+<p>ちなみに$\mathbf{x}^T \mathbf{x}$が有効なカーネルであることを用いると，上式でガウスカーネルが有効なカーネルであることが証明できる．</p>
+
+
+        <h2 id="related">See Also</h2>
+
+		
+	</div>
+     
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/tmrecom/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-02-08 09:39:46.428045 &#43;0900 JST m=&#43;0.088021163">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
