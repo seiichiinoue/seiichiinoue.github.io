@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ienekomusume</title>
+    <title>いのうの作業ログ</title>
     <link>https://seiichiinoue.github.io/</link>
-    <description>Recent content on ienekomusume</description>
+    <description>Recent content on いのうの作業ログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sat, 08 Feb 2020 09:14:16 +0900</lastBuildDate>
@@ -170,7 +170,7 @@
       <pubDate>Wed, 07 Aug 2019 08:34:41 +0900</pubDate>
       
       <guid>https://seiichiinoue.github.io/post/nlp/</guid>
-      <description>単語について 単語の意味をコンピュータに理解させる手法は大きく分けて以下の三つ． シソーラス: 人の手で意味を与えていく．（辞書など） カウントベー</description>
+      <description>Word2Vec 論文: Efficient Estimation of Word Representations in Vector Space 大量のテキストデータを用いて学習を行い，各単語の意味を推論によって表現する方法． CBOWモデル(周辺の単語からターゲ</description>
     </item>
     
     <item>

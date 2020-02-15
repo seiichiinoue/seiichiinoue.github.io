@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				自然言語処理(ML)の論文まとめ &middot; ienekomusume
+				自然言語処理(ML)の論文まとめ &middot; いのうの作業ログ
 		</title>
 
 		
@@ -17,14 +17,14 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
         
 		
-		<link href="" rel="alternate" type="application/rss+xml" title="ienekomusume" />
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
 	</head>
 
     <body>
         		<nav class="nav">
 			<div class="nav-container">
 				<a href="https://seiichiinoue.github.io/">
-					<h2 class="nav-title">ienekomusume</h2>
+					<h2 class="nav-title">いのうの作業ログ</h2>
 				</a>
 				<ul>
     <li><a href="https://seiichiinoue.github.io/about">About</a></li>
@@ -49,36 +49,6 @@
 		
 
 		
-
-<h2 id="単語について">単語について</h2>
-
-<p>単語の意味をコンピュータに理解させる手法は大きく分けて以下の三つ．</p>
-
-<ul>
-<li>シソーラス: 人の手で意味を与えていく．（辞書など）</li>
-<li>カウントベース: 着目する単語の周囲の単語に着目する（分散仮説）</li>
-<li>推論ベース: Word2Vecなど．</li>
-</ul>
-
-<h2 id="embedding">Embedding</h2>
-
-<p>自然言語処理におけるembeddingとは，<strong>文や単語，文字など自然言語の構成要素に対して何らかの空間におけるベクトルを与えること</strong>を示す．</p>
-
-<h3 id="one-hot表現">one-hot表現</h3>
-
-<ul>
-<li>最もシンプルなembedding手法．</li>
-<li>表現したい語彙をリストにして，各単語の値がindexに対応する部分が1，それ以外が0のベクトルとなる．</li>
-<li>Bag-of-Word(BoW)は，one-hotベクトルの和を取ることで対象のsequence単位の特徴量を得ることができる．</li>
-</ul>
-
-<h3 id="lsi-latent-semantic-indexing">LSI; Latent Semantic Indexing</h3>
-
-<ul>
-<li>BoWによる空間モデルが使用される．（出現順序を考慮せず，出現頻度などのみで文書をベクトル化するモデル）</li>
-<li>各文書を潜在変数空間の点として捉え，関連度を検索クエリの単語との距離で測る．</li>
-<li>LSIの発展としてLDA; Latent Dirichlet Allocationなどがある．</li>
-</ul>
 
 <h3 id="word2vec">Word2Vec</h3>
 
@@ -580,7 +550,7 @@ $$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = d
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-12 13:33:08.146414 &#43;0900 JST m=&#43;0.204760219">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-15 21:08:18.778671 &#43;0900 JST m=&#43;0.320066133">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
