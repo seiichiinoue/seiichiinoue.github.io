@@ -68,12 +68,34 @@ libboost_python37-mt.a
 libboost_python37-mt.dylib
 libboost_python37.a
 libboost_python37.dylib</code></pre></div>
+<p>追記: Linuxで，apt-getを使用してビルドした場合は<code>/usr/lib/</code>にあります．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">root@ec515f7ea39e:/workspace# find / -name *boost_python*
+/usr/lib/x86_64-linux-gnu/libboost_python-py27.so
+/usr/lib/x86_64-linux-gnu/libboost_python3-py36.so
+/usr/lib/x86_64-linux-gnu/libboost_python3.so
+/usr/lib/x86_64-linux-gnu/libboost_python.so
+/usr/lib/x86_64-linux-gnu/libboost_python-py36.so
+/usr/lib/x86_64-linux-gnu/libboost_python3-py36.a
+/usr/lib/x86_64-linux-gnu/libboost_python-py36.a
+/usr/lib/x86_64-linux-gnu/libboost_python3-py36.so.1.65.1
+/usr/lib/x86_64-linux-gnu/libboost_python3.a
+/usr/lib/x86_64-linux-gnu/libboost_python-py27.so.1.65.1
+/usr/lib/x86_64-linux-gnu/libboost_python.a
+/usr/lib/x86_64-linux-gnu/libboost_python-py27.a</code></pre></div>
 <p>次に，boost-pythonを使うには，pythonのconfigファイルのパスを通してあげないといけないようなので，<code>pyconfig.h</code>の場所を確認します．（これをリンクしてあげないとリンクエラーが出てしまう）</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ find /usr/local -name pyconfig.h
 /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/include/python2.7/pyconfig.h
 /usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/pyconfig.h
 /usr/local/Cellar/pypy3/7.1.1/libexec/include/include/pyconfig.h
 /usr/local/Cellar/pypy3/7.1.1/libexec/include/pyconfig.h</code></pre></div>
+<p>追記: Linuxの場合は，<code>/usr/include/</code>にあります．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">root@ec515f7ea39e:/workspace# find /usr/include/ -name pyconfig.h
+/usr/include/x86_64-linux-gnu/python2.7/pyconfig.h
+/usr/include/x86_64-linux-gnu/python3.6m/pyconfig.h
+/usr/include/x86_64-linux-gnu/python3.6dm/pyconfig.h
+/usr/include/python2.7/pyconfig.h
+/usr/include/python3.6m/pyconfig.h
+/usr/include/python3.6dm/pyconfig.h</code></pre></div>
 <p>これを(bash | zsh).rcか何かにexportしてあげて，</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">CPLUS_INCLUDE_PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CPLUS_INCLUDE_PATH</span><span class="s2">:/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/&#34;</span></code></pre></div>
 <p>これで完了です．</p>
@@ -119,7 +141,7 @@ libboost_python37.dylib</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-02-20 06:37:11.121312 &#43;0900 JST m=&#43;0.243649597">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-02-20 08:26:35.48169 &#43;0900 JST m=&#43;0.252694943">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
