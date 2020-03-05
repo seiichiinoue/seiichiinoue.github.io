@@ -81,14 +81,14 @@
   </url>
   
   <url>
-    <loc>https://seiichiinoue.github.io/post/cstm/</loc>
-    <lastmod>2019-10-23T01:32:07+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://seiichiinoue.github.io/categories/statistics/</loc>
     <lastmod>2019-10-23T01:32:07+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://seiichiinoue.github.io/post/cstm/</loc>
+    <lastmod>2019-10-23T01:32:07+09:00</lastmod>
   </url>
   
   <url>
