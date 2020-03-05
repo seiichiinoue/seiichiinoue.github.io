@@ -183,7 +183,7 @@ $$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
 
 <h3 id="学習過程の実装">学習過程の実装</h3>
 
-<p>まず、LAGANの目的関数は以下のようになります。</p>
+<p>まず、LSGANの目的関数は以下のようになります。</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_true</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span>
 <span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span></code></pre></div>
 <p>ただし</p>
@@ -357,7 +357,7 @@ Discriminatorの更新は以下のようになります。</p>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-05 13:06:51.748294 &#43;0900 JST m=&#43;0.311887295">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-05 14:38:10.208359 &#43;0900 JST m=&#43;0.330552818">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
