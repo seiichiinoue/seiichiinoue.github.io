@@ -209,7 +209,7 @@ P(Y|\lambda) &=& \Sigma_X P(Y, X | \lambda) \\
 $$\alpha_t (i) = P(Y_0, Y_1,...,Y_t, x_t = \omega_i | \lambda)$$
 </div>
 
-<p>を用います．$\alpha(i)$はマルコフ状態が$\omega_i$である$t$時点までに観測された文字列の確率です．</p>
+<p>を用います．$\alpha(i)$はマルコフ状態が$\omega_i$である$t$時点までの観測結果の同時確率です．</p>
 
 <p>$\alpha(i)$は以下のように計算されます．</p>
 
@@ -266,13 +266,11 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 
 <p>であり（分母の$P(Y | \lambda)$は$\alpha_{T-1}(i)$を$i$で周辺化すれば得られます），この$\gamma$を最大化するように隠れ状態を決定すれば良いことになります．</p>
 
-<p>しかし，この方法ではマルコフ性を考慮した系列とならない場合があるので，後に説明するviterbiアルゴリズムを用いて計算します．</p>
-
 <h3 id="モデルの推定">モデルの推定</h3>
 
 <p>出力確率と隠れ状態を算出できたので，それらを用いて，観測データに最もフィットするモデルのパラメータの調整を行います．</p>
 
-<p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下の&rdquo;di-gamma&rdquo;を定義します．</p>
+<p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下のdi-gammaを定義します．</p>
 
 <div style="overflow-x: auto;">
 $$\gamma_t(i, j) = P(x_t = \omega_i, x_{t+1} = \omega_j | Y, \lambda)$$
@@ -424,7 +422,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-06-24 05:46:45.046078 &#43;0900 JST m=&#43;0.267463490">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-07-24 15:38:06.274004 &#43;0900 JST m=&#43;0.261378165">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
