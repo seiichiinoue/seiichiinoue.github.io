@@ -212,20 +212,23 @@ MH acceptance:
     alpha0: 1.00003</code></pre></div>
 <p>かなりパープレキシティは下がったのではないでしょうか．</p>
 
-<p>それでは，学習したモデルを使用して単語ベクトルを抽出し，プロットしてみます．非常にサイズの大きな画像となっているので，以下には20次元のうち，一部を載せます．</p>
+<!--
+それでは，学習したモデルを使用して単語ベクトルを抽出し，プロットしてみます．非常にサイズの大きな画像となっているので，以下には20次元のうち，一部を載せます．
 
-<h3 id="0-1次元">0-1次元</h3>
+### 0-1次元
 
-<p><img src="https://seiichiinoue.github.io/img/words_0_1.png"></p>
+<img src="https://seiichiinoue.github.io/img/words_0_1.png">
 
-<h3 id="9-10次元">9-10次元</h3>
+### 9-10次元
 
-<p><img src="https://seiichiinoue.github.io/img/words_9_10.png"></p>
+<img src="https://seiichiinoue.github.io/img/words_9_10.png">
 
-<p>次に，単語ベクトルを使用して，類似する単語を上位からいくつか検索してみます．類似度の計算には，コサイン類似度を用いています．CSTMでは，word2vecとは異なり，語順や語の位置をみていないため，類似するベクトルはあくまでトピックが類似しているだけであり，意味が類似しているわけでは無いことに注意してください．</p>
+次に，単語ベクトルを使用して，類似する単語を上位からいくつか検索してみます．類似度の計算には，コサイン類似度を用いています．CSTMでは，word2vecとは異なり，語順や語の位置をみていないため，類似するベクトルはあくまでトピックが類似しているだけであり，意味が類似しているわけでは無いことに注意してください．
 
-<h3 id="四条金吾">四条金吾</h3>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">word id: 2409 word: 四条金吾 count: 5 sim: 1.0000000000000002
+### 四条金吾
+
+```text
+word id: 2409 word: 四条金吾 count: 5 sim: 1.0000000000000002
 word id: 11613 word: に坐し count: 9 sim: 0.7475744705196312
 word id: 2414 word: 委くは count: 13 sim: 0.7321756369887295
 word id: 12271 word: 霊山浄土に count: 10 sim: 0.7290645830411115
@@ -244,9 +247,13 @@ word id: 10422 word: かげ count: 12 sim: 0.6717896817213159
 word id: 11645 word: より甲州 count: 3 sim: 0.6678975850062032
 word id: 11515 word: 寺の別当 count: 4 sim: 0.6579620340392612
 word id: 12467 word: 楽と count: 7 sim: 0.6579452881718544
-word id: 13392 word: は梵天 count: 3 sim: 0.6556428726415026</code></pre></div>
-<h3 id="流罪">流罪</h3>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">word id: 4106 word: 流罪 count: 69 sim: 1.0
+word id: 13392 word: は梵天 count: 3 sim: 0.6556428726415026
+```
+
+### 流罪
+
+```text
+word id: 4106 word: 流罪 count: 69 sim: 1.0
 word id: 8459 word: 人人にも count: 3 sim: 0.8270976823111298
 word id: 14097 word: 帷 count: 2 sim: 0.7879294120831661
 word id: 2523 word: 他国 count: 23 sim: 0.754207043265161
@@ -265,11 +272,15 @@ word id: 10965 word: 蜘 count: 5 sim: 0.6916445918652208
 word id: 5892 word: 然る count: 34 sim: 0.6890282284418385
 word id: 2715 word: 大師の御 count: 7 sim: 0.6877322431132905
 word id: 9904 word: 供養す count: 16 sim: 0.6874966344947109
-word id: 7588 word: 置いて count: 21 sim: 0.6836983078964222</code></pre></div>
-<p>試しに，文書ベクトル同士でも類似度の計算をおこなってみました．結果は以下の通りです．</p>
+word id: 7588 word: 置いて count: 21 sim: 0.6836983078964222
+```
 
-<h3 id="開目抄">開目抄</h3>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">doc id: 333 doc: 開目抄下 sim: 0.9999999999999999
+試しに，文書ベクトル同士でも類似度の計算をおこなってみました．結果は以下の通りです．
+
+### 開目抄
+
+```text
+doc id: 333 doc: 開目抄下 sim: 0.9999999999999999
 doc id: 349 doc: 開目抄上 sim: 0.991156541340843
 doc id: 27 doc: 撰時抄 sim: 0.983186474897307
 doc id: 266 doc: 諌暁八幡抄 sim: 0.9826058618206056
@@ -288,10 +299,15 @@ doc id: 220 doc: 星名五郎太郎殿御返事 sim: 0.9718421492519042
 doc id: 139 doc: 呵責謗法滅罪抄 sim: 0.9717119252011754
 doc id: 37 doc: 如説修行抄 sim: 0.9708722425486271
 doc id: 102 doc: 顕仏未来記 sim: 0.9704520391114769
-doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053</code></pre></div>
-<p>開目抄上下で類似度が高くなっているのは，想定通りの結果なので，文書の特徴をうまく捉えて学習できてそうでよかったです．</p>
+doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053
+```
 
-<p>まだ，とりあえず学習させてみた状態で，これらを用いて他の計算を行っていないので実用性の評価にはかけますが，かなり面白い結果となったのでは無いかと思います．こういったモデルを使って，リコメンデーションアプリなどを作れたら面白いのでは無いかと思いました．（作るかはわかりません）</p>
+開目抄上下で類似度が高くなっているのは，想定通りの結果なので，文書の特徴をうまく捉えて学習できてそうでよかったです．
+
+まだ，とりあえず学習させてみた状態で，これらを用いて他の計算を行っていないので実用性の評価にはかけますが，かなり面白い結果となったのでは無いかと思います．こういったモデルを使って，リコメンデーションアプリなどを作れたら面白いのでは無いかと思いました．（作るかはわかりません）
+-->
+
+<p>まだ，とりあえず学習させてみただけなのですが，潜在座標というアイデアを用いて単語の相関を表現したり，トピックという外性変数を用いずに文書をモデル化したりすることは，いろいろと応用が出来そうだなと思いました．</p>
 
 
         <h2 id="related">See Also</h2>
@@ -310,7 +326,7 @@ doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-07-24 15:38:06.261933 &#43;0900 JST m=&#43;0.249306812">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-07-24 16:04:34.151136 &#43;0900 JST m=&#43;0.185306439">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
