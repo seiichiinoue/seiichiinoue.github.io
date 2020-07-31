@@ -93,6 +93,15 @@
     </item>
     
     <item>
+      <title>Hidden Markov Modelの実装</title>
+      <link>https://seiichiinoue.github.io/post/hmm/</link>
+      <pubDate>Tue, 24 Sep 2019 01:11:56 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/hmm/</guid>
+      <description>隠れマルコフモデルによる教師なし品詞推定の実装を行いました．実装はseiichiinoue/hmmに公開しています． 品詞推定 品詞の推定とは文</description>
+    </item>
+    
+    <item>
       <title>[備忘録] xcodeアップデートの際のgcc設定</title>
       <link>https://seiichiinoue.github.io/post/gcclink/</link>
       <pubDate>Sat, 21 Sep 2019 19:40:06 +0900</pubDate>

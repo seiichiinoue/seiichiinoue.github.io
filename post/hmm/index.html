@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				Hidden Markov Modelの実装 &middot; いのうの作業ログ
+				Hidden Markov Modelの実装 &middot; いのうのブログ
 		</title>
 
 		
@@ -17,14 +17,14 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
         
 		
-		<link href="" rel="alternate" type="application/rss+xml" title="いのうの作業ログ" />
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうのブログ" />
 	</head>
 
     <body>
         		<nav class="nav">
 			<div class="nav-container">
 				<a href="https://seiichiinoue.github.io/">
-					<h2 class="nav-title">いのうの作業ログ</h2>
+					<h2 class="nav-title">いのうのブログ</h2>
 				</a>
 				<ul>
     <li><a href="https://seiichiinoue.github.io/about">About</a></li>
@@ -50,7 +50,7 @@
 
 		
 
-<p>隠れマルコフモデルとviterbiアルゴリズムを使用した教師なし品詞推定の実装を行いました．実装は<a href="https://github.com/seiichiinoue/hmm">seiichiinoue/hmm</a>に公開しています．</p>
+<p>隠れマルコフモデルによる教師なし品詞推定の実装を行いました．実装は<a href="https://github.com/seiichiinoue/hmm">seiichiinoue/hmm</a>に公開しています．</p>
 
 <h2 id="品詞推定">品詞推定</h2>
 
@@ -270,13 +270,13 @@ $$\gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{P(Y | \lambda)}$$
 
 <p>出力確率と隠れ状態を算出できたので，それらを用いて，観測データに最もフィットするモデルのパラメータの調整を行います．</p>
 
-<p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下のdi-gammaを定義します．</p>
+<p>まず，$t = 0, 1, &hellip;, T-2$と，$i, j \in (0, 1, &hellip;, N-1)$に対して，以下を定義します．</p>
 
 <div style="overflow-x: auto;">
 $$\gamma_t(i, j) = P(x_t = \omega_i, x_{t+1} = \omega_j | Y, \lambda)$$
 </div>
 
-<p>よって$\gamma(i, j)$は，時刻$t$に$\omega_i$となり，時刻$t+1$に$\omega_j$に遷移する確率です．そしてdi-gammaは$\alpha, \, \beta, \, A, \, B$を用いて，以下のように表すことができます．</p>
+<p>よって$\gamma(i, j)$は，時刻$t$に$\omega_i$となり，時刻$t+1$に$\omega_j$に遷移する確率です．そして上式は$\alpha, \, \beta, \, A, \, B$を用いて，以下のように表すことができます．</p>
 
 <div style="overflow-x: auto;">
 $$\gamma_t(i, j) = \frac{\alpha_t(i) a_{ij} b_j (Y_{t+1}) \beta_{t+1} (j)}{P(Y | \lambda)}$$
@@ -422,7 +422,7 @@ $$s_t^* = \phi_{t+1} (s_{t+1}^*) \,\, (0 \leq t \leq T - 1)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-07-24 15:38:06.274004 &#43;0900 JST m=&#43;0.261378165">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-07-31 17:50:39.660321 &#43;0900 JST m=&#43;0.322270964">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
