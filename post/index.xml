@@ -6,10 +6,19 @@
     <description>Recent content in Posts on いのうのブログ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 31 Jan 2020 20:20:13 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 28 Sep 2020 20:51:09 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>大学院に合格した</title>
+      <link>https://seiichiinoue.github.io/post/tmu/</link>
+      <pubDate>Mon, 28 Sep 2020 20:51:09 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/tmu/</guid>
+      <description>久しぶりの投稿です．先日大学院試験の結果が出て，無事東京都立大学の小町研に合格したので受験体験記的なものを書きたいと思います． 経緯 大学は経済</description>
+    </item>
     
     <item>
       <title>トピックモデルを用いた類似記事のレコメンド機能の実装</title>
