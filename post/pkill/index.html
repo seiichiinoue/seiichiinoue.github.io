@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				特定の名前のプロセスをkillする方法 &middot; いのうのブログ
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="いのうのブログ" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">いのうのブログ</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2020-11-24 19:46:45 &#43;0900 JST">November 24, 2020</time>
+</div>
+
+		<h1 class="post-title">特定の名前のプロセスをkillする方法</h1>
+<div class="post-line"></div>
+
+		
+
+		<p>Chrome Driver等で脳死で実行，Ctrl+Cを繰り返した結果，プロセスが大変なことになってしまったので，<code>chromedriver</code>という名前の入ったプロセスを一気にkillしたいと思って調べたので備忘録</p>
+
+<p>通常，プロセスをkillする際は，</p>
+
+<pre><code>$ ps aux | grep chromedriver
+seiichi          34994   0.0  0.1  4488388  11692 s004  S     7:18PM   0:00.10 chromedriver --port=54055
+seiichi          34442   0.0  0.1  4488388  11664 s004  S     7:15PM   0:00.10 chromedriver --port=52793
+seiichi          34316   0.0  0.1  4488388  11712 s004  S     7:15PM   0:00.10 chromedriver --port=52421
+seiichi          34108   0.0  0.1  4488388  11012 s004  S     7:13PM   0:00.10 chromedriver --port=51932
+seiichi          33983   0.0  0.1  4488388   9768 s004  S     7:13PM   0:00.11 chromedriver --port=51627
+seiichi          37496   0.0  0.0  4258892    220 s005  R+    7:46PM   0:00.00 grep chromedriver
+seiichi          36187   0.0  0.1  4488388   9920 s004  S     7:25PM   0:00.09 chromedriver --port=57620
+seiichi          35949   0.0  0.1  4488388   9708 s004  S     7:24PM   0:00.09 chromedriver --port=57047
+seiichi          35761   0.0  0.1  4488388  11148 s004  S     7:23PM   0:00.09 chromedriver --port=56499
+seiichi          35033   0.0  0.1  4488540  11096 s004  S     7:18PM   0:00.11 chromedriver --port=54143
+$ kill -9 [process_number]
+</code></pre>
+
+<p>とするが，<code>pkill</code>を使うと</p>
+
+<pre><code>$ pkill -KILL -f chromedriver
+</code></pre>
+
+<p>で一気に消してくれる．ちなみにオプションは以下の通り．</p>
+
+<pre><code>OPTIONS
+       -c     Suppress normal output; instead print a count of matching processes.
+
+       -d delimiter
+              Sets the string used to delimit each process ID in the output (by default a newline).  (pgrep only.)
+
+       -f     The pattern is normally only matched against the process name.  When -f is set, the full command line is used.
+
+       -g pgrp,...
+              Only match processes in the process group IDs listed.  Process group 0 is translated into pgrep's or pkill's own process group.
+
+       -G gid,...
+              Only match processes whose real group ID is listed.  Either the numerical or symbolical value may be used.
+
+       -l     List the process name as well as the process ID. (pgrep only.)
+
+       -n     Select only the newest (most recently started) of the matching processes.
+
+       -o     Select only the oldest (least recently started) of the matching processes.
+
+       -P ppid,...
+              Only match processes whose parent process ID is listed.
+
+       -s sid,...
+              Only match processes whose process session ID is listed.  Session ID 0 is translated into pgrep's or pkill's own session ID.
+
+       -t term,...
+              Only match processes whose controlling terminal is listed.  The terminal name should be specified without the &quot;/dev/&quot; prefix.
+
+       -u euid,...
+              Only match processes whose effective user ID is listed.  Either the numerical or symbolical value may be used.
+
+       -U uid,...
+              Only match processes whose real user ID is listed.  Either the numerical or symbolical value may be used.
+
+       -v     Negates the matching.
+
+       -x     Only match processes whose name (or command line if -f is specified) exactly match the pattern.
+
+       -signal
+              Defines the signal to send to each matched process.  Either the numeric or the symbolic signal name can be used.  (pkill only.)
+</code></pre>
+
+
+        <h2 id="related">See Also</h2>
+
+		
+	</div>
+     
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/tmu/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-11-24 19:50:45.604296 &#43;0900 JST m=&#43;0.098822566">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
