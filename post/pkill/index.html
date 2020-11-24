@@ -51,56 +51,49 @@
 		<p>Chrome Driver等で脳死で実行，Ctrl+Cを繰り返した結果，プロセスが大変なことになってしまったので，<code>chromedriver</code>という名前の入ったプロセスを一気にkillしたいと思って調べたので備忘録</p>
 
 <p>通常，プロセスをkillする際は，</p>
-
-<pre><code>$ ps aux | grep chromedriver
-seiichi          34994   0.0  0.1  4488388  11692 s004  S     7:18PM   0:00.10 chromedriver --port=54055
-seiichi          34442   0.0  0.1  4488388  11664 s004  S     7:15PM   0:00.10 chromedriver --port=52793
-seiichi          34316   0.0  0.1  4488388  11712 s004  S     7:15PM   0:00.10 chromedriver --port=52421
-seiichi          34108   0.0  0.1  4488388  11012 s004  S     7:13PM   0:00.10 chromedriver --port=51932
-seiichi          33983   0.0  0.1  4488388   9768 s004  S     7:13PM   0:00.11 chromedriver --port=51627
-seiichi          37496   0.0  0.0  4258892    220 s005  R+    7:46PM   0:00.00 grep chromedriver
-seiichi          36187   0.0  0.1  4488388   9920 s004  S     7:25PM   0:00.09 chromedriver --port=57620
-seiichi          35949   0.0  0.1  4488388   9708 s004  S     7:24PM   0:00.09 chromedriver --port=57047
-seiichi          35761   0.0  0.1  4488388  11148 s004  S     7:23PM   0:00.09 chromedriver --port=56499
-seiichi          35033   0.0  0.1  4488540  11096 s004  S     7:18PM   0:00.11 chromedriver --port=54143
-$ kill -9 [process_number]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ps aux <span class="p">|</span> grep chromedriver
+seiichi          <span class="m">34994</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>  <span class="m">11692</span> s004  S     <span class="m">7</span>:18PM   <span class="m">0</span>:00.10 chromedriver --port<span class="o">=</span><span class="m">54055</span>
+seiichi          <span class="m">34442</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>  <span class="m">11664</span> s004  S     <span class="m">7</span>:15PM   <span class="m">0</span>:00.10 chromedriver --port<span class="o">=</span><span class="m">52793</span>
+seiichi          <span class="m">34316</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>  <span class="m">11712</span> s004  S     <span class="m">7</span>:15PM   <span class="m">0</span>:00.10 chromedriver --port<span class="o">=</span><span class="m">52421</span>
+seiichi          <span class="m">34108</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>  <span class="m">11012</span> s004  S     <span class="m">7</span>:13PM   <span class="m">0</span>:00.10 chromedriver --port<span class="o">=</span><span class="m">51932</span>
+seiichi          <span class="m">33983</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>   <span class="m">9768</span> s004  S     <span class="m">7</span>:13PM   <span class="m">0</span>:00.11 chromedriver --port<span class="o">=</span><span class="m">51627</span>
+seiichi          <span class="m">37496</span>   <span class="m">0</span>.0  <span class="m">0</span>.0  <span class="m">4258892</span>    <span class="m">220</span> s005  R+    <span class="m">7</span>:46PM   <span class="m">0</span>:00.00 grep chromedriver
+seiichi          <span class="m">36187</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>   <span class="m">9920</span> s004  S     <span class="m">7</span>:25PM   <span class="m">0</span>:00.09 chromedriver --port<span class="o">=</span><span class="m">57620</span>
+seiichi          <span class="m">35949</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>   <span class="m">9708</span> s004  S     <span class="m">7</span>:24PM   <span class="m">0</span>:00.09 chromedriver --port<span class="o">=</span><span class="m">57047</span>
+seiichi          <span class="m">35761</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488388</span>  <span class="m">11148</span> s004  S     <span class="m">7</span>:23PM   <span class="m">0</span>:00.09 chromedriver --port<span class="o">=</span><span class="m">56499</span>
+seiichi          <span class="m">35033</span>   <span class="m">0</span>.0  <span class="m">0</span>.1  <span class="m">4488540</span>  <span class="m">11096</span> s004  S     <span class="m">7</span>:18PM   <span class="m">0</span>:00.11 chromedriver --port<span class="o">=</span><span class="m">54143</span>
+$ <span class="nb">kill</span> -9 <span class="o">[</span>process_number<span class="o">]</span></code></pre></div>
 <p>とするが，<code>pkill</code>を使うと</p>
-
-<pre><code>$ pkill -KILL -f chromedriver
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ pkill -KILL -f chromedriver</code></pre></div>
 <p>で一気に消してくれる．ちなみにオプションは以下の通り．</p>
-
-<pre><code>OPTIONS
-       -c     Suppress normal output; instead print a count of matching processes.
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">OPTIONS
+       -c     Suppress normal output<span class="p">;</span> instead print a count of matching processes.
 
        -d delimiter
-              Sets the string used to delimit each process ID in the output (by default a newline).  (pgrep only.)
+              Sets the string used to delimit each process ID in the output <span class="o">(</span>by default a newline<span class="o">)</span>.  <span class="o">(</span>pgrep only.<span class="o">)</span>
 
-       -f     The pattern is normally only matched against the process name.  When -f is set, the full command line is used.
+       -f     The pattern is normally only matched against the process name.  When -f is set, the full <span class="nb">command</span> line is used.
 
        -g pgrp,...
-              Only match processes in the process group IDs listed.  Process group 0 is translated into pgrep's or pkill's own process group.
+              Only match processes in the process group IDs listed.  Process group <span class="m">0</span> is translated into pgrep<span class="s1">&#39;s or pkill&#39;</span>s own process group.
 
        -G gid,...
               Only match processes whose real group ID is listed.  Either the numerical or symbolical value may be used.
 
-       -l     List the process name as well as the process ID. (pgrep only.)
+       -l     List the process name as well as the process ID. <span class="o">(</span>pgrep only.<span class="o">)</span>
 
-       -n     Select only the newest (most recently started) of the matching processes.
+       -n     Select only the newest <span class="o">(</span>most recently started<span class="o">)</span> of the matching processes.
 
-       -o     Select only the oldest (least recently started) of the matching processes.
+       -o     Select only the oldest <span class="o">(</span>least recently started<span class="o">)</span> of the matching processes.
 
        -P ppid,...
               Only match processes whose parent process ID is listed.
 
        -s sid,...
-              Only match processes whose process session ID is listed.  Session ID 0 is translated into pgrep's or pkill's own session ID.
+              Only match processes whose process session ID is listed.  Session ID <span class="m">0</span> is translated into pgrep<span class="s1">&#39;s or pkill&#39;</span>s own session ID.
 
        -t term,...
-              Only match processes whose controlling terminal is listed.  The terminal name should be specified without the &quot;/dev/&quot; prefix.
+              Only match processes whose controlling terminal is listed.  The terminal name should be specified without the <span class="s2">&#34;/dev/&#34;</span> prefix.
 
        -u euid,...
               Only match processes whose effective user ID is listed.  Either the numerical or symbolical value may be used.
@@ -110,12 +103,10 @@ $ kill -9 [process_number]
 
        -v     Negates the matching.
 
-       -x     Only match processes whose name (or command line if -f is specified) exactly match the pattern.
+       -x     Only match processes whose name <span class="o">(</span>or <span class="nb">command</span> line <span class="k">if</span> -f is specified<span class="o">)</span> exactly match the pattern.
 
        -signal
-              Defines the signal to send to each matched process.  Either the numeric or the symbolic signal name can be used.  (pkill only.)
-</code></pre>
-
+              Defines the signal to send to each matched process.  Either the numeric or the symbolic signal name can be used.  <span class="o">(</span>pkill only.<span class="o">)</span></code></pre></div>
 
         <h2 id="related">See Also</h2>
 
@@ -132,7 +123,7 @@ $ kill -9 [process_number]
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-11-24 19:50:45.604296 &#43;0900 JST m=&#43;0.098822566">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-11-24 19:52:58.122222 &#43;0900 JST m=&#43;0.197208953">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
