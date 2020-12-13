@@ -166,7 +166,7 @@ $$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
     <span class="k">return</span> <span class="n">_grad_word</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>勾配が求まったので，次に勾配を用いて$p$を更新します．0.5ステップ後のpは次のように計算されます．</p>
+<p>勾配が求まったので，次に勾配を用いて$p$を更新します．0.5ステップ後の$p$は次のように計算されます．</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">compute_p_word_next_half_step</span><span class="p">(</span><span class="n">id</span> <span class="n">word_id</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">word_vec</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">p_word</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">double</span> <span class="o">*</span><span class="n">grad</span> <span class="o">=</span> <span class="n">compute_gradient_word</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">word_vec</span><span class="p">);</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">_ndim_d</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
@@ -181,7 +181,7 @@ $$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
 	<span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>そして，1ステップ後のpを計算して，リープフロッグ法の1iterが終わりです．これをL(ハイパーパラメータ)回回して，遷移先を決定します．</p>
+<p>そして，1ステップ後の$p$を計算して，リープフロッグ法の1iterが終わりです．これをL(ハイパーパラメータ)回回して，遷移先を決定します．</p>
 <div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">execute_leap_frog_word</span><span class="p">(</span><span class="n">id</span> <span class="n">word_id</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">new_vec</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">p_word</span><span class="p">,</span> <span class="kt">int</span> <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// compute next(cur + L) step 
 </span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">l</span><span class="o">&lt;</span><span class="n">L</span><span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
@@ -225,7 +225,7 @@ $$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-12-14 00:54:06.178945 &#43;0900 JST m=&#43;0.085988590">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-12-14 00:55:36.544359 &#43;0900 JST m=&#43;0.080135854">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
