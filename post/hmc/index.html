@@ -80,32 +80,18 @@
 
 <p>CSTMの生成過程は次のようになります．</p>
 
-<div style="overflow-x: auto;">
-$
-\begin{enumerate}
-\item Draw $\alpha\_0 \sim \mathrm{Ga}(a\_0, b\_0)$.
-\item Draw $G\_0 \sim \mathrm{PY}(\beta, \gamma)$.
-\item For $k = 1 \ldots K$, $\phi(w\_k) \sim \mathcal{N} (0, I\_d)$.
-\item For $d = 1 \ldots D$,
-    \begin{itemize}
-        \item Draw $f \sim \mathrm{GP} (0, \mathrm{K})$.
-        \item For $k = 1 \ldots K$, $\alpha(w\_k) = \alpha\_0 G\_0(w_k) e^{f(w\_k)}$.
-        \item Draw $\bm{w} \sim \mathrm{Polya}(\alpha)$.
-    \end{itemize}
-\end{enumerate}
-$
-<div>
+<p><img src="img/cstm_generate.png"></p>
 
-単語ベクトルを$\phi(w)$とし，文書ベクトルを$u$としたとき，どちらも同じ潜在空間上で考えているので，内積をとって，その近さによって単語の確率を操作するようなモデルです．
-文書ごとに単語の確率をきめ細やかに変更できるのが特徴です．
+<p>単語ベクトルを$\phi(w)$とし，文書ベクトルを$u$としたとき，どちらも同じ潜在空間上で考えているので，内積をとって，その近さによって単語の確率を操作するようなモデルです．
+文書ごとに単語の確率をきめ細やかに変更できるのが特徴です．</p>
 
-## HMCによるCSTMの推定
+<h2 id="hmcによるcstmの推定">HMCによるCSTMの推定</h2>
 
-CSTMの事後分布は，Polya分布の積に従うので，Polya分布の対数の符号反転が位置エネルギー($h$)となります．
+<p>CSTMの事後分布は，Polya分布の積に従うので，Polya分布の対数の符号反転が位置エネルギー($h$)となります．</p>
 
 <div style="overflow-x: auto;">
 $$
-\prod\_d p (\bm{w} | \bm{\alpha}) = \frac{\Gamma (\sum\_k \alpha\_k)}{\Gamma (\sum\_k (\alpha\_k + n\_k))} \prod\_k \frac{\Gamma (\alpha\_k + n\_k)}{\Gamma (\alpha\_k)}
+\prod_d p (w | \alpha) = \frac{\Gamma (\sum_k \alpha_k)}{\Gamma (\sum_k (\alpha_k + n_k))} \prod_k \frac{\Gamma (\alpha_k + n_k)}{\Gamma (\alpha_k)}
 $$
 </div>
 
@@ -138,110 +124,85 @@ CSTMでは，推定パラメータが単語ベクトル，文書ベクトル，$
 <p>まず，Step1のパラメータの初期化についてです．</p>
 
 <div style="overflow-x: auto;">
-$$p ~ \mathcal{N} (0, \sigma\_{\phi} I), \quad \phi(w) \sim (0, I\_d)$$
+$$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
 </div>
 
 <p>ただし，予備実験の結果から$\sigma_{\phi} = 0.02$としました．</p>
 
 <p>次に，位置エネルギーの勾配を計算します．しかしCSTMは事後分布の微分が閉じた式となっていないため，数値微分を用いて計算します．
 テイラー展開による3点近似を用いて計算します．具体的には実際に値を左右に微小値だけ動かして，その間数値を計算し，勾配を求めます．（ただし計算量のオーダーがえぐいです．）</p>
-
-<div style="overflow-x: auto;">
-```
-double *compute_gradient_word(id word_id, double *word_vec) {
-    // compute gradient of log-likelihood for word k in document d with numerical differention
-    double g0 = _cstm->get_g0_of_word(word_id);
-    for (int i=0; i<_ndim_d; ++i) {
-        _h[i] = (double)(0.5) * (double)abs(word_vec[i]) * 1e-4;
-    }
-    for (int i=0; i<_ndim_d; ++i) {
-        // generate tmp word vec
-        std::memcpy(_tmp_vec, word_vec, _cstm->_ndim_d * sizeof(double));
-        _tmp_vec[i] += _h[i];
-        // calc f(x + h)
-        double log_pw_f = 0;
-        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
-			double *doc_vec = _cstm->get_doc_vector(doc_id);
-            double new_alpha_word = _cstm->compute_alpha_word(word_vec, doc_vec, g0);
-			int n_k = _cstm->get_word_count_in_doc(word_id, doc_id);
-            log_pw_f += (double)(-1.0) * _cstm->_compute_log_probability_document(new_alpha_word, n_k);
-        }
-        std::memcpy(_tmp_vec, word_vec, _cstm->_ndim_d * sizeof(double));
-        _tmp_vec[i] -= _h[i];
-        // calc f(x - h)
-        double log_pw_b = 0;
-        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
-            double *doc_vec = _cstm->get_doc_vector(doc_id);
-            double new_alpha_word = _cstm->_compute_alpha_word(_tmp_vec, doc_vec, g0);
-            int n_k = _cstm->get_word_count_in_doc(word_id, doc_id);
-            log_pw_b += (double)(-1.0) * _cstm->_compute_reduced_log_probability_document(n_k, new_alpha_word);
-        }
-        // calc gradient via 3-point linear approximation
-        _grad_word[i] = (double)(0.5 / _h[i]) * (log_pw_f - log_pw_b);
-    }
-    return _grad_word;
-}
-```
-</div>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">double</span> <span class="o">*</span><span class="nf">compute_gradient_word</span><span class="p">(</span><span class="n">id</span> <span class="n">word_id</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">word_vec</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// compute gradient of log-likelihood for word k in document d with numerical differention
+</span><span class="c1"></span>    <span class="kt">double</span> <span class="n">g0</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_g0_of_word</span><span class="p">(</span><span class="n">word_id</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">_ndim_d</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">abs</span><span class="p">(</span><span class="n">word_vec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e-4</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">_ndim_d</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// generate tmp word vec
+</span><span class="c1"></span>        <span class="n">std</span><span class="o">::</span><span class="n">memcpy</span><span class="p">(</span><span class="n">_tmp_vec</span><span class="p">,</span> <span class="n">word_vec</span><span class="p">,</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_ndim_d</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+        <span class="n">_tmp_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_h</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="c1">// calc f(x + h)
+</span><span class="c1"></span>        <span class="kt">double</span> <span class="n">log_pw_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">doc_id</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">doc_id</span><span class="o">&lt;</span><span class="n">get_num_documents</span><span class="p">();</span> <span class="o">++</span><span class="n">doc_id</span><span class="p">)</span> <span class="p">{</span>
+			<span class="kt">double</span> <span class="o">*</span><span class="n">doc_vec</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_doc_vector</span><span class="p">(</span><span class="n">doc_id</span><span class="p">);</span>
+            <span class="kt">double</span> <span class="n">new_alpha_word</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">compute_alpha_word</span><span class="p">(</span><span class="n">word_vec</span><span class="p">,</span> <span class="n">doc_vec</span><span class="p">,</span> <span class="n">g0</span><span class="p">);</span>
+			<span class="kt">int</span> <span class="n">n_k</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_word_count_in_doc</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">);</span>
+            <span class="n">log_pw_f</span> <span class="o">+=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_compute_log_probability_document</span><span class="p">(</span><span class="n">new_alpha_word</span><span class="p">,</span> <span class="n">n_k</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">memcpy</span><span class="p">(</span><span class="n">_tmp_vec</span><span class="p">,</span> <span class="n">word_vec</span><span class="p">,</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_ndim_d</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+        <span class="n">_tmp_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">_h</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="c1">// calc f(x - h)
+</span><span class="c1"></span>        <span class="kt">double</span> <span class="n">log_pw_b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">doc_id</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">doc_id</span><span class="o">&lt;</span><span class="n">get_num_documents</span><span class="p">();</span> <span class="o">++</span><span class="n">doc_id</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">double</span> <span class="o">*</span><span class="n">doc_vec</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_doc_vector</span><span class="p">(</span><span class="n">doc_id</span><span class="p">);</span>
+            <span class="kt">double</span> <span class="n">new_alpha_word</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_compute_alpha_word</span><span class="p">(</span><span class="n">_tmp_vec</span><span class="p">,</span> <span class="n">doc_vec</span><span class="p">,</span> <span class="n">g0</span><span class="p">);</span>
+            <span class="kt">int</span> <span class="n">n_k</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_word_count_in_doc</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">);</span>
+            <span class="n">log_pw_b</span> <span class="o">+=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_compute_reduced_log_probability_document</span><span class="p">(</span><span class="n">n_k</span><span class="p">,</span> <span class="n">new_alpha_word</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// calc gradient via 3-point linear approximation
+</span><span class="c1"></span>        <span class="n">_grad_word</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">_h</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">log_pw_f</span> <span class="o">-</span> <span class="n">log_pw_b</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">_grad_word</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>勾配が求まったので，次に勾配を用いて$p$を更新します．0.5ステップ後のpは次のように計算されます．</p>
-
-<div style="overflow-x: auto;">
-```
-void compute_p_word_next_half_step(id word_id, double *word_vec, double *p_word) {
-    double *grad = compute_gradient_word(word_id, word_vec);
-    for (int i=0; i<_ndim_d; ++i) {
-        p_word[i] -= 0.5 * _epsilon * grad[i];
-    }
-}
-```
-</div>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">compute_p_word_next_half_step</span><span class="p">(</span><span class="n">id</span> <span class="n">word_id</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">word_vec</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">p_word</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">grad</span> <span class="o">=</span> <span class="n">compute_gradient_word</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">word_vec</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">_ndim_d</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">p_word</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">_epsilon</span> <span class="o">*</span> <span class="n">grad</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>そして，これを使って単語ベクトル$\phi(w)$の計算をします．</p>
-
-<div style="overflow-x: auto;">
-```
-void compute_word_vec_next_step(double *word_vec, double *p_word) {
-    for (int i=0; i<_ndim_d; ++i) {
-        word_vec[i] += _epsilon * p_word[i];
-	}
-}
-```
-</div>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">compute_word_vec_next_step</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">word_vec</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">p_word</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">_ndim_d</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">word_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_epsilon</span> <span class="o">*</span> <span class="n">p_word</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>そして，1ステップ後のpを計算して，リープフロッグ法の1iterが終わりです．これをL(ハイパーパラメータ)回回して，遷移先を決定します．</p>
-
-<div style="overflow-x: auto;">
-```
-void execute_leap_frog_word(id word_id, double *new_vec, double *p_word, int L=100) {
-    // compute next(cur + L) step 
-    for (int l=0; l<L; ++l) {
-        // sampling
-        compute_p_word_next_half_step(word_id, new_vec, p_word);
-        compute_word_vec_next_step(new_vec, p_word);
-        compute_p_word_next_half_step(word_id, new_vec, p_word);
-    }
-}
-```
-</div>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">execute_leap_frog_word</span><span class="p">(</span><span class="n">id</span> <span class="n">word_id</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">new_vec</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">p_word</span><span class="p">,</span> <span class="kt">int</span> <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// compute next(cur + L) step 
+</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">l</span><span class="o">&lt;</span><span class="n">L</span><span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// sampling
+</span><span class="c1"></span>        <span class="n">compute_p_word_next_half_step</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">new_vec</span><span class="p">,</span> <span class="n">p_word</span><span class="p">);</span>
+        <span class="n">compute_word_vec_next_step</span><span class="p">(</span><span class="n">new_vec</span><span class="p">,</span> <span class="n">p_word</span><span class="p">);</span>
+        <span class="n">compute_p_word_next_half_step</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">new_vec</span><span class="p">,</span> <span class="n">p_word</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>また，遷移先の採択は，以前のパラメータでのハミルトニアンと，次時点のパラメータの候補のハミルトニアンを比較して行います．</p>
-
-<div style="overflow-x: auto;">
-```
-bool accept_word_vector_if_needed(double H_old, double H_new) {
-    double acceptance_ratio = std::min(1.0, cstm::exp(H_old - H_new));
-    double bernoulli = sampler::uniform(0, 1);
-    if (bernoulli <= acceptance_ratio) {
-        _num_acceptance_word += 1;
-        return true;
-    }
-    _num_rejection_word += 1;
-    return false;
-}
-```
-</div>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">bool</span> <span class="nf">accept_word_vector_if_needed</span><span class="p">(</span><span class="kt">double</span> <span class="n">H_old</span><span class="p">,</span> <span class="kt">double</span> <span class="n">H_new</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">double</span> <span class="n">acceptance_ratio</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">cstm</span><span class="o">::</span><span class="n">exp</span><span class="p">(</span><span class="n">H_old</span> <span class="o">-</span> <span class="n">H_new</span><span class="p">));</span>
+    <span class="kt">double</span> <span class="n">bernoulli</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">::</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bernoulli</span> <span class="o">&lt;=</span> <span class="n">acceptance_ratio</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_num_acceptance_word</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">_num_rejection_word</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>これで以上です．あとは必要なepoch数回します．
 実験もスモールコーパスに対しては行いましたが，通常のコーパスに対しては計算量が多すぎて無理でした．</p>
 
@@ -263,7 +224,7 @@ bool accept_word_vector_if_needed(double H_old, double H_new) {
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-12-14 00:30:04.125844 &#43;0900 JST m=&#43;0.129512430">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-12-14 00:44:26.466286 &#43;0900 JST m=&#43;0.157255626">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
