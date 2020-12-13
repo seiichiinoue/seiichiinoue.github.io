@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				Hamiltonian MCMCを用いたCSTMの推定 &middot; 冴えない院生の育てかた
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		<link rel="apple-touch-icon" sizes="180x180" href="https://seiichiinoue.github.io/img/favicon.png">
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="冴えない院生の育てかた" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">冴えない院生の育てかた</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2020-12-13 19:31:09 &#43;0900 JST">December 13, 2020</time>
+</div>
+
+		<h1 class="post-title">Hamiltonian MCMCを用いたCSTMの推定</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<h2 id="hamiltonian-mcmc法">Hamiltonian MCMC法</h2>
+
+<p>本ブログでは詳細な理論の説明は割愛します．詳しくは，<a href="https://www.amazon.co.jp/dp/4254122128/ref=cm_sw_r_tw_dp_x_68H1FbWFBF8QS">「基礎からのベイズ統計学 ハミルトニアンモンテカルロ法による実践的入門」</a>や，Nealの<a href="http://www.mcmchandbook.net/HandbookChapter5.pdf">MCMC using Hamiltonian Dynamics</a>を参照してください．</p>
+
+<p>ここでは，できるだけ簡単にHamiltonian MCMC法のイメージを書きます．
+以下はほとんど清水先生の<a href="https://norimune.net/3149">ブログ</a>からの引用です．</p>
+
+<p>Hamiltonian MCMC法は，物理学のアナロジーを用いて推移確率を決めます．事後分布の形がガウス分布だと仮定すると，ガウス分布の平均の尤度関数は正規分布に比例し，事前分布に一様分布を仮定すると，事後分布は尤度と事前分布の積で表されるので，正規分布となります．</p>
+
+<p><img src="https://norimune.net/wp/wp-content/uploads/2018/12/mcmc7.jpg" alt="" /></p>
+
+<p>この乱数を生成したいとして，HMCでは事後分布の形状がわかることを利用します．
+まず，事後分布の対数の符号反転，つまり情報量の関数を考えます．</p>
+
+<p><img src="https://norimune.net/wp/wp-content/uploads/2018/12/mcmc8.jpg" alt="" /></p>
+
+<p>ここで，玉を適当な場所において転がす事を考えます．そのとき，正規乱数によって転がす強さ（運動量）を決めます．強く弾くと一回遠くまで転がってまた落ちてきてというように幅広い範囲で転がり続けます．弱く弾くと，下のほうで転がってる状態になるでしょう．摩擦がなければ運動量と位置ネルギーの合計（これをハミルトニアンといいます）は一定になるように，ずっと転がり続けます．HMCでは転がす時間を予め決めておいて，その時間になったら玉を止めます．止まったところのX軸の値が，次のパラメータの値とする．という方法です．</p>
+
+<p>次のパラメータは，前回のパラメータの位置からまた正規乱数によって決めた運動量で弾いてということを繰り返します。この「ある値から乱数で決めた強さで玉を弾いて，一定時間立って止めた場所が次のパラメータの値」という更新自体が，推移確率になっているということです．</p>
+
+<p>HMCでは，基本的には密度の高いところ（下の方）に転がることが多くなり，たまに強く弾くことで事後分布の端のほうもサンプリングできる，そういうアルゴリズムになっています．また，密度の高いところから離れたパラメータが生成された場合，位置エネルギーが大きいため，広い範囲に転がり，密度の高いところにパラメータが生成された場合は，位置エネルギーが小さいため比較的近くを転がりやすくなります．このように，密度が高いところに集中するようになる一方，自己相関が低い乱数を生成することができます．</p>
+
+<p>実際には，玉がどこにあるかを判別するために，時間を短い間隔で区切って，離散的に玉の状態を判断します．このとき，微小時間をepsilon，その判定を何回するかをLというハイパーパラメータで決めます．Lとepsilonの積が玉を転がす時間というわけです．</p>
+
+<h2 id="cstm">CSTM</h2>
+
+<p>CSTMは以前僕のブログで紹介しています．詳細は <a href="https://seiichiinoue.github.io/post/cstm/">https://seiichiinoue.github.io/post/cstm/</a> を見てください．</p>
+
+<p>CSTMの生成過程は次のようになります．</p>
+
+<div style="overflow-x: auto;">
+$
+\begin{enumerate}
+\item Draw $\alpha\_0 \sim \mathrm{Ga}(a\_0, b\_0)$.
+\item Draw $G\_0 \sim \mathrm{PY}(\beta, \gamma)$.
+\item For $k = 1 \ldots K$, $\phi(w\_k) \sim \mathcal{N} (0, I\_d)$.
+\item For $d = 1 \ldots D$,
+    \begin{itemize}
+        \item Draw $f \sim \mathrm{GP} (0, \mathrm{K})$.
+        \item For $k = 1 \ldots K$, $\alpha(w\_k) = \alpha\_0 G\_0(w_k) e^{f(w\_k)}$.
+        \item Draw $\bm{w} \sim \mathrm{Polya}(\alpha)$.
+    \end{itemize}
+\end{enumerate}
+$
+<div>
+
+単語ベクトルを$\phi(w)$とし，文書ベクトルを$u$としたとき，どちらも同じ潜在空間上で考えているので，内積をとって，その近さによって単語の確率を操作するようなモデルです．
+文書ごとに単語の確率をきめ細やかに変更できるのが特徴です．
+
+## HMCによるCSTMの推定
+
+CSTMの事後分布は，Polya分布の積に従うので，Polya分布の対数の符号反転が位置エネルギー($h$)となります．
+
+<div style="overflow-x: auto;">
+$$
+\prod\_d p (\bm{w} | \bm{\alpha}) = \frac{\Gamma (\sum\_k \alpha\_k)}{\Gamma (\sum\_k (\alpha\_k + n\_k))} \prod\_k \frac{\Gamma (\alpha\_k + n\_k)}{\Gamma (\alpha\_k)}
+$$
+</div>
+
+<p>また，HMCでは，以下のハミルトニアンを用いてパラメータの候補を受諾・棄却します．</p>
+
+<div style="overflow-x: auto;">
+$$H(\lambda, p) = h(\lambda) + \frac{1}{2} p^2$$
+</div>
+
+<p>ここで，$\lambda$はパラメータのベクトルで，pは運動量です．</p>
+
+<p>次に，パラメータの移動を考えます．HMCでは，次の時点のパラメータは位置エネルギーの勾配を用いて計算されます．
+理論の詳細は割愛しますが，ハミルトニアンが一定のところをうまく数値計算する手法として，リープフロッグ法が用いられます．</p>
+
+<p>更新手順は簡単にまとめると次のようになります．</p>
+
+<p>$\lambda, p$を初期化</p>
+
+<ol>
+<li>位置エネルギーの勾配を使って次の時点の$p$を計算</li>
+<li>$p$を使って$\lambda$を計算</li>
+<li>2と同様に$p$を計算</li>
+</ol>
+
+<p>それでは実際に推定を行っていきます．
+CSTMでは，推定パラメータが単語ベクトル，文書ベクトル，$\alpha_0$がの3つあるので，ランダムウォークMH法などと同様にそれぞれ独立にサンプリングして更新していきます．</p>
+
+<p>以下では単語ベクトルの更新過程のみ掲載します．（他はほとんど一緒です）</p>
+
+<p>まず，Step1のパラメータの初期化についてです．</p>
+
+<div style="overflow-x: auto;">
+$$p ~ \mathcal{N} (0, \sigma\_{\phi} I), \quad \phi(w) \sim (0, I\_d)$$
+</div>
+
+<p>ただし，予備実験の結果から$\sigma_{\phi} = 0.02$としました．</p>
+
+<p>次に，位置エネルギーの勾配を計算します．しかしCSTMは事後分布の微分が閉じた式となっていないため，数値微分を用いて計算します．
+テイラー展開による3点近似を用いて計算します．具体的には実際に値を左右に微小値だけ動かして，その間数値を計算し，勾配を求めます．（ただし計算量のオーダーがえぐいです．）</p>
+
+<div style="overflow-x: auto;">
+```
+double *compute_gradient_word(id word_id, double *word_vec) {
+    // compute gradient of log-likelihood for word k in document d with numerical differention
+    double g0 = _cstm->get_g0_of_word(word_id);
+    for (int i=0; i<_ndim_d; ++i) {
+        _h[i] = (double)(0.5) * (double)abs(word_vec[i]) * 1e-4;
+    }
+    for (int i=0; i<_ndim_d; ++i) {
+        // generate tmp word vec
+        std::memcpy(_tmp_vec, word_vec, _cstm->_ndim_d * sizeof(double));
+        _tmp_vec[i] += _h[i];
+        // calc f(x + h)
+        double log_pw_f = 0;
+        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
+			double *doc_vec = _cstm->get_doc_vector(doc_id);
+            double new_alpha_word = _cstm->compute_alpha_word(word_vec, doc_vec, g0);
+			int n_k = _cstm->get_word_count_in_doc(word_id, doc_id);
+            log_pw_f += (double)(-1.0) * _cstm->_compute_log_probability_document(new_alpha_word, n_k);
+        }
+        std::memcpy(_tmp_vec, word_vec, _cstm->_ndim_d * sizeof(double));
+        _tmp_vec[i] -= _h[i];
+        // calc f(x - h)
+        double log_pw_b = 0;
+        for (int doc_id=0; doc_id<get_num_documents(); ++doc_id) {
+            double *doc_vec = _cstm->get_doc_vector(doc_id);
+            double new_alpha_word = _cstm->_compute_alpha_word(_tmp_vec, doc_vec, g0);
+            int n_k = _cstm->get_word_count_in_doc(word_id, doc_id);
+            log_pw_b += (double)(-1.0) * _cstm->_compute_reduced_log_probability_document(n_k, new_alpha_word);
+        }
+        // calc gradient via 3-point linear approximation
+        _grad_word[i] = (double)(0.5 / _h[i]) * (log_pw_f - log_pw_b);
+    }
+    return _grad_word;
+}
+```
+</div>
+
+<p>勾配が求まったので，次に勾配を用いて$p$を更新します．0.5ステップ後のpは次のように計算されます．</p>
+
+<div style="overflow-x: auto;">
+```
+void compute_p_word_next_half_step(id word_id, double *word_vec, double *p_word) {
+    double *grad = compute_gradient_word(word_id, word_vec);
+    for (int i=0; i<_ndim_d; ++i) {
+        p_word[i] -= 0.5 * _epsilon * grad[i];
+    }
+}
+```
+</div>
+
+<p>そして，これを使って単語ベクトル$\phi(w)$の計算をします．</p>
+
+<div style="overflow-x: auto;">
+```
+void compute_word_vec_next_step(double *word_vec, double *p_word) {
+    for (int i=0; i<_ndim_d; ++i) {
+        word_vec[i] += _epsilon * p_word[i];
+	}
+}
+```
+</div>
+
+<p>そして，1ステップ後のpを計算して，リープフロッグ法の1iterが終わりです．これをL(ハイパーパラメータ)回回して，遷移先を決定します．</p>
+
+<div style="overflow-x: auto;">
+```
+void execute_leap_frog_word(id word_id, double *new_vec, double *p_word, int L=100) {
+    // compute next(cur + L) step 
+    for (int l=0; l<L; ++l) {
+        // sampling
+        compute_p_word_next_half_step(word_id, new_vec, p_word);
+        compute_word_vec_next_step(new_vec, p_word);
+        compute_p_word_next_half_step(word_id, new_vec, p_word);
+    }
+}
+```
+</div>
+
+<p>また，遷移先の採択は，以前のパラメータでのハミルトニアンと，次時点のパラメータの候補のハミルトニアンを比較して行います．</p>
+
+<div style="overflow-x: auto;">
+```
+bool accept_word_vector_if_needed(double H_old, double H_new) {
+    double acceptance_ratio = std::min(1.0, cstm::exp(H_old - H_new));
+    double bernoulli = sampler::uniform(0, 1);
+    if (bernoulli <= acceptance_ratio) {
+        _num_acceptance_word += 1;
+        return true;
+    }
+    _num_rejection_word += 1;
+    return false;
+}
+```
+</div>
+
+<p>これで以上です．あとは必要なepoch数回します．
+実験もスモールコーパスに対しては行いましたが，通常のコーパスに対しては計算量が多すぎて無理でした．</p>
+
+<p>特に数値微分の箇所の計算量のオーダーが高いので計算量を下げる方法など，改良を検討していきたいと思います．</p>
+
+
+        <h2 id="related">See Also</h2>
+
+		
+	</div>
+     
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/pkill/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-12-14 00:30:04.125844 &#43;0900 JST m=&#43;0.129512430">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
