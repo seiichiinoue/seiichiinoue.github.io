@@ -145,9 +145,9 @@ $$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
         <span class="c1">// calc f(x + h)
 </span><span class="c1"></span>        <span class="kt">double</span> <span class="n">log_pw_f</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
         <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">doc_id</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">doc_id</span><span class="o">&lt;</span><span class="n">get_num_documents</span><span class="p">();</span> <span class="o">++</span><span class="n">doc_id</span><span class="p">)</span> <span class="p">{</span>
-　　　　　　<span class="kt">double</span> <span class="o">*</span><span class="n">doc_vec</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_doc_vector</span><span class="p">(</span><span class="n">doc_id</span><span class="p">);</span>
+            <span class="kt">double</span> <span class="o">*</span><span class="n">doc_vec</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_doc_vector</span><span class="p">(</span><span class="n">doc_id</span><span class="p">);</span>
             <span class="kt">double</span> <span class="n">new_alpha_word</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">compute_alpha_word</span><span class="p">(</span><span class="n">word_vec</span><span class="p">,</span> <span class="n">doc_vec</span><span class="p">,</span> <span class="n">g0</span><span class="p">);</span>
-　　　　　　<span class="kt">int</span> <span class="n">n_k</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_word_count_in_doc</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">);</span>
+            <span class="kt">int</span> <span class="n">n_k</span> <span class="o">=</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">get_word_count_in_doc</span><span class="p">(</span><span class="n">word_id</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">);</span>
 　　　　　　<span class="n">log_pw_f</span> <span class="o">+=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_compute_log_probability_document</span><span class="p">(</span><span class="n">new_alpha_word</span><span class="p">,</span> <span class="n">n_k</span><span class="p">);</span>
         <span class="p">}</span>
         <span class="n">std</span><span class="o">::</span><span class="n">memcpy</span><span class="p">(</span><span class="n">_tmp_vec</span><span class="p">,</span> <span class="n">word_vec</span><span class="p">,</span> <span class="n">_cstm</span><span class="o">-&gt;</span><span class="n">_ndim_d</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
@@ -225,7 +225,7 @@ $$p ~ \mathcal{N} (0, \sigma_{\phi} I), \quad \phi(w) \sim (0, I_d)$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-12-14 00:50:57.393574 &#43;0900 JST m=&#43;0.160211642">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-12-14 00:54:06.178945 &#43;0900 JST m=&#43;0.085988590">2020</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
