@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>docker on いのうのブログ</title>
+    <title>docker on 冴えない院生の育てかた</title>
     <link>https://seiichiinoue.github.io/categories/docker/</link>
-    <description>Recent content in docker on いのうのブログ</description>
+    <description>Recent content in docker on 冴えない院生の育てかた</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 13 Aug 2019 04:07:58 +0900</lastBuildDate>
