@@ -6,10 +6,19 @@
     <description>Recent content on 冴えない院生の育てかた</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 31 Jan 2020 20:20:13 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 26 Apr 2021 20:11:23 +0900</lastBuildDate>
     
 	<atom:link href="https://seiichiinoue.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>A Bayesian Model of Diachronic Meaning Changeの実装</title>
+      <link>https://seiichiinoue.github.io/post/scan/</link>
+      <pubDate>Mon, 26 Apr 2021 20:11:23 +0900</pubDate>
+      
+      <guid>https://seiichiinoue.github.io/post/scan/</guid>
+      <description>今回実装したのは，通時的な意味変化を捉えるトピックモデルです．2016年のTACL論文になります．以下論文です． https://www.aclweb.org/anthology/Q16-1003.pdf 実装後に発見したのですが，</description>
+    </item>
     
     <item>
       <title>トピックモデルを用いた類似記事のレコメンド機能の実装</title>
