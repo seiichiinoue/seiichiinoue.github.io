@@ -21,15 +21,6 @@
     </item>
     
     <item>
-      <title>多変量入力におけるガウスカーネルの計算法</title>
-      <link>https://seiichiinoue.github.io/post/mlrbf/</link>
-      <pubDate>Sat, 08 Feb 2020 09:14:16 +0900</pubDate>
-      
-      <guid>https://seiichiinoue.github.io/post/mlrbf/</guid>
-      <description>ガウス過程の勉強をしていて，多変量の入力に対するカーネル関数の計算に躓いたので，ガウスカーネルに限定してメモしておきます． ガウスカーネル ガウ</description>
-    </item>
-    
-    <item>
       <title>トピックモデルを用いた類似記事のレコメンド機能の実装</title>
       <link>https://seiichiinoue.github.io/post/tmrecom/</link>
       <pubDate>Fri, 31 Jan 2020 20:20:13 +0900</pubDate>
