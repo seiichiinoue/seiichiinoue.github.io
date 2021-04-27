@@ -221,13 +221,13 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
 <p>凡例には1810年におけるトピック毎の確率上位単語を10個載せました．</p>
 
-<p>茶色で示されるトピックは，joyやheartなどが確率上位となっており，昔はそういった単語と共起する確率が高かったことがわかります（自分は，単語の意味変化に詳しくないのですが，昔はa transports of joy的な使われ方をしていたみたいです．）．また，茶色で示されるトピックは昔は支配的であったのに対し，現在に近くに連れて，トピック確率が低くなっていることもわかります．</p>
+<p>茶色で示されるトピックは，joyやheartなどが確率上位となっており，昔はそういった単語と共起する確率が高かったことがわかります（自分は，単語の意味変化に詳しくないのですが，昔はa transports of joy的な使われ方をしていたみたいです<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup>）．また，茶色で示されるトピックは昔は支配的であったのに対し，現在になるにつれて，支配率が低くなっていることもわかります．</p>
 
 <p>現在は，青色で示されるトピック，つまり流通や移動手段に関する単語として使われることが多いこともわかりました．</p>
 
 <h2 id="まとめ">まとめ</h2>
 
-<p>意味変化を捉える研究は大量にあって（私も全て網羅できているわけでは到底ありませんが），研究室の先輩は単語分散表現を用いて意味変化の検出を行うといったことをしてたりするんですが，トピックモデルを使うと解釈がしやすく，分析をする際は有用だなと思いました．</p>
+<p>意味変化を捉える研究は大量にあって（自分は全て網羅できているわけでは到底ありません），研究室の先輩は単語分散表現を用いて意味変化の検出を行うといったことをしてたりするんですが，トピックモデルを使うと解釈がしやすく，分析をする際は有用だなと思いました．</p>
 
 <p>今回実装したモデルはword-specific documentsを使った意味変化のトピックモデルで，target wordをあらかじめ決めることでその周辺単語集合をモデル化する手法でした．実際の用途としては「統計的に意味変化があった単語を発見したい」ということが多いので，target wordをあらかじめ決めることなく同様のモデリングができたら面白そうだな，と思ってます．</p>
 <div class="footnotes">
@@ -239,6 +239,8 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
 <li id="fn:2">LindermanらのDependent Multinomial Models Made Easy: Stick Breaking with the Polya-Gamma Augmentationが詳しいです．
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
+<li id="fn:3">「喜びに我を忘れて」という意味らしい
+ <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -258,7 +260,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-04-27 20:41:30.265778 &#43;0900 JST m=&#43;0.057224562">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-27 20:50:06.262476 &#43;0900 JST m=&#43;0.149221646">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
