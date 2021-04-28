@@ -154,7 +154,7 @@ $$p( \phi_ | \mathbf{z}, \mathbf{\mu}, \kappa, t) \propto \prod_{d=1}^{D} \prod_
 <p>このとき，$\phi$はロジスティック分布のCDFとも解釈することができます:</p>
 
 <div style="overflow-x: auto;">
-$$\phi = \frac{\exp(\beta)}{\sum \exp(\beta)} = \int_{-\inf}^{\beta} \frac{\exp(x)}{(\sum \exp(x))^2} \mathrm{d}x$$
+$$\phi = \frac{\exp(\beta)}{\sum \exp(\beta)} = \int_{-\infty}^{\beta} \frac{\exp(x)}{(\sum \exp(x))^2} \mathrm{d}x$$
 </div>
 
 <p>よって，トピック$z$は下図のように多項分布からサンプルされることになります．</p>
@@ -163,7 +163,7 @@ $$\phi = \frac{\exp(\beta)}{\sum \exp(\beta)} = \int_{-\inf}^{\beta} \frac{\exp(
 
 <ol>
 <li>CDF上の$\beta$の点を通るvertical lineを引く．</li>
-<li>補助変数をそれぞれの文書に対し，一様分布からサンプルする: $u_n \sim \mathcal{U} (0,1)$</li>
+<li>補助変数をそれぞれの文書に対し，一様分布からサンプルする: $u_n \sim \mathrm{U} (0,1)$</li>
 <li>$u_n$を$\beta$上にプロットする．</li>
 <li>もし$u_n$がCDF曲線よりも下に位置するなら（$\phi = \exp(\beta) / \sum \exp(\beta)$よりも小さければ），z = kとする．上に位置するならz $\neq$ kとする．</li>
 </ol>
@@ -177,8 +177,8 @@ $$\phi = \frac{\exp(\beta)}{\sum \exp(\beta)} = \int_{-\inf}^{\beta} \frac{\exp(
 <li>それぞれの文書に対して
 
 <ol>
-<li>z = kの場合，$u_n$を次の一様分布から生成: $u_n \sim U(0, \phi)$</li>
-<li>z $\neq$ kの場合，$u_n$を次の一様分布から生成: $u_n \sim U(\phi, 1)$</li>
+<li>z = kの場合，$u_n$を次の一様分布から生成: $u_n \sim \mathrm{U}(0, \phi)$</li>
+<li>z $\neq$ kの場合，$u_n$を次の一様分布から生成: $u_n \sim \mathrm{U}(\phi, 1)$</li>
 </ol></li>
 </ol>
 
@@ -259,7 +259,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-04-28 10:54:32.624302 &#43;0900 JST m=&#43;0.065733348">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-28 11:06:54.508599 &#43;0900 JST m=&#43;0.066220145">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
