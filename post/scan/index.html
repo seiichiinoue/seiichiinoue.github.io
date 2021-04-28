@@ -107,7 +107,7 @@ $$\phi_n = \frac{\exp(x_n)}{\sum_{n^{\prime}} \exp(x_n^{\prime})}$$
 <p>SCANの推定パラメータは，潜在変数である文書のトピック$z$，トピック分布$\phi$，単語分布$\psi$，トピック分布のlogistic normal事前分布のパラメータ$\kappa$です．</p>
 
 <p>推定にはblocked Gibbs Samplerを用います．一般に，トピックモデルは多項分布-Dirichlet分布を用いて離散変数のモデル化を行うことが多いのですが，SCANは多項分布の事前分布に共役ではないガウス分布を仮定しているので，同様に推定することはできません．
-そのため，Mimnoらから提案された補助変数を用いたlogistic normal priorに従うパラメータ推定法を用います．</p>
+logistic normalパラメータを推定する方法として，Polya-Gamma分布を用いたサンプリング<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">1</a></sup>がありますが，本実装では，Mimnoらから提案された補助変数を用いる推定法を用います．</p>
 
 <p>大まかな流れとしては，文書のトピックを他のパラメータを固定した状態でサンプルし，次にトピックと単語の多項分布のパラメータを同様に他のパラメータを固定してサンプルし，最後に精度パラメータをサンプルする，という感じです．</p>
 
@@ -125,7 +125,7 @@ p(z^d | \mathbf{w}, t, \phi, \psi) &\propto& p(z^d | t) p(\mathbf{w} | t, z^d)\\
 <p>各文書に対して，上式を用いて各トピックの確率を計算することでトピックの確率分布（実際には正規化されていない）が得られます．
 著者実装では，正規化されてないパラメータを用いたランダムサンプラー（？）的な何かを使ってサンプリングしていましたが，私は普通に多項分布を用いてサンプルしました．</p>
 
-<p>多項分布を用いてサンプルする際は，一般に正規化された確率を引数に渡してあげなければならないのですが，上式から分かる通り，$\prod \psi^{z^d}_w &lt;&lt; 0$であるため，underflowしないようにlogsumexp<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>等を使わなければならないことに注意です．</p>
+<p>多項分布を用いてサンプルする際は，一般に正規化された確率を引数に渡してあげなければならないのですが，上式から分かる通り，$\prod \psi^{z^d}_w &lt;&lt; 0$であるため，underflowしないようにlogsumexp<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">2</a></sup>等を使わなければならないことに注意です．</p>
 
 <h3 id="logistic-normalパラメータのサンプリング">logistic normalパラメータのサンプリング</h3>
 
@@ -141,8 +141,7 @@ $$p( \phi_ | \mathbf{z}, \mathbf{\mu}, \kappa, t) \propto \prod_{d=1}^{D} \prod_
 一般にロジスティック回帰は数値最適化で推定されますが，今回はMCMC法を用いる手法を用います．以下，簡単のためトピック分布を$\phi$と略記します．
 -->
 
-<p>上述の通り本モデルでは，多項分布の事前分布に共役でないlogistic normalを考えているので，LDAなどで用いられるサンプリング手法は用いることができません．
-logistic normalパラメータを推定する方法として，Polya-Gamma分布を用いたサンプリング<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>がありますが，本実装では，補助変数を用いた推定方法を用いました．</p>
+<p>上述の通り本モデルでは，多項分布の事前分布には共役でないlogistic normalを考えているので，トピック分布$phi$，単語分布$\psi$の推定には，補助変数を用いたサンプラーを考えます．</p>
 
 <p>次のような生成過程を考えてみます．</p>
 
@@ -235,10 +234,10 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 <hr />
 
 <ol>
-<li id="fn:1">python等だとライブラリがうまくやってくれるはずなので特に意識しなくていいです．
- <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
 <li id="fn:2">LindermanらのDependent Multinomial Models Made Easy: Stick Breaking with the Polya-Gamma Augmentationが詳しいです．
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
+<li id="fn:1">python等だとライブラリがうまくやってくれるはずなので特に意識しなくていいです．
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
 <li id="fn:3">「喜びに我を忘れて」という意味らしい
  <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
 </ol>
@@ -260,7 +259,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-04-27 20:53:14.625182 &#43;0900 JST m=&#43;0.138936504">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-28 10:37:41.0613 &#43;0900 JST m=&#43;0.161839516">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
