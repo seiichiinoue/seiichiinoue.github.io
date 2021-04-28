@@ -76,16 +76,16 @@ $$d_i = (t_{-I}, t_{-I+1}, \ldots, t_{-1}, t, t_{1}, \ldots, t_{I-1}, t_{I})$$
 
 <p>本モデルでは，時点$t$のtemporal meaning representationとして，K次元のトピック分布$\phi^t$とV次元の単語分布$\psi^{t, k}$を仮定します．また，時点間でのトピック分布の変化を制御するための精度パラメータである$\kappa^{\phi}$を導入します．</p>
 
-<p>上述の精度パラメータを使って，どのように時点間の相関をもたせるかですが，それは多項分布$\phi$, $\psi$の事前分布にlogistic normalを置くことで実現します．logistic normalに従う多項分布パラメータは，$n$次元のランダムベクトル$\mathbf{x}$が$n$次元の平均ベクトル$\mathbf{\mu}$，$n \times n$次元の分散共分散行列$\Sigma$によるガウス分布から生成され:</p>
+<p>上述の精度パラメータを使って，どのように時点間の相関をもたせるかですが，それは多項分布$\phi$, $\psi$の事前分布にlogistic normalを置くことで実現します．logistic normalに従う多項分布パラメータは，$n$次元のランダムベクトル$\mathbf{\beta}$が$n$次元の平均ベクトル$\mathbf{\mu}$，$n \times n$次元の分散共分散行列$\Sigma$によるガウス分布から生成され:</p>
 
 <div style="overflow-x: auto;">
-$$\mathbf{x} \sim \mathcal{N} (\mathbf{x} | \mathbf{\mu}, \Sigma)$$
+$$\mathbf{\beta} \sim \mathcal{N} (\mathbf{\beta} | \mathbf{\mu}, \Sigma)$$
 </div>
 
 <p>それを次のようにロジスティック変換することにより単体上に射影する（0 ~ 1の確率に変換する）ことで生成されます．</p>
 
 <div style="overflow-x: auto;">
-$$\phi_n = \frac{\exp(x_n)}{\sum_{n^{\prime}} \exp(x_n^{\prime})}$$
+$$\phi_n = \frac{\exp(\beta_n)}{\sum_{n^{\prime}} \exp(\beta_n^{\prime})}$$
 </div>
 
 <p>このように事前分布にガウス分布を置くことで，分散を通してパラメータの変化の度合いをコントロールできます．</p>
@@ -141,7 +141,7 @@ $$p( \phi_ | \mathbf{z}, \mathbf{\mu}, \kappa, t) \propto \prod_{d=1}^{D} \prod_
 一般にロジスティック回帰は数値最適化で推定されますが，今回はMCMC法を用いる手法を用います．以下，簡単のためトピック分布を$\phi$と略記します．
 -->
 
-<p>上述の通り本モデルでは，多項分布の事前分布には共役でないlogistic normalを考えているので，トピック分布$phi$，単語分布$\psi$の推定には，補助変数を用いたサンプラーを考えます．</p>
+<p>上述の通り本モデルでは，多項分布の事前分布には共役でないlogistic normalを考えているので，トピック分布$\phi$，単語分布$\psi$の推定には，補助変数を用いたサンプラーを考えます．</p>
 
 <p>次のような生成過程を考えてみます．</p>
 
@@ -259,7 +259,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-04-28 10:37:41.0613 &#43;0900 JST m=&#43;0.161839516">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-28 10:54:32.624302 &#43;0900 JST m=&#43;0.065733348">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
