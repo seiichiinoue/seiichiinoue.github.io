@@ -183,34 +183,11 @@ $$A (\alpha_0^{\prime}) = min \Biggl\{ 1, \prod_{d=1}^{D} \frac{ p_d (w | \alpha
 
 <h2 id="実験">実験</h2>
 
-<p>某鎌倉語コーパスを用いて実験を行いました．まず．文章を分かち書きしなければならないのですが，形態素解析ツールのmecabの古文辞書の性能があまり良くなかったので，google開発のsentencepieceを用いて単語分割の学習を行い，そのモデルを使用して分かち書きを行いました．</p>
+<p>実験にはNIPS, CSJ, 毎日新聞の3つを用いました．以下にパープレキシティの推移を掲載します．</p>
 
-<p>学習したsentencepieceモデルを使用して分かち書きをした結果，語彙数は計15402となりました．また，文書数は351，総単語数は560575です．</p>
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/29/91632/ee82d1b6-87f6-4f61-a39c-c745a8a83c83.png" width=80%></p>
 
-<p>参考までに，学習開始時と終了時のパープレキシティ，対数尤度を掲載しておきます．</p>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">epoch 1/100
-perplexity: 24599
-log likelihood: -5.66767e+06
-MH acceptance:
-    document: 0.123813
-    word: 0.0100462
-    alpha0: 1
-epoch 2/100
-perplexity: 12832.7
-log likelihood: -5.3029e+06
-MH acceptance:
-    document: 0.198916
-    word: 0.0196661
-    alpha0: 1
-...
-epoch 100/100
-perplexity: 1143.18
-log likelihood: -3.94733e+06
-MH acceptance:
-    document: 0.499251
-    word: 0.465541
-    alpha0: 1.00003</code></pre></div>
-<p>かなりパープレキシティは下がったのではないでしょうか．</p>
+<p>いずれのコーパスに対しても推論ができていて，パープレキシティも収束していることがわかります．</p>
 
 <!--
 それでは，学習したモデルを使用して単語ベクトルを抽出し，プロットしてみます．非常にサイズの大きな画像となっているので，以下には20次元のうち，一部を載せます．
@@ -307,7 +284,7 @@ doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053
 まだ，とりあえず学習させてみた状態で，これらを用いて他の計算を行っていないので実用性の評価にはかけますが，かなり面白い結果となったのでは無いかと思います．こういったモデルを使って，リコメンデーションアプリなどを作れたら面白いのでは無いかと思いました．（作るかはわかりません）
 -->
 
-<p>まだ，とりあえず学習させてみただけなのですが，潜在座標というアイデアを用いて単語の相関を表現したり，トピックという外性変数を用いずに文書をモデル化したりすることは，いろいろと応用が出来そうだなと思いました．</p>
+<p>まだ，とりあえず学習させてみただけなのですが，学習によって得られる潜在座標は，文書座標と同じ空間にあるので様々な可視化に役立ちそうと思いました．またこのモデルをある種の文書表現獲得器と捉えると，文書分類等の後続のタスクへの応用もできそうだなと思いました．</p>
 
 
         <h2 id="related">See Also</h2>
@@ -326,7 +303,7 @@ doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-04-29 18:20:06.263069 &#43;0900 JST m=&#43;0.130927205">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-04-29 18:54:15.41383 &#43;0900 JST m=&#43;0.065906535">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
