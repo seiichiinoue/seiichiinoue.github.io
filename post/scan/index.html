@@ -217,7 +217,11 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
 -->
 
-<p>トピック確率と単語分布を用いて，各時点における支配的なトピックと推移，また確率上位の単語を可視化しました．凡例には1810年におけるトピック毎の確率上位単語を10個載せました．</p>
+<p>トピック確率と単語分布を用いて，各時点における支配的なトピックと推移，また確率上位の単語を可視化しました．凡例には以下の式で計算されるトピック毎の確率上位単語を10個載せました:</p>
+
+<div style="overflow-x: auto;">
+$$p(w | k) = \sum_t p(w | t, k) = \sum_t \psi^{t, k}_w$$
+</div>
 
 <!--
 <img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/27/91632/c4a2b734-ecb7-4133-a2cc-57ca4bd056d5.png">
@@ -225,12 +229,11 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
 <p>以下は&rdquo;transport&rdquo;についての結果です．</p>
 
-<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/03/91632/25374612-80b5-4861-bb77-49843cf7d1c5.png"></p>
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/06/91632/5139f1c6-f525-4d8a-9126-8743405c3f00.png"></p>
 
 <p>全体的な流れとしては，昔はオレンジ色や緑色，ピンク色のトピックが支配的だったのに対し，近年では，そういったトピックの普及率は下がり，茶色や赤色，青色のトピックの普及率があがっていることがわかります．</p>
 
-<p>オレンジ色や緑色，ピンク色のトピックに共通して出現する&rdquo;joy&rdquo;という単語ですが，昔は&rdquo;a transports of joy&rdquo;という用法<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup>があったみたいで，そのような語義を捉えられていることがわかります．
-また，茶色や赤色，青色のトピックにおいては，戦争や移動手段（飛行機や船舶等）や輸送に関する単語の確率が高く，近年になるにつれてトピックの普及率が上がっていることもわかります．</p>
+<p>また，茶色や赤色，青色のトピックにおいては，戦争や移動手段（飛行機や船舶等）や輸送に関する単語の確率が高く，近年になるにつれてトピックの普及率が上がっていることもわかります．</p>
 
 <!--
 茶色で示されるトピックは，joyやheartなどが確率上位となっており，昔はそういった単語と共起する確率が高かったことがわかります（自分は，単語の意味変化に詳しくないのですが，昔はa transports of joy的な使われ方をしていたみたいです[^3]）．また，茶色で示されるトピックは昔は支配的であったのに対し，現在になるにつれて，支配率が低くなっていることもわかります．
@@ -240,7 +243,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
 <p>以下は&rdquo;band&rdquo;についての結果です．</p>
 
-<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/03/91632/bf6c58fc-02fc-4ced-9cd7-f298d93bbece.png"></p>
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/06/91632/50ed7a63-e493-4ed6-b6d0-2d497a8c1105.png"></p>
 
 <p>こちらも同様に，近年になるにつれて，音楽に関係するオレンジ色や茶色のトピックや，装身具等の帯にまつわる緑色のトピックの支配率が上がっていることがわかります．</p>
 
@@ -260,8 +263,6 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
 <li id="fn:1">python等だとライブラリがうまくやってくれるはずなので特に意識しなくていいです．
  <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:3">「喜びに我を忘れて」という意味らしい
- <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -281,7 +282,7 @@ $$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-05-04 05:20:26.544923 &#43;0900 JST m=&#43;0.136425435">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-05-06 02:36:23.213648 &#43;0900 JST m=&#43;0.063140444">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
