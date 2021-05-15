@@ -85,7 +85,7 @@ $$\mathbf{\beta} \sim \mathcal{N} (\mathbf{\beta} | \mathbf{\mu}, \Sigma)$$
 <p>それを次のようにロジスティック変換することにより単体上に射影する（0 ~ 1の確率に変換する）ことで生成されます．</p>
 
 <div style="overflow-x: auto;">
-$$\phi_n = \frac{\exp(\beta_n)}{\sum_{n^{\prime}} \exp(\beta_n^{\prime})}$$
+$$\phi_n = \frac{\exp(\beta_n)}{\sum_{n^{\prime}} \exp(\beta_{n^{\prime}})}$$
 </div>
 
 <p>このように事前分布にガウス分布を置くことで，分散を通してパラメータ間の相関（後述しますが時点間の相関）をコントロールできます．</p>
@@ -290,7 +290,7 @@ $$p(w | k) = \sum_t p(w | t, k) = \sum_t \psi^{t, k}_w$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-05-07 01:40:04.472467 &#43;0900 JST m=&#43;0.142473080">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-05-15 16:59:36.116568 &#43;0900 JST m=&#43;0.153443006">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
