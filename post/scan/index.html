@@ -72,7 +72,7 @@ $$d_i = (t_{-I}, t_{-I+1}, \ldots, t_{-1}, t, t_{1}, \ldots, t_{I-1}, t_{I})$$
 
 <p>というような文書を仮定します．</p>
 
-<p>この文書に対して，year label (正確な年は必要なく，どの文書集合がどの年代のものかがわかればよい) が付与されていて，その文書のyear labelを使って時期ごとにパラメータを設定し，それぞれの時期間に相関を持たせながら学習するようなモデルになっています．</p>
+<p>この文書に対して，year label (正確な年は必要なく，どの文書集合がどの年代のものかがわかればよい) が付与されていて，その文書のyear labelに従って，対応する時期のパラメータを推定し，かつ，それぞれの時期間に相関を持たせながら学習するようなモデルになっています．</p>
 
 <p>本モデルでは，時点$t$のtemporal meaning representationとして，K次元のトピック分布$\phi^t$とV次元の単語分布$\psi^{t, k}$を仮定します．また，時点間でのトピック分布の変化を制御するための精度パラメータである$\kappa^{\phi}$を導入します．</p>
 
@@ -88,9 +88,9 @@ $$\mathbf{\beta} \sim \mathcal{N} (\mathbf{\beta} | \mathbf{\mu}, \Sigma)$$
 $$\phi_n = \frac{\exp(\beta_n)}{\sum_{n^{\prime}} \exp(\beta_{n^{\prime}})}$$
 </div>
 
-<p>このように事前分布にガウス分布を置くことで，分散を通してパラメータ間の相関（後述しますが時点間の相関）をコントロールできます．</p>
+<p>このように事前分布にガウス分布を置くことで，分散を通してパラメータ間の相関をコントロールします．</p>
 
-<p>以下にSCANのグラフィカルモデルと生成モデルを示します．</p>
+<p>以下にSCANのグラフィカルモデルと生成モデルを示します．SCANの構造ははDynamic Topic Model (Blei+, 2006)のUnigram Mixture拡張と考えるとわかりやすいです．</p>
 
 <p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/27/91632/d86959e0-8887-44fd-b0e5-5cba535a3625.png"></p>
 
@@ -290,7 +290,7 @@ $$p(w | k) = \sum_t p(w | t, k) = \sum_t \psi^{t, k}_w$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2021-06-29 22:27:08.055118 &#43;0900 JST m=&#43;0.391340521">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2021-07-07 23:30:16.518155 &#43;0900 JST m=&#43;0.179371199">2021</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
