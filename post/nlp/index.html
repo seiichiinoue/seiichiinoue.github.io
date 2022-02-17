@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<title>
-				ニューラル言語モデルサーベイ &middot; Seiichi Inoue
+				近年のニューラル言語モデルまとめ &middot; Seiichi Inoue
 		</title>
 
 		
@@ -43,59 +43,49 @@
         <time datetime="2019-08-07 08:34:41 &#43;0900 JST">August 7, 2019</time>
 </div>
 
-		<h1 class="post-title">ニューラル言語モデルサーベイ</h1>
+		<h1 class="post-title">近年のニューラル言語モデルまとめ</h1>
 <div class="post-line"></div>
 
 		
 
 		
 
-<h3 id="word2vec">Word2Vec</h3>
+<!--
 
-<ul>
-<li><p>論文: <a href="https://arxiv.org/abs/1301.3781">Efficient Estimation of Word Representations in Vector Space</a></p></li>
+### Word2Vec
 
-<li><p>大量のテキストデータを用いて学習を行い，各単語の意味を推論によって表現する方法．</p></li>
+- 論文: [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781)
 
-<li><p>CBOWモデル(周辺の単語からターゲットを予測するモデル)とSkip-Gramモデルがあるが，そのうちSkip-Gramモデル(ある単語の周辺に出現する単語の出現確率を計算するモデル)が主に使われる．</p></li>
+- 大量のテキストデータを用いて学習を行い，各単語の意味を推論によって表現する方法．
+- CBOWモデル(周辺の単語からターゲットを予測するモデル)とSkip-Gramモデルがあるが，そのうちSkip-Gramモデル(ある単語の周辺に出現する単語の出現確率を計算するモデル)が主に使われる．
+- Skip-Gram は２層のニューラルネットワークであり隠れ層は一つだけ．隣接する層のユニットは全結合している．
 
-<li><p>Skip-Gram は２層のニューラルネットワークであり隠れ層は一つだけ．隣接する層のユニットは全結合している．</p></li>
-</ul>
+<img src="https://camo.qiitausercontent.com/135690f9499a9717cd0537dab997cc6bcd33f1a0/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f36333338393465382d366531652d633237342d613333612d3833643062343665393961382e706e67" width=300>
 
-<p><img src="https://camo.qiitausercontent.com/135690f9499a9717cd0537dab997cc6bcd33f1a0/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f36333338393465382d366531652d633237342d613333612d3833643062343665393961382e706e67" width=300></p>
+- 目的関数を設定して，2層のニューラルネットワークを構築するが，**word2vecにおいて必要なものは，モデル自体ではなく隠れ層の重み**であることに注意．
+- 入力としてある単語，出力にその周辺単語を与えてニューラルネットワークを学習させることで，「**意味が近い(=意味ベクトルの距離が近い)時は周辺単語の意味ベクトルもまた距離が近いはず**」という仮説に基づいたembedding表現を得ることができる．
 
-<ul>
-<li>目的関数を設定して，2層のニューラルネットワークを構築するが，<strong>word2vecにおいて必要なものは，モデル自体ではなく隠れ層の重み</strong>であることに注意．</li>
-<li>入力としてある単語，出力にその周辺単語を与えてニューラルネットワークを学習させることで，「<strong>意味が近い(=意味ベクトルの距離が近い)時は周辺単語の意味ベクトルもまた距離が近いはず</strong>」という仮説に基づいたembedding表現を得ることができる．</li>
-</ul>
+<img src="https://camo.qiitausercontent.com/f087da40cde3cba6e8e4f49105f1d87fdacb3c9c/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64346335363430632d316465302d333731652d396465632d6435376637306636393863622e706e67" width=600>
 
-<p><img src="https://camo.qiitausercontent.com/f087da40cde3cba6e8e4f49105f1d87fdacb3c9c/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64346335363430632d316465302d333731652d396465632d6435376637306636393863622e706e67" width=600></p>
+<img src="https://camo.qiitausercontent.com/00f2cdda20a9a7d7852498621d48d4799ed728be/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f63393539373939392d656166632d343635312d306135372d3830336434383039343036372e706e67" width=600>
 
-<p><img src="https://camo.qiitausercontent.com/00f2cdda20a9a7d7852498621d48d4799ed728be/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f63393539373939392d656166632d343635312d306135372d3830336434383039343036372e706e67" width=600></p>
+- 上図のように，one-hotベクトルを入力として与えてあげれば，実際に対象の単語ベクトルを抽出する際は内積ではなくインデックスを使って抽出すれば良いだけなので単語数や隠れそうの次元を気にすることなくモデルを構築することができる
 
-<ul>
-<li>上図のように，one-hotベクトルを入力として与えてあげれば，実際に対象の単語ベクトルを抽出する際は内積ではなくインデックスを使って抽出すれば良いだけなので単語数や隠れそうの次元を気にすることなくモデルを構築することができる</li>
-</ul>
+<img src="https://camo.qiitausercontent.com/96a336fd510e0e4100396787d80e2a4c199dca94/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64373435303531352d343064302d306662332d643536302d6639663864653466373036362e706e67" width=650>
 
-<p><img src="https://camo.qiitausercontent.com/96a336fd510e0e4100396787d80e2a4c199dca94/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64373435303531352d343064302d306662332d643536302d6639663864653466373036362e706e67" width=650></p>
+- 出力層は上図のよう．対象の単語の重みベクトルを得たあと，中間層から出力層の単語の重みベクトルとの内積をとっている．つまり単語同士の内積が出力となっていることがわかる．
 
-<ul>
-<li>出力層は上図のよう．対象の単語の重みベクトルを得たあと，中間層から出力層の単語の重みベクトルとの内積をとっている．つまり単語同士の内積が出力となっていることがわかる．</li>
-</ul>
+### fastText
 
-<h3 id="fasttext">fastText</h3>
+- 論文: [Enriching Word Vectors with Subword Information](https://arxiv.org/pdf/1607.04606v1.pdf)
 
-<ul>
-<li><p>論文: <a href="https://arxiv.org/pdf/1607.04606v1.pdf">Enriching Word Vectors with Subword Information</a></p></li>
+- 単語より小さな単位でembeddingを行うことで未知語への対応を可能にした．
+- 文字レベルのN-gramを用いる．
+- 以下の通り，subwordを用いて活用形で変化しない基幹部分の表現を得るといった手法．
 
-<li><p>単語より小さな単位でembeddingを行うことで未知語への対応を可能にした．</p></li>
+![](https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F25990%2F6b13bea3-7639-cdb7-675f-6a6eb313ee63.png?ixlib=rb-1.2.2&auto=compress%2Cformat&fit=max&s=761b64372eb8e158923eb5b529c931eb)
 
-<li><p>文字レベルのN-gramを用いる．</p></li>
-
-<li><p>以下の通り，subwordを用いて活用形で変化しない基幹部分の表現を得るといった手法．</p></li>
-</ul>
-
-<p><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F25990%2F6b13bea3-7639-cdb7-675f-6a6eb313ee63.png?ixlib=rb-1.2.2&amp;auto=compress%2Cformat&amp;fit=max&amp;s=761b64372eb8e158923eb5b529c931eb" alt="" /></p>
+-->
 
 <h2 id="lstm">LSTM</h2>
 
@@ -467,48 +457,14 @@ $$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = d
 
 <ul>
 <li>系列の15%を[MASK]トークンに置き換えて予測</li>
-
-<li><p>そのうち80%がマスク，10%がランダムな単語，10%を置き換えない方針で変換する</p>
-<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">MaskedLanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="s2">&#34;&#34;&#34;
-</span><span class="s2">入力系列のMASKトークンから元の単語を予測する
-</span><span class="s2">nクラス分類問題, nクラス : vocab_size
-</span><span class="s2">&#34;&#34;&#34;</span>
-
-<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">):</span>
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    :param hidden: output size of BERT model
-</span><span class="s2">    :param vocab_size: total vocab size
-</span><span class="s2">    &#34;&#34;&#34;</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></code></pre></div></li>
+<li>そのうち80%がマスク，10%がランダムな単語，10%を置き換えない方針で変換する</li>
 </ul>
 
 <h4 id="事前学習2-隣接文の予測">事前学習2 隣接文の予測</h4>
 
 <ul>
 <li>二つの文章を与え隣り合っているかをYes/Noで判定</li>
-
-<li><p>文章AとBが与えられた時に，50%の確率で別の文章Bに置き換える</p>
-<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">NextSentencePrediction</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="s2">&#34;&#34;&#34;
-</span><span class="s2">2クラス分類問題 : is_next, is_not_next
-</span><span class="s2">&#34;&#34;&#34;</span>
-
-<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    :param hidden: BERT model output size
-</span><span class="s2">    &#34;&#34;&#34;</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span></code></pre></div></li>
+<li>文章AとBが与えられた時に，50%の確率で別の文章Bに置き換える</li>
 </ul>
 
 <h3 id="bertモデルの応用">BERTモデルの応用</h3>
@@ -540,8 +496,8 @@ $$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = d
 	</div>
      
 	<div class="pagination">
-		<a href="https://seiichiinoue.github.io/post/abc136/" class="left arrow">&#8592;</a>
-		<a href="https://seiichiinoue.github.io/post/mathjax/" class="right arrow">&#8594;</a>
+		<a href="https://seiichiinoue.github.io/post/cpplsp/" class="left arrow">&#8592;</a>
+		<a href="https://seiichiinoue.github.io/post/segfault/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -550,7 +506,7 @@ $$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = d
 
         		<footer>
 			<span>
-			&copy; <time datetime="2022-02-17 12:49:37.154011 &#43;0900 JST m=&#43;0.154303712">2022</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-02-17 17:45:09.774639 &#43;0900 JST m=&#43;0.136214884">2022</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

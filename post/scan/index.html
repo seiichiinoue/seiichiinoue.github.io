@@ -50,13 +50,14 @@
 
 		
 
-<p>今回実装したのは，通時的な意味変化を捉えるトピックモデルです．2016年のTACL論文になります．以下論文です．</p>
+<p>今回実装したのは，Dynamic Bayesian Model of Sense Change (SCAN)という，通時的な意味変化を捉える階層ベイズモデルです．
+ユニグラム混合をガウス分布のマルコフ確率場で動的拡張を行い，対象単語の文脈単語集合に対してトピックモデリングをすることで，意味の変化を捉えようというモデルになっています．</p>
+
+<p>これは，2016年のTACL論文で提案されたモデルになっています．以下論文です:</p>
 
 <p><a href="https://www.aclweb.org/anthology/Q16-1003.pdf">https://www.aclweb.org/anthology/Q16-1003.pdf</a></p>
 
-<p>実装後に発見したのですが，一応著者が公開している実装もあるらしいです（しかしGoで書かれていて，超絶読みづらいです）．</p>
-
-<p>僕の実装は以下になります:</p>
+<p>実装は以下:</p>
 
 <p><a href="https://github.com/seiichiinoue/scan">https://github.com/seiichiinoue/scan</a></p>
 
@@ -289,7 +290,7 @@ $$p(w | k) = \sum_t p(w | t, k) = \sum_t \psi^{t, k}_w$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2022-02-17 12:49:37.137642 &#43;0900 JST m=&#43;0.137935171">2022</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-02-17 17:45:09.76796 &#43;0900 JST m=&#43;0.129535839">2022</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
