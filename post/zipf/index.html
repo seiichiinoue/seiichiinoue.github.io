@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>
+				zipf分布を用いた冪乗則に従う擬似データの生成 &middot; Seiichi Inoue
+		</title>
+
+		
+  		<link rel="stylesheet" href="https://seiichiinoue.github.io/css/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i,700">
+		
+        
+        
+        
+        
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="Seiichi Inoue" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="https://seiichiinoue.github.io/">
+					<h2 class="nav-title">Seiichi Inoue</h2>
+				</a>
+				<ul>
+    <li><a href="https://seiichiinoue.github.io/about">About</a></li>
+    <li><a href="https://seiichiinoue.github.io/">Posts</a></li>
+</ul>
+
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+        <br>
+        <time datetime="2022-04-06 20:22:05 &#43;0900 JST">April 6, 2022</time>
+</div>
+
+		<h1 class="post-title">zipf分布を用いた冪乗則に従う擬似データの生成</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+<p>zipfの法則は，言語をはじめとしたさまざまな現象において成り立つことで有名です．</p>
+
+<p>自然言語処理（言語学）においては，1文書中の単語の出現頻度について，$k$番目に出現頻度が高い単語が，1番頻度が高い単語に対して$1 / k$に比例するといった経験則があげられます．</p>
+
+<p>今回は，このzipfの法則を用いてlong tailな擬似データを生成することを考えます．</p>
+
+<h2 id="背景-bag-of-wordsのサンプリング">背景: Bag of Wordsのサンプリング</h2>
+
+<p>やりたいこととしては，ランダムな疑似データ（Bag of Words）を生成したいです（つまり語順は気にしません; どの単語が何回出現したかさえわかれば良いです）．</p>
+
+<p>一番ナイーブな方法としては，一様分布を事前分布に持つ多項分布からランダムに単語を生成する方法が考えられます:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># 語彙サイズ</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">N</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>  <span class="c1"># 一様分布</span>
+<span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+<span class="c1"># [85, 100, 110,  89,  98,  95, 101, 108,  95, 119]</span></code></pre></div>
+<p>こんな感じです．しかし実際のコーパス（文書）はこんな分布になっていないはずなので，事前分布をdirichlet分布にしてみましょう:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># 語彙サイズ</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">dirichlet</span><span class="p">([</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">N</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>  <span class="c1"># ハイパラは一様分布</span>
+<span class="k">print</span><span class="p">(</span><span class="n">prior</span><span class="p">)</span>
+<span class="c1"># [0.11686016 0.0160516  0.04487059 0.1391904  0.05196437 0.22893579</span>
+<span class="c1"># 0.02837644 0.25930711 0.04440848 0.07003507]</span>
+<span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+<span class="c1"># [111,  23,  42, 132,  55, 239,  32, 249,  42,  75]</span></code></pre></div>
+<p>ちょっと偏りが出ました．これは冪乗則に従っているんでしょうか？</p>
+
+<p>語彙サイズを10→10,000にして，サンプル数も1,000→100,000と大きくして確認してみます:</p>
+
+<p><img src="https://seiichiinoue.github.io/img/dirichlet_freq.png"></p>
+
+<p>log-logプロットをした結果は以下のように直線にはならず，冪分布にはなっていないことがわかります <sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>:</p>
+
+<p><img src="https://seiichiinoue.github.io/img/dirichlet_freq_log.png"></p>
+
+<p>そこで，きちんと冪分布に従うような擬似データを生成するため，zipfを使ってみようというのが今回の話です．</p>
+
+<h2 id="zipf分布">zipf分布</h2>
+
+<p>zipf分布は$N$を語彙サイズ，$k$を頻度順位として，以下のように定義されます:</p>
+
+<div style="overflow-x: auto;">
+$$f(k; s, N) = \frac{1 / k^s}{\sum_{n=1}^N 1/ n^s }$$
+</div>
+
+<p>ここで，$s$はzipf分布のスケールパラメータで，本来のzipの法則では$s = 1$ですが，$s$を1よりも少しでも大きい数とすれば$N$を無限大にしても分母は収束するようになって，分布関数として定義できるようになります．</p>
+
+<h2 id="zipf分布を使ったサンプリング">zipf分布を使ったサンプリング</h2>
+
+<p>それではzipf分布を使ってBoWを生成してみましょう:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># 語彙サイズ</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">zipf</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">i</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="n">denom</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">zipf</span><span class="p">)</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="o">/</span> <span class="n">denom</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">zipf</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">prior</span><span class="p">)</span>
+<span class="c1"># [0.34141715214740553, 0.17070857607370277, 0.1138057173824685, 0.08535428803685138, </span>
+<span class="c1">#  0.06828343042948111, 0.05690285869123425, 0.04877387887820079, 0.04267714401842569, </span>
+<span class="c1">#  0.0379352391274895, 0.034141715214740555]</span>
+<span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+<span class="c1"># [316, 183, 131, 81, 58, 56, 49, 58, 36, 32]</span></code></pre></div>
+<p>結構冪分布っぽくなったんじゃないでしょうか？</p>
+
+<p>先ほどと同様に語彙サイズを10→10,000にして，サンプル数も1,000→100,000と大きくして確認してみます:</p>
+
+<p><img src="https://seiichiinoue.github.io/img/zipf_freq.png"></p>
+
+<p>log-logプロットでは直線になっていることが確認できます:</p>
+
+<p><img src="https://seiichiinoue.github.io/img/zipf_freq_log.png"></p>
+
+<h2 id="zipfパラメータの選択">zipfパラメータの選択</h2>
+
+<p>zipf分布のスケールパラメータ$s$を変更することは，比例関係のスケール（log-logプロットの傾き）を変更することであり，これはzipf分布を一般化させた冪乗則の式を変形することで解釈できます．</p>
+
+<p>冪乗則は次のように$x$と$y$の間の比例関係が冪乗に従うというものであり，次のように表されます:</p>
+
+<div style="overflow-x: auto;">
+$$y = b x ^a$$
+</div>
+
+<p>この両辺を対数変換すると:</p>
+
+<div style="overflow-x: auto;">
+$$\log y = a \log x + \log b$$
+</div>
+
+<p>log-logプロット上では傾きa,切片bの直線になり，zipf分布のスケールパラメータ$s$を変更することはすなわち傾きの操作に等しいです．</p>
+
+<p>実際に$s$を変更してみます．</p>
+
+<ul>
+<li>$s = 0.5$の場合</li>
+</ul>
+
+<p><img src="https://seiichiinoue.github.io/img/zipf_freq_log_s0.5.png"></p>
+
+<p>このように，$s &lt; 1.0$とすると，裾の厚い分布が得られます．</p>
+
+<ul>
+<li>$s = 1.5$の場合</li>
+</ul>
+
+<p><img src="https://seiichiinoue.github.io/img/zipf_freq_log_s1.5.png"></p>
+
+<p>逆に$s &gt; 1.0$とすると，裾が薄い分布になり，頻度の分布のカーブが急になるイメージです．</p>
+
+<h2 id="まとめ-あとがき">まとめ / あとがき</h2>
+
+<p>今回は，dirichlet分布からのランダムサンプリングでは簡単に実現できない冪乗則に従う擬似コーパスの作成方法について紹介しました．</p>
+
+<p>個人的な話にはなりますが，研究で擬似データを生成するタスクを行っていたとき，dirichletを用いた擬似データではうまくfittingできないことがあった一方（実データを再現できていない可能性があるためかと思っています），zipfを使うと上手くいったので面白いなと思いました．</p>
+
+<p>まだまだ冪乗則については知らないことが多いので自分も勉強をしていこうと思います．</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">dirichletのpriorをうまく設計すれば冪分布に従うのかもしれませんが，自分はやり方がわかりませんでした．詳しい方は教えてください．
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+
+        <h2 id="related">See Also</h2>
+
+		
+	</div>
+     
+	<div class="pagination">
+		<a href="https://seiichiinoue.github.io/post/scan/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2022-04-07 02:58:07.818302 &#43;0900 JST m=&#43;0.096063827">2022</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+            <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+                });
+            </script>
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		</footer>
+
+    </body>
+</html>
