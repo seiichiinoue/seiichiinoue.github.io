@@ -48,24 +48,20 @@
 
 		
 
-		
-
-<h2 id="gccのアップデート">gccのアップデート</h2>
-
+		<h2 id="gccのアップデート">gccのアップデート</h2>
 <p>まずは，最新のgccをインストールする．私の場合，macなのでbrewで一発で入る．</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ brew reinstall gcc</code></pre></div>
-<h2 id="リンクの貼り直し">リンクの貼り直し</h2>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ brew reinstall gcc
+</span></span></code></pre></div><h2 id="リンクの貼り直し">リンクの貼り直し</h2>
 <p>まず，gccの場所を探す．</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ls /usr/local/bin <span class="p">|</span> grep gcc
-$ ls /usr/local/bin <span class="p">|</span> grep g++</code></pre></div>
-<p>上記コマンドで見つかった<code>gcc-x</code>と<code>g++-x</code>が対象のエイリアスになるので，見つかったエイリアスに対して，シンボリックリンクを張ってあげる．</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ln -s /usr/local/bin/gcc-8 /usr/local/bin/gcc
-$ ln -s /usr/local/bin/g++-8 /usr/local/bin/g++</code></pre></div>
-<p>ここで，すでにシンボリックリンクが貼られている場合は，<code>-f</code>コマンドをつけなければ上書きしてくれないことに注意する．</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ ls /usr/local/bin <span class="p">|</span> grep gcc
+</span></span><span class="line"><span class="cl">$ ls /usr/local/bin <span class="p">|</span> grep g++
+</span></span></code></pre></div><p>上記コマンドで見つかった<code>gcc-x</code>と<code>g++-x</code>が対象のエイリアスになるので，見つかったエイリアスに対して，シンボリックリンクを張ってあげる．</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ ln -s /usr/local/bin/gcc-8 /usr/local/bin/gcc
+</span></span><span class="line"><span class="cl">$ ln -s /usr/local/bin/g++-8 /usr/local/bin/g++
+</span></span></code></pre></div><p>ここで，すでにシンボリックリンクが貼られている場合は，<code>-f</code>コマンドをつけなければ上書きしてくれないことに注意する．</p>
 <p>最後に<code>~/.bash_profile</code>に以下を記載してパスを通したら完了．</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash_profile" data-lang="bash_profile"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/bin</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash_profile" data-lang="bash_profile"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/bin
+</span></span></code></pre></div>
 
         <h2 id="related">See Also</h2>
 
@@ -83,7 +79,7 @@ $ ln -s /usr/local/bin/g++-8 /usr/local/bin/g++</code></pre></div>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-09-21 02:38:44.470511 &#43;0900 JST m=&#43;0.130522870">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-11-16 23:59:58.828774 &#43;0900 JST m=&#43;0.274171215">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

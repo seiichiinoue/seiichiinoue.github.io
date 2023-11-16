@@ -48,199 +48,115 @@
 
 		
 
-		
-
-<p>久々の更新となります．トピックモデルによる文書分類を用いてこのブログのレコメンド機能を実装したので，まとめていきたいと思います．</p>
-
+		<p>久々の更新となります．トピックモデルによる文書分類を用いてこのブログのレコメンド機能を実装したので，まとめていきたいと思います．</p>
 <p>大まかな流れとしては，ブログの全文書を用いたモデリング，モデルのAPI化，APIのデプロイ，DOMをいじって結果を表示，という感じになっています．かなり単純なのですが，自分にとっては初めてのことが多かったので（特にwebに関することで）備忘録的な形でも残せたらなと思って書いていきます．</p>
-
 <p>まず，トピックモデルは，様々な離散データに隠れた潜在的なトピックを推定するモデルです．ここでいうトピックとは，自然言語処理の文脈では，話題や分野に対応すると考えられ，購買データなどでは，消費者の嗜好などに対応すると考えることができます．</p>
-
 <p>また，ナイーブベイズ分類器などとは異なり，完全に教師なし（人手を介さない）でデータから自動的に学習するモデルとなっています．</p>
-
 <p>今回は，そのトピックモデルのひとつであるLDA; Latent Dirichlet Allocationを用いてこのブログのモデリングを行いました．</p>
-
 <h2 id="lda-latent-dirichlet-allocation">LDA; Latent Dirichlet Allocation</h2>
-
 <p>LDAはざっくりと以下のようなモデルになります．</p>
-
 <ul>
 <li>文書の背景には「トピックの適合率」が存在している</li>
 <li>文書中の各単語の背景には，一つのトピックが存在している</li>
 <li>各単語の背景にあるトピックは，その単語が属している文書の「トピックの混合率」から生成される</li>
 </ul>
-
 <p>つまり，LDAによる文書群のモデル化ができれば，任意の単語に対して，単語の背景にあるトピックが推定可能なので，同じトピックに属する単語を探すことでその単語と同じような意味をもつ単語でクラスタリングすることができます．また，文書についても同様に，各文書の背景トピックを見れば，文書のクラスタリングも可能になります．</p>
-
 <h2 id="ldaの生成モデル">LDAの生成モデル</h2>
-
 <p>LDAでは，まず，文書$\mathbf{w}$をトピックの混合比(=潜在トピック分布)で表現します．各文書のトピックは多項分布に従うので，そのトピックの混合比は，多項分布の共役事前分布のディリクレ分布から生成されると考えます．</p>
-
 <p>次に，文書においてトピックが生成されたら，そのトピックにおける単語の生起確率分布を考えます．こちらも多項分布に従うので，同様にディリクレ分布から生成されると考えます．</p>
-
 <p>そして，各単語は，単語が属する文書がもつトピックにおける単語の生起確率分布に従って生成されます．</p>
-
 <p>以上のLDAにおける単語の生成モデルの流れをまとめると，以下のようになります．</p>
-
 <ul>
 <li>トピックの混合比 $\theta \sim Dir(\alpha)$ を生成</li>
 <li>For n = 1 &hellip; N,
-
 <ul>
 <li>トピック $z_n \sim Mult(\theta)$ を選択</li>
 <li>単語 $w_n \sim p(w|z)$ を生成</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>これが生成モデルですが，もちろん現実には文書，つまり単語のカウント数というデータがあるだけで，この生成過程はわかっていません．それをデータから求めます．</p>
-
 <h2 id="ldaの解法">LDAの解法</h2>
-
-<!-- 生成モデルがわかったので，観測データからパラメータを推定する方法を考えます． -->
-
+<!-- raw HTML omitted -->
 <p>単語生起確率が$\beta$で，各単語の背景トピックが$z$であるような文章群$\mathbf{w}$が得られる確率は以下のような図(グラフィカルモデル)によって表現され，</p>
-
-<p><img src="https://seiichiinoue.github.io/img/ldamodel.png"></p>
-
+<!-- raw HTML omitted -->
 <p>その実態である，観測単語とトピック，トピック分布の同時確率関数は以下のようになります．</p>
-
-<div style="overflow-x: auto;">
-$$p(w, z, \theta) = p(w|z) p(z| \theta) p( \theta| \alpha)$$
-</div>
-
+<!-- raw HTML omitted -->
 <p>よって，文書$\mathbf{w} = w_1, w_2, &hellip; , w_N$について</p>
-
-<div style="overflow-x: auto;">
-
-$$p(\mathbf{w}, z, \theta) = p( \theta| \alpha) \prod_n p(w_n |z_n) p(z_n| \theta)$$
-
-\begin{aligned}
-p(\mathbf{w}) &= \int \sum_z p(\mathbf{w}, z, \theta) d \theta \\
-&= \frac{\Gamma{(\sum_k \alpha_k})}{\prod_k \Gamma{(\alpha_k)}} \int (\prod_k \theta_k^{\alpha_k - 1}) \prod_n \sum_k p(w_n | k) \theta_k d \theta
-\end{aligned}
-
-</div>
-
+<!-- raw HTML omitted -->
+<p>$$p(\mathbf{w}, z, \theta) = p( \theta| \alpha) \prod_n p(w_n |z_n) p(z_n| \theta)$$</p>
+<p>\begin{aligned}
+p(\mathbf{w}) &amp;= \int \sum_z p(\mathbf{w}, z, \theta) d \theta \
+&amp;= \frac{\Gamma{(\sum_k \alpha_k})}{\prod_k \Gamma{(\alpha_k)}} \int (\prod_k \theta_k^{\alpha_k - 1}) \prod_n \sum_k p(w_n | k) \theta_k d \theta
+\end{aligned}</p>
+<!-- raw HTML omitted -->
 <p>となり，これが尤度関数となります．この尤度を最大にするときのパラメータを推定したいです．</p>
-
-<p>推定方法はいくつかありますが，今回はGibbsサンプラーを用いて<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>推定しました．</p>
-
+<p>推定方法はいくつかありますが，今回はGibbsサンプラーを用いて<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>推定しました．</p>
 <h2 id="ldaのgibbs-sampler">LDAのGibbs Sampler</h2>
-
 <p>Gibbsサンプラーとは，マルコフ連鎖モンテカルロ法(MCMC)の最も簡単な場合で，潜在変数を分布ではなく，条件付き分布から実際にサンプリングしていくことでパラメータの推定を行う手法です．</p>
-
 <p>潜在変数$z_1, z_2, &hellip;, z_N$を持つ確率モデル</p>
-
 <p>$$p(X, z_1, z_2, &hellip;, z_N)$$</p>
-
 <p>がある時，各$z_i$を考え直す，つまり条件付き分布</p>
-
-<div style="overflow-x: auto;">
-$$z_i \sim p(z_i | X, z_1, z_2, ..., z_{i-1}, z_{i+1}, ..., z_N)$$
-</div>
-
+<!-- raw HTML omitted -->
 <p>からランダムにサンプリングすることを繰り返します．</p>
-
 <p>また，EMアルゴリズムとは違い，原理的に無限回繰り返せば真の分布からのサンプルになります．つまり，局所最適に陥らず大域的最適解を得やすいということになります．</p>
-
 <p>LDAの潜在変数は，文書のトピック分布$\theta$と各単語のトピック$z$，トピック毎の単語の生起確率分布$\beta$ですが，ここでは$\theta$と$\beta$を積分消去して，尤もらしい$z$得ることを考えます．つまり</p>
-
-<div style="overflow-x: auto;">
-$$z_i \sim p(z_i | \mathbf{w}, z_{-i}, \alpha, \eta)$$
-</div>
-
+<!-- raw HTML omitted -->
 <p>から$z_i$をサンプリングして更新していくことで，尤もらしい$z_i$を得ます．</p>
-
 <p>ここで，$p(z_i | \mathbf{w}, z_{-i}, \alpha, \eta)$は，</p>
-
-<div style="overflow-x: auto;">
-
-\begin{aligned}
-p(z_i = k | \mathbf{w}, z_{-i}) &\propto p(z_i = k, w_i | \mathbf{w}_{-i}, z_{-i})\\
-&= p(w_i | z_i = k, w_{-i}, z_{-i}) p(z_i = k | \mathbf{w}_{-i}, z_{-i})\\
-&= \frac{ \eta + n_{-i, k}^{(w_i)} }{ \sum_w (\eta + n_{-i, k}^{(w)}) } \cdot \frac{ \alpha_k + n_{-i, k}^{(d)} }{ \sum_k (\alpha_k + n_{-i, k}^{(d)}) }
-\end{aligned}
-
-</div>
-
+<!-- raw HTML omitted -->
+<p>\begin{aligned}
+p(z_i = k | \mathbf{w}, z_{-i}) &amp;\propto p(z_i = k, w_i | \mathbf{w}<em>{-i}, z</em>{-i})\
+&amp;= p(w_i | z_i = k, w_{-i}, z_{-i}) p(z_i = k | \mathbf{w}<em>{-i}, z</em>{-i})\
+&amp;= \frac{ \eta + n_{-i, k}^{(w_i)} }{ \sum_w (\eta + n_{-i, k}^{(w)}) } \cdot \frac{ \alpha_k + n_{-i, k}^{(d)} }{ \sum_k (\alpha_k + n_{-i, k}^{(d)}) }
+\end{aligned}</p>
+<!-- raw HTML omitted -->
 <p>で，$n_{-i, k}^{(w)}$は，データ全体で単語$w$がトピック$k$に割り当てられた回数($w_i$を除く)であり，$n_{-i, k}^{(d)}$は，文書$d$中でトピック$k$に割り当てられた単語数($w_i$を除く)です．</p>
-
 <h2 id="ldaの幾何学的解釈">LDAの幾何学的解釈</h2>
-
 <p>LDAは，名前の通り，潜在ディリクレ分布にallocateするというものですが，何を何にallocateしているのでしょうか．ここで，3-1=2次元の単体上での生成の流れをみながら，LDAを再解釈してみます．</p>
-
-<p><img src="https://seiichiinoue.github.io/img/ldaingeo.png"></p>
-
+<!-- raw HTML omitted -->
 <p>LDAでは，文書毎にトピック単体上のディリクレ分布からトピック分布$\theta$を選択します．ここで，単体の角が各トピックに対応しています．そして，$\theta$から確率的に頂点$\beta$を選び，$\beta = p(w|k)$から確率的に$w$を選びます．</p>
-
 <p>これは，$p(w) = \sum_k \theta_k p(w | k)$から直接$w$を選んでいることと等価です．つまり，トピック単体は単語単体上に埋め込まれているということがわかります．</p>
-
-<p>よって，文書を比較的大きいと考えられる単語次元よりも低次の単体に&rdquo;allocate&rdquo;するというのがLDAの名前の所以になっているようです．</p>
-
+<p>よって，文書を比較的大きいと考えられる単語次元よりも低次の単体に&quot;allocate&quot;するというのがLDAの名前の所以になっているようです．</p>
 <h2 id="ldaによる文書分類">LDAによる文書分類</h2>
-
 <p>さて，LDAのことがなんとなくわかったので，LDAを用いて文書分類を行っていきます．LDAで文書分類を行う方法は，いくつか考えられますが，ここでは文書が持つトピック分布$\theta$を用いて分類を行います．</p>
-
 <p>$\theta$はトピック分布であり，上述の通りディリクレ分布に従うので，$\theta$の期待値を以下のように求めてあげればよいです．ただし，$\alpha$はNewton-Raphson法などで最尤推定します．</p>
-
-<div style="overflow-x: auto;">
-$$E[\theta_k | \alpha] = \frac{\alpha_k}{\sum_k \alpha_k}$$
-</div>
-
+<!-- raw HTML omitted -->
 <p>ここで，類似する記事 := 同じトピックを持つ記事と定義してあげて，同じトピックを持つ記事でクラスタリングしてあげれば分類ができます．レコメンドも，同じクラスタに属する文書を用いることで実現できそうです．</p>
-
 <p>つまり，記事$i$と類似する記事の集合を$y_i$とすると，</p>
-
-<div style="overflow-x: auto;">
-$$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
-</div>
-
+<!-- raw HTML omitted -->
 <p>が類似する記事の集合となり，これをレコメンドすれば良いです．ここで$\theta_i$は文書$i$における各トピックの期待値です．</p>
-
 <h2 id="システムの概要">システムの概要</h2>
-
 <p>レコメンデーションのアルゴリズムまで考えることができたので，次は構築したモデルをwebAPIにして，web上で動くようにします．</p>
-
-<p>APIの作成にはpythonのFlask<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>を用いました．実装は <a href="https://github.com/seiichiinoue/recomapp">seiichiinoue/recomapp</a>にあります．</p>
-
+<p>APIの作成にはpythonのFlask<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>を用いました．実装は <a href="https://github.com/seiichiinoue/recomapp">seiichiinoue/recomapp</a>にあります．</p>
 <p>APIでは，レコメンドを取得したい対象の記事のpathnameを投げた時に，レコメンド結果をjsonで返すというような単純なことをしています．以下のように取得できるようにしています．</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl <span class="s1">&#39;https://recomapp.herokuapp.com/infer?name=tmrecom&#39;</span>
-<span class="o">{</span><span class="s2">&#34;success&#34;</span>:true,<span class="s2">&#34;Content-Type&#34;</span>:<span class="s2">&#34;application/json&#34;</span>,<span class="s2">&#34;similar_doc_name&#34;</span>:<span class="o">[</span><span class="s2">&#34;0729&#34;</span>,<span class="s2">&#34;docker&#34;</span>,<span class="s2">&#34;cstm&#34;</span>,<span class="s2">&#34;vpylm&#34;</span>,<span class="s2">&#34;tobit&#34;</span>,<span class="s2">&#34;segfault&#34;</span>,<span class="s2">&#34;pointer&#34;</span><span class="o">]</span>,<span class="s2">&#34;similar_doc_title&#34;</span>:<span class="o">[</span><span class="s2">&#34;ブログを始めました&#34;</span>,<span class="s2">&#34;DockerでUbuntuの環境を構築する&#34;</span>,<span class="s2">&#34;Continuous Space Topic Modelの実装&#34;</span>,<span class="s2">&#34;Pitman-Yor過程に基づく可変長n-gram言語モデルの実装&#34;</span>,<span class="s2">&#34;トービットモデルにおける逆ミルズ比の解釈&#34;</span>,<span class="s2">&#34;segfaultについて&#34;</span>,<span class="s2">&#34;C++の配列とポインタのメモ&#34;</span><span class="o">]}</span></code></pre></div>
-<p>それから，herokuでAPIをデプロイしたらweb上で動く推論モデルの完成です（すげー！）</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl <span class="s1">&#39;https://recomapp.herokuapp.com/infer?name=tmrecom&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;success&#34;</span>:true,<span class="s2">&#34;Content-Type&#34;</span>:<span class="s2">&#34;application/json&#34;</span>,<span class="s2">&#34;similar_doc_name&#34;</span>:<span class="o">[</span><span class="s2">&#34;0729&#34;</span>,<span class="s2">&#34;docker&#34;</span>,<span class="s2">&#34;cstm&#34;</span>,<span class="s2">&#34;vpylm&#34;</span>,<span class="s2">&#34;tobit&#34;</span>,<span class="s2">&#34;segfault&#34;</span>,<span class="s2">&#34;pointer&#34;</span><span class="o">]</span>,<span class="s2">&#34;similar_doc_title&#34;</span>:<span class="o">[</span><span class="s2">&#34;ブログを始めました&#34;</span>,<span class="s2">&#34;DockerでUbuntuの環境を構築する&#34;</span>,<span class="s2">&#34;Continuous Space Topic Modelの実装&#34;</span>,<span class="s2">&#34;Pitman-Yor過程に基づく可変長n-gram言語モデルの実装&#34;</span>,<span class="s2">&#34;トービットモデルにおける逆ミルズ比の解釈&#34;</span>,<span class="s2">&#34;segfaultについて&#34;</span>,<span class="s2">&#34;C++の配列とポインタのメモ&#34;</span><span class="o">]}</span>
+</span></span></code></pre></div><p>それから，herokuでAPIをデプロイしたらweb上で動く推論モデルの完成です（すげー！）</p>
 <p>無事APIをデプロイできたので，あとはフロント側からjavascriptでDOMをいじってあげて，各記事に適切なレコメンデーション記事のリストを表示すれば完成です．</p>
-
 <p>javascriptには，DOM; Document Object ModelというHTMLにjavascriptからアクセスできるようにしたオブジェクト構造があります．今回は，静的ジェネレータを用いたブログ内でwebAPIを通して取得したデータをもとに動的にページを生成したかったので，簡単なjavascriptを用いました．</p>
-
 <p>例えば，このページのこの箇所は</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&#34;システムの概要&#34;</span><span class="p">)</span>
-</code></pre></div>
-<p>このようにアクセスすることができ，このオブジェクトには<code>insert</code>メソッドが用意されているので，予め&rdquo;See Also&rdquo;のフィールドを作っておいてあげて，DOM側からそのElementにリストを追加すれば簡単にレコメンドを表示できます．</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&#34;システムの概要&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>このようにアクセスすることができ，このオブジェクトには<code>insert</code>メソッドが用意されているので，予め&quot;See Also&quot;のフィールドを作っておいてあげて，DOM側からそのElementにリストを追加すれば簡単にレコメンドを表示できます．</p>
 <h2 id="まとめと展望">まとめと展望</h2>
-
 <p>とりあえず，以上のように統計モデルを使って（記事へのタグ付けなど人手を介さず）レコメンデーションを自動化することができました．</p>
-
 <p>しかし，結果は各記事(<code>/post/</code>にあります)をみていただきたいのですが，現時点ではブログでの記事数が少なく，文書数/語彙数と共に本来の分布を正確に推定できるには事足りず，推論結果が納得のいくものにはなりませんでした．文書数を増やすことはもちろんですが（頑張ります！），前処理の時点で数式やコードブロックをバッサリと捨ててしまっていたりと無駄になっている記号の情報が多いので，そこらへんの情報を使用したら現状下でももう少し精度が上がるのではないかと思いました．</p>
-
 <p>また，APIに関してですが，現時点では記事が追加される度に自分でモデルを再学習させて，デプロイしなおしており，効率的とは言えません．ciなどを用いて記事が追加(ブログレポジトリのmasterブランチに<code>.md</code>ファイルがpush)された時に，自動でモデルを再学習/ビルド/デプロイをできるようにできたらより嬉しいかなと思いました．</p>
-
 <h2 id="参照">参照</h2>
-
 <ul>
 <li><a href="http://chasen.org/~daiti-m/paper/daichi15topicmodel-for-ecology.pdf">統計数理研究所 離散データの確率的トピックモデル</a>, 持橋大地, 生物に見られる時空間パターンと統計数理:同調・認知・行動にて (2015)</li>
 <li><a href="http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf">Latent Dirichlet Allocation</a>, Blei, Ng, Jordan, Journal of Machine Learning Research 3 (2003)</li>
 <li><a href="https://dl.acm.org/doi/10.1145/2133806.2133826">Probabilistic Topic Models</a>, Blei, Communications of ACM (2012)</li>
 </ul>
-<div class="footnotes">
-
-<hr />
-
+<div class="footnotes" role="doc-endnotes">
+<hr>
 <ol>
-<li id="fn:1">Gibbsサンプラーは変分ベイズと比べて計算量が多いらしいですが，今回用いたデータは自分のブログの文書のみであり，リソースには余裕があったため，局所解に陥りにくいGibbsサンプラーを採用しました．
- <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:2">Python用の軽量なウェブアプリケーションフレームワークです
- <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
+<li id="fn:1">
+<p>Gibbsサンプラーは変分ベイズと比べて計算量が多いらしいですが，今回用いたデータは自分のブログの文書のみであり，リソースには余裕があったため，局所解に陥りにくいGibbsサンプラーを採用しました．&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Python用の軽量なウェブアプリケーションフレームワークです&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
 </ol>
 </div>
 
@@ -261,7 +177,7 @@ $$y_i = \{d_j | d_j \in D_{-i}, \, argmax_i(\theta_i) = argmax_j(\theta_j)\}$$
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-09-21 02:38:44.530522 &#43;0900 JST m=&#43;0.190535236">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-11-16 23:59:58.824705 &#43;0900 JST m=&#43;0.270102605">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
