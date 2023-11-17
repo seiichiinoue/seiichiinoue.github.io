@@ -48,118 +48,229 @@
 
 		
 
-		<p>今回実装したのは，Dynamic Bayesian Model of Sense Change (SCAN)という，通時的な意味変化を捉える階層ベイズモデルです．
+		
+
+<p>今回実装したのは，Dynamic Bayesian Model of Sense Change (SCAN)という，通時的な意味変化を捉える階層ベイズモデルです．
 ユニグラム混合をガウス分布のマルコフ確率場で動的拡張を行い，対象単語の文脈単語集合に対してトピックモデリングをすることで，意味の変化を捉えようというモデルになっています．</p>
+
 <p>これは，2016年のTACL論文で提案されたモデルになっています．以下論文です:</p>
+
 <p><a href="https://www.aclweb.org/anthology/Q16-1003.pdf">https://www.aclweb.org/anthology/Q16-1003.pdf</a></p>
+
 <p>実装は以下:</p>
+
 <p><a href="https://github.com/seiichiinoue/scan">https://github.com/seiichiinoue/scan</a></p>
+
 <h2 id="dynamic-bayesian-model-of-sense-change-scan">Dynamic Bayesian Model of Sense Change (SCAN)</h2>
+
 <p>前置きとして，このモデルは単語の意味変化を捉えるためのモデルになっています．</p>
+
 <p>データが少し特殊で，word-specific documentsを用いて学習します．意味変化を検出したいtarget wordの周辺単語を任意の文脈窓幅$I$について</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$d_i = (t_{-I}, t_{-I+1}, \ldots, t_{-1}, t, t_{1}, \ldots, t_{I-1}, t_{I})$$
+</div>
+
 <p>というような文書を仮定します．</p>
+
 <p>この文書に対して，year label (正確な年は必要なく，どの文書集合がどの年代のものかがわかればよい) が付与されていて，その文書のyear labelに従って，対応する時期のパラメータを推定し，かつ，それぞれの時期間に相関を持たせながら学習するようなモデルになっています．</p>
+
 <p>本モデルでは，時点$t$のtemporal meaning representationとして，K次元のトピック分布$\phi^t$とV次元の単語分布$\psi^{t, k}$を仮定します．また，時点間でのトピック分布の変化を制御するための精度パラメータである$\kappa^{\phi}$を導入します．</p>
+
 <p>上述の精度パラメータを使って，どのように時点間の相関をもたせるかですが，それは多項分布$\phi$, $\psi$の事前分布にlogistic normalを置くことで実現します．logistic normalに従う多項分布パラメータは，$n$次元のランダムベクトル$\mathbf{\beta}$が$n$次元の平均ベクトル$\mathbf{\mu}$，$n \times n$次元の分散共分散行列$\Sigma$によるガウス分布から生成され:</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\mathbf{\beta} \sim \mathcal{N} (\mathbf{\beta} | \mathbf{\mu}, \Sigma)$$
+</div>
+
 <p>それを次のようにロジスティック変換することにより単体上に射影する（0 ~ 1の確率に変換する）ことで生成されます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\phi_n = \frac{\exp(\beta_n)}{\sum_{n^{\prime}} \exp(\beta_{n^{\prime}})}$$
+</div>
+
 <p>このように事前分布にガウス分布を置くことで，分散を通してパラメータ間の相関をコントロールします．</p>
+
 <p>以下にSCANのグラフィカルモデルと生成モデルを示します．Dynamic Topic Model (Blei+, 2006)のUnigram Mixture拡張と考えるとわかりやすいです．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/27/91632/d86959e0-8887-44fd-b0e5-5cba535a3625.png"></p>
+
 <p>まず，トピック精度パラメータ$\kappa^{\phi}$を共役事前分布であるGamma分布から生成します．</p>
+
 <p>次に，それぞれの時点$t$において，logistic normal事前分布からトピック分布$\phi^{t}$を生成し，それぞれのトピック$k$について，同様にlogistic normal事前分布から単語分布$\psi^{t, k}$を生成します．</p>
+
 <p>そして，各文書に対して，トピック$z^d$を多項分布$Mult(\phi^t)$から生成し，文脈窓幅$I$回文脈単語を多項分布$Mult(\psi^{t, z_d})$から独立に生成する流れになります．</p>
+
 <p>ここで，トピック分布 (論文中ではsense distributionと呼ばれている) と単語分布について，$t - 1$時点と$t + 1$時点のパラメータの平均を事前分布の平均としていますが，これは，intrinsic Gaussian Markov Random Field (iGMRF) であり，時期間のパラメータに相関を持たせ，変化を捉えることを可能としています．</p>
+
 <h2 id="推論">推論</h2>
+
 <p>SCANの推定パラメータは，潜在変数である文書のトピック$z$，トピック分布$\phi$，単語分布$\psi$，トピック分布のlogistic normal事前分布のパラメータ$\kappa$です．</p>
+
 <p>推定にはblocked Gibbs Samplerを用います．一般に，トピックモデルは多項分布-Dirichlet分布を用いて離散変数のモデル化を行うことが多いのですが，SCANは多項分布の事前分布に共役ではないガウス分布を仮定しているので，同様に推定することはできません．
-logistic normalパラメータを推定する方法として，Polya-Gamma分布を用いたサンプリング<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>がありますが，本実装では，Mimnoらから提案された補助変数を用いる推定法を用います．</p>
+logistic normalパラメータを推定する方法として，Polya-Gamma分布を用いたサンプリング<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">1</a></sup>がありますが，本実装では，Mimnoらから提案された補助変数を用いる推定法を用います．</p>
+
 <p>大まかな流れとしては，文書のトピックを他のパラメータを固定した状態でサンプルし，次にトピックと単語の多項分布のパラメータを同様に他のパラメータを固定してサンプルし，最後に精度パラメータをサンプルする，という感じです．</p>
+
 <h3 id="トピックのサンプリング">トピックのサンプリング</h3>
+
 <p>文書のトピックは，他のパラメータを全て固定した上で以下の条件付き確率に従ってサンプルされます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+\begin{eqnarray}
+p(z^d | \mathbf{w}, t, \phi, \psi) &\propto& p(z^d | t) p(\mathbf{w} | t, z^d)\\\\
+&=& \phi^{t}_{z^d} \prod_{w \in \mathbf{w}} \psi^{t, z^d}_w 
+\end{eqnarray}
+</div>
+
 <p>各文書に対して，上式を用いて各トピックの確率を計算することでトピックの確率分布（実際には正規化されていない）が得られます．</p>
-<p>多項分布を用いてサンプルする際は，一般に正規化された確率を引数に渡してあげなければならないのですが，上式から分かる通り，$\prod \psi^{z^d}_w &laquo; 0$であるため，underflowしないようにlogsumexp<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>等を使わなければならないことに注意です．</p>
+
+<p>多項分布を用いてサンプルする際は，一般に正規化された確率を引数に渡してあげなければならないのですが，上式から分かる通り，$\prod \psi^{z^d}_w &lt;&lt; 0$であるため，underflowしないようにlogsumexp<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">2</a></sup>等を使わなければならないことに注意です．</p>
+
 <h3 id="logistic-normalパラメータのサンプリング">logistic normalパラメータのサンプリング</h3>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<!--
+トピックが与えられたとき，事後確率は
+
+<div style="overflow-x: auto;">
+$$p( \phi_ | \mathbf{z}, \mathbf{\mu}, \kappa, t) \propto \prod_{d=1}^{D} \prod_{k=1}^K \frac{\exp(\phi^t_{k})}{\sum_{k=1}^{K} \exp(\phi^t_k)} \mathcal{N} (\mathbf{\mu}, \kappa)$$
+</div>
+
+となります．結果的にトピック分布$\phi$を推定することは，文書のindexを入力として，トピック$z$をラベルとした時の，ガウス事前分布を用いたロジスティック回帰のパラメータを学習することと等価です．
+
+一般にロジスティック回帰は数値最適化で推定されますが，今回はMCMC法を用いる手法を用います．以下，簡単のためトピック分布を$\phi$と略記します．
+-->
+
 <p>上述の通り本モデルでは，多項分布の事前分布には共役でないlogistic normalを考えているので，トピック分布$\phi$，単語分布$\psi$の推定には，補助変数を用いたサンプラーを考えます．</p>
+
 <p>次のような生成過程を考えてみます．</p>
+
 <ol>
 <li>$\beta$をガウス分布から生成</li>
 <li>$\beta$をロジスティック変換する: $\phi = \exp(\beta) / \sum \exp(\beta)$</li>
 <li>それぞれの文書に対して，トピックを生成: $z_n \sim \mathrm{Mult} (\phi)$</li>
 </ol>
+
 <p>このとき，$\phi$はロジスティック分布のCDFとも解釈することができます:</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\phi = \frac{\exp(\beta)}{\sum \exp(\beta)} = \int_{-\infty}^{\beta} \frac{\exp(x)}{(\sum \exp(x))^2} \mathrm{d}x$$
+</div>
+
 <p>よって，トピック$z$は次のように多項分布からサンプルされることになります．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/16/91632/d2b8f88f-998c-42d4-bd52-3996a1a1dca7.png"></p>
+
 <ol>
 <li>Fig. 1(a)に示すように$\beta$を通るvertical lineを引く．</li>
 <li>補助変数をそれぞれの文書に対し，一様分布からサンプルする: $u_n \sim \mathrm{U} (0,1)$</li>
 <li>$u_n$を$\beta$上にプロットする．</li>
 <li>もし$u_n$がCDF曲線よりも下に位置するなら（$\phi = \exp(\beta) / \sum \exp(\beta)$よりも小さければ），z = kとする．上に位置するならz $\neq$ kとする．</li>
 </ol>
+
 <p>同様に，$\beta$の初期値が決まっていれば，$z$から$\beta$を推定することもできます．k番目のトピック分布のパラメータを推定すること考えます．</p>
+
 <p>まずは補助変数を次のように生成し，</p>
+
 <ol>
 <li>CDF上，現在の$\beta$の点を通るvertical lineを引く．</li>
 <li>それぞれの文書に対して
+
 <ol>
 <li>z = kの場合，$u_n$を次の一様分布から生成: $u_n \sim \mathrm{U}(0, \phi)$</li>
 <li>z $\neq$ kの場合，$u_n$を次の一様分布から生成: $u_n \sim \mathrm{U}(\phi, 1)$</li>
 <li>Fig. 1(b)のように$u_n$を$\beta$を通るvertical line上にプロットする．</li>
+</ol></li>
 </ol>
-</li>
-</ol>
+
 <p>全ての文書に対して補助変数を得たら，$\beta$の推定範囲は次のようになります．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$ max_{z = k} log \left( \frac{C u_n}{1 - u_n} \right) < \beta < min_{z \neq k} log \left( \frac{C u_n}{1 - u_n} \right) $$
+</div>
+
 <p>ただし，Cは定数で</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$ C = \sum_{k} \exp(\beta_k^{\prime}) (1 - \delta(k^{\prime} - k))$$
+</div>
+
 <p>となります．あとは，事前分布はガウス分布なので，この範囲で切断された，平均$\frac{1}{2} (\phi^{t-1} + \phi^{t+1})$，分散$\kappa_{\phi}$の切断正規分布からサンプルすればよいです．</p>
+
 <p>Tipsとして，n個の一様分布からサンプリングされた確率変数はベータ分布に従う性質を使うと，補助変数はn個全て生成する必要なく，計算量を削減できます．</p>
+
 <p>単語分布についても，トピック分布と同様に補助変数法を用いてサンプルを行います．
 トピック分布においては，文書の数だけ補助変数を生成しましたが，これを文書*各文書毎に現れる単語数分だけ生成し，単語分布を更新していきます．</p>
+
 <h2 id="結果">結果</h2>
+
 <p>COHA (Corpus of Historical American English) を使って実験しました．1810-2009までの文書があり，冒頭で説明した通り，解析対象の単語の周辺単語を抜き取って文書を作成し，対象単語ごとにモデルを作成しました．
-以下では&quot;transport&quot;を対象に学習を行なった結果を示します．</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+以下では&rdquo;transport&rdquo;を対象に学習を行なった結果を示します．</p>
+
+<!--
+実際に各時点におけるトピック分布とトピック毎の確率の高い単語の可視化なんかも載せたいのですが，研究室にあるコーパスを使用しての実験となるため本サイトでの公開は控えさせてもらいます．ひとまずperplexityの推移のみ掲載します．
+
+
+以下perplexityの推移です．
+
+<img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/26/91632/3615e441-5326-4b40-bb80-951fb247f39d.png" width=70%>
+
+-->
+
 <p>トピック確率と単語分布を用いて，各時点における支配的なトピックと推移，また確率上位の単語を可視化しました．凡例には以下の式で計算されるトピック毎の確率上位単語を10個載せました:</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<p>以下は&quot;transport&quot;についての結果です．</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p(w | k) = \sum_t p(w | t, k) = \sum_t \psi^{t, k}_w$$
+</div>
+
+<!--
+<img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/27/91632/c4a2b734-ecb7-4133-a2cc-57ca4bd056d5.png">
+-->
+
+<p>以下は&rdquo;transport&rdquo;についての結果です．</p>
+
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/06/91632/5e821eaf-6268-49a1-a55a-78f1b773996e.png"></p>
+
+<!--
+全体的な流れとしては，昔はオレンジ色や緑色，ピンク色のトピックが支配的だったのに対し，近年では，そういったトピックの普及率は下がり，茶色や赤色，青色のトピックの普及率があがっていることがわかります．
+-->
+
 <p>全体的な流れとしては，昔は青色のトピックが支配的だったのに対し，近年では，交通手段の意味を持ちそうなピンク色や，国際輸送に関する緑色，戦争や航空系の移動手段に関する赤色のトピックの普及率があがっていることがわかります．</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<p>青色で示されるトピックにおいて，&ldquo;joy&quot;の単語確率が高くなっていますが，これは昔a transports of joy的な使われ方をしていたことによるものです<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>．このような用法の変化も捉えられていることがわかります．</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<p>以下は&quot;band&quot;についての結果です．</p>
-<!-- raw HTML omitted -->
+
+<!--
+また，茶色や赤色，青色のトピックにおいては，戦争や移動手段（飛行機や船舶等）や輸送に関する単語の確率が高く，近年になるにつれてトピックの普及率が上がっていることもわかります．
+-->
+
+<p>青色で示されるトピックにおいて，&rdquo;joy&rdquo;の単語確率が高くなっていますが，これは昔a transports of joy的な使われ方をしていたことによるものです<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup>．このような用法の変化も捉えられていることがわかります．</p>
+
+<!--
+現在は，青色で示されるトピック，つまり流通や移動手段に関する単語として使われることが多いこともわかりました．
+-->
+
+<p>以下は&rdquo;band&rdquo;についての結果です．</p>
+
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/05/06/91632/50ed7a63-e493-4ed6-b6d0-2d497a8c1105.png"></p>
+
 <p>こちらも同様に，近年になるにつれて，音楽に関係するオレンジ色や茶色のトピックや，装身具等の帯にまつわる緑色のトピックの支配率が上がっていることがわかります．</p>
-<p>また，紫色のトピックには&quot;inidans&quot;や&quot;hawk&quot;などの単語が現れており，これは，1832年のBlack Hawk戦争に関与したネイティブアメリカンのグループであるBritish Bandを示しています．実験では上図に示す通り，この時期にそういった意味が普及していたことを捉えられていることがわかります．</p>
+
+<p>また，紫色のトピックには&rdquo;inidans&rdquo;や&rdquo;hawk&rdquo;などの単語が現れており，これは，1832年のBlack Hawk戦争に関与したネイティブアメリカンのグループであるBritish Bandを示しています．実験では上図に示す通り，この時期にそういった意味が普及していたことを捉えられていることがわかります．</p>
+
 <h2 id="まとめ">まとめ</h2>
+
 <p>意味変化を捉える研究は大量にあって（自分は全て網羅できているわけでは到底ありません），研究室の先輩は単語分散表現を用いて意味変化の検出を行うといったことをしてたりするんですが，トピックモデルを使うと解釈がしやすく，分析をする際は有用だなと思いました．</p>
+
 <p>今回実装したモデルはword-specific documentsを使った意味変化のトピックモデルで，target wordをあらかじめ決めることでその周辺単語集合をモデル化する手法でした．実際の用途としては「統計的に意味変化があった単語を発見したい」ということが多いので，target wordをあらかじめ決めることなく同様のモデリングができたら面白そうだな，と思ってます．</p>
-<div class="footnotes" role="doc-endnotes">
-<hr>
+<div class="footnotes">
+
+<hr />
+
 <ol>
-<li id="fn:1">
-<p>LindermanらのDependent Multinomial Models Made Easy: Stick Breaking with the Polya-Gamma Augmentationが詳しいです．&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:2">
-<p>python等だとライブラリがうまくやってくれるはずなので特に意識しなくていいです．&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:3">
-<p>「喜びに我を忘れて」という意味．&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
+<li id="fn:2">LindermanらのDependent Multinomial Models Made Easy: Stick Breaking with the Polya-Gamma Augmentationが詳しいです．
+ <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
+<li id="fn:1">python等だとライブラリがうまくやってくれるはずなので特に意識しなくていいです．
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+<li id="fn:3">「喜びに我を忘れて」という意味．
+ <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
 </ol>
 </div>
 
@@ -180,7 +291,7 @@ logistic normalパラメータを推定する方法として，Polya-Gamma分布
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.815943 &#43;0900 JST m=&#43;0.261340764">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.464501 &#43;0900 JST m=&#43;0.124512193">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

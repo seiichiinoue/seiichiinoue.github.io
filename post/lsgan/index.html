@@ -48,253 +48,295 @@
 
 		
 
-		<p>最近、**<a href="https://arxiv.org/pdf/1611.04076.pdf">Least Squares Generative Adversarial Networks</a>**を読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが、ローカルのスペックでは厳しそうだったのでMNISTによる追試しかできていませんが&hellip;</p>
+		
+
+<p>最近、<strong><a href="https://arxiv.org/pdf/1611.04076.pdf">Least Squares Generative Adversarial Networks</a></strong>を読んだので、Pytorchで実装してみました。本当はアニメ顔生成モデルを作りたかったのですが、ローカルのスペックでは厳しそうだったのでMNISTによる追試しかできていませんが&hellip;</p>
+
 <p>画像処理初学者で、学習したことのまとめがてら記事を書いているので、間違いがあるかもしれません。その際はご指摘ください。</p>
+
 <h2 id="ganについて">GANについて</h2>
+
 <h3 id="生成モデル">生成モデル</h3>
+
 <p>訓練データを学習し、それらのデータと似たような新しいデータを生成するモデルのことを生成モデルと呼びます。別の言い方をすると、訓練データの分布と生成データの分布が一致するように学習していくようなモデルです。GANはこの生成モデルの一種です。</p>
+
 <h3 id="学習の仕組み">学習の仕組み</h3>
+
 <p>GANは<strong>Generator</strong>と<strong>Discriminator</strong>という２つのネットワークから成り立ちます。Generatorは訓練データと同じようなデータを生成しようとします。一方、Discriminatorはデータが訓練データ(real sample)なのか、それともGeneratorが生成したもの(fake sample)なのかを識別します。</p>
-<p><img src="https://camo.qiitausercontent.com/b4c6e79151e0f8b10ef1e14faf53d485e2dedf48/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3230333135312f39393265376135312d393638372d636438382d333534652d3464383862623935373735302e706e67" alt=""></p>
+
+<p><img src="https://camo.qiitausercontent.com/b4c6e79151e0f8b10ef1e14faf53d485e2dedf48/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3230333135312f39393265376135312d393638372d636438382d333534652d3464383862623935373735302e706e67" alt="" /></p>
+
 <p>GeneratorはDiscriminatorに本物と識別させれるように、Discriminatorは正しく正誤を判断できるようにと、2つのネットワークを同時に更新していくことによって、生成モデルを学習させていきます。</p>
+
 <h2 id="lsganについて">LSGANについて</h2>
+
 <h3 id="学習の仕組みと目的関数">学習の仕組みと目的関数</h3>
+
 <p>それでは、数式を用いてLSGANの仕組みを見ていきます。</p>
+
 <p>$G$はgenerator、$D$はdiscriminator、$x$は訓練データ、$z$はノイズを表します。</p>
+
 <p>$G$はノイズ$z$を入力としてデータを生成します。$D(x)$は、そのデータが訓練データである確率を表します。$D$は訓練データと生成データに対して正しくラベル付けを行う確率を最大化しようとします。一方、$G$は誤差を最小化しようとします。</p>
+
 <p>LSGANは正解ラベルに対する二乗誤差を用いるので、目的関数はパラメータ$a, b, c$を用いて以下のように表せます。</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$min_D L(D) = \frac{1}{2} E[(D(x) - b)^2] + \frac{1}{2} E[(D(G(z)) - a)^2]$$
+</div>
+
+<div style="overflow-x: auto;">
+$$min_G L(G) = \frac{1}{2} E[(D(G(z)) - c)^2]$$
+</div>
+
 <p>($a,b,c$は定数であり設計者が事前に決めておくそうなのですが、論文では$a,b,c=−1,1,0$または$a,b,c=0,1,1$が推奨されています。)</p>
+
 <p>$D$の精度が向上すると$D(x)$が大きくなり、$L(D)$の第1項が大きくなります。従って$D(G(z))$は小さくなるため、$L(D)$の第2項も大きくなります。</p>
+
 <p>一方、$G$が訓練データに似ているものを生成できるようになると、$D$がうまく分類できなくなるため$D(G(z))$は大きくなり、$L(G)$は小さくなるという構造になっています。</p>
+
 <h3 id="誤差関数に最小二乗を用いるメリット">誤差関数に最小二乗を用いるメリット</h3>
-<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/lsgan.png" alt=""></p>
+
+<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/lsgan.png" alt="" /></p>
+
 <p>上図の$(b)$がシグモイドクロスエントロピー誤差の決定境界、$(c)$が最小二乗誤差を用いた際の決定境界を示しています。$G$を更新する際のfake sampleがマゼンタ色の点です。</p>
+
 <p>$(b)$のようにシグモイドクロスエントロピー誤差を用いて更新をすると、fake sampleは決定境界の正しい側にあるため、誤差は非常に小さな値になってしまいます。
 しかし，$(c)$のように、最小二乗誤差を用いて更新をすると、決定境界の正しい側でも、遠くにあるサンプルにはペナルティを課すため、fake sample(Generatorが作成したデータ)を決定境界に向かって移動させることができます。</p>
+
 <p>よって、Generatorは決定境界に沿うようにfake sampleを生成するように誤差を最小化することができるといったものです。単純ではありますが、非常に強力です。</p>
+
 <h3 id="モデルの構造">モデルの構造</h3>
+
 <p>それでは、実装に移っていきます。</p>
-<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/model1.png" alt=""></p>
+
+<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/files/img/model1.png" alt="" /></p>
+
 <p>モデルの構造は上図のようになっています。注意すべき点は、中間層においてバッチノーマライゼーションを適用していることと(DCGANと同じです)、今回は畳み込み層を減らしていること、またMNISTを学習データとして用いているので、出力は1次元であるということです。</p>
+
 <h2 id="実装">実装</h2>
+
 <h3 id="モデルの実装">モデルの実装</h3>
+
 <p>上図にしたがってモデルを定義していきます。まずはGeneratorから。
 (今回はlatent spaceの次元を62次元にしました)</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.functional</span> <span class="k">as</span> <span class="nn">F</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">(</span><span class="n">Generator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">        <span class="c1"># fully connected</span>
-</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">62</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
-</span></span><span class="line"><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="c1"># deconvolutional layer</span>
-</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">deconv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
-</span></span><span class="line"><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deconv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span>
-</span></span></code></pre></div><p>Discriminatorは以下のようになります。
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+
+<span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Generator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># fully connected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">62</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="c1"># deconvolutional layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deconv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deconv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></code></pre></div>
+<p>Discriminatorは以下のようになります。
 ただし、LSGANにおいて、Discriminatorは出力ベクトルの次元を1にし、出力には活性化関数を通しません。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">(</span><span class="n">Discriminator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">        <span class="c1"># convolutional layer</span>
-</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="c1"># fully connected</span>
-</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># nn.Sigmoid(),</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># lsgan not using activation function with Generator</span>
-</span></span><span class="line"><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span>
-</span></span></code></pre></div><p>これでモデルが完成しました。それでは、学習の過程をコードに落としていきます。</p>
+<div class="highlight"><pre class="chroma"><code class="language-Python" data-lang="Python"><span class="k">class</span> <span class="nc">Discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Discriminator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># convolutional layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># fully connected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="c1"># nn.Sigmoid(),</span>
+            <span class="c1"># lsgan not using activation function with Generator</span>
+        <span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></code></pre></div>
+<p>これでモデルが完成しました。それでは、学習の過程をコードに落としていきます。</p>
+
 <h3 id="学習過程の実装">学習過程の実装</h3>
+
 <p>まず、LSGANの目的関数は以下のようになります。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_true</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span>
-</span></span><span class="line"><span class="cl"><span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span>
-</span></span></code></pre></div><p>ただし</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
-</span></span></code></pre></div><p>これを誤差関数として、パラメータの更新を行います。
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_true</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span>
+<span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batchsize</span></code></pre></div>
+<p>ただし</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span></code></pre></div>
+<p>これを誤差関数として、パラメータの更新を行います。
 Discriminatorの更新は以下のようになります。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># latent spaceからランダムサンプリング</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># これがGeneratorの生成画像の素になります</span>
-</span></span><span class="line"><span class="cl"><span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">D_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># real sampleの誤差を算出</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_real</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">real_img</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_real_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_real</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># fake sampleの誤差を算出</span>
-</span></span><span class="line"><span class="cl"><span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>  <span class="c1"># stop back propagate to G</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_fake_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># minimizing loss</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">D_real_loss</span> <span class="o">+</span> <span class="n">D_fake_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">batch_size</span>  <span class="c1"># lsganの目的関数</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_running_loss</span> <span class="o">+=</span> <span class="n">D_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</span></span></code></pre></div><p>Generatorも同様、以下の様になります。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">G_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batch_size</span>
-</span></span><span class="line"><span class="cl"><span class="n">G_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">G_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">G_running_loss</span> <span class="o">+=</span> <span class="n">G_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</span></span></code></pre></div><p>これを訓練ループとして定義します。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
-</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
-</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">save_image</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="mi">62</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="c1"># settings</span>
-</span></span><span class="line"><span class="cl">    <span class="n">D_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0002</span> <span class="p">,</span><span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">    <span class="n">G_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0002</span> <span class="p">,</span><span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    <span class="c1"># labels</span>
-</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="cl">    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epoch</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="c1"># answer labels</span>
-</span></span><span class="line"><span class="cl">        <span class="n">y_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="n">y_fake</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="n">D_running_loss</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">        <span class="n">G_running_loss</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">batch_index</span><span class="p">,</span> <span class="p">(</span><span class="n">real_img</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_itr</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">real_img</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
-</span></span><span class="line"><span class="cl">                <span class="k">break</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># random sampling from latent space</span>
-</span></span><span class="line"><span class="cl">            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># --------------------</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># update discriminator</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># --------------------</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="n">D_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># real</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_real</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">real_img</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_real_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_real</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># fake</span>
-</span></span><span class="line"><span class="cl">            <span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>  <span class="c1"># stop back propagate to G</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_fake_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># minimizing loss</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">D_real_loss</span> <span class="o">+</span> <span class="n">D_fake_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">batch_size</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_running_loss</span> <span class="o">+=</span> <span class="n">D_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="c1"># ----------------</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># update generator</span>
-</span></span><span class="line"><span class="cl">            <span class="c1"># ----------------</span>
-</span></span><span class="line"><span class="cl">            
-</span></span><span class="line"><span class="cl">            <span class="n">G_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">            <span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            <span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            
-</span></span><span class="line"><span class="cl">            <span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batch_size</span>
-</span></span><span class="line"><span class="cl">            <span class="n">G_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="n">G_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">            <span class="n">G_running_loss</span> <span class="o">+=</span> <span class="n">G_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;epoch: </span><span class="si">%d</span><span class="s1"> loss_d: </span><span class="si">%.3f</span><span class="s1"> loss_g: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">D_running_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">G_running_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="c1"># save image</span>
-</span></span><span class="line"><span class="cl">        <span class="n">save_image</span><span class="p">(</span><span class="n">fake_img</span><span class="p">,</span> <span class="n">save_place</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_place</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_place</span><span class="p">)</span>
-</span></span></code></pre></div><h2 id="データセット">データセット</h2>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># latent spaceからランダムサンプリング</span>
+<span class="c1"># これがGeneratorの生成画像の素になります</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
+
+<span class="n">D_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+<span class="c1"># real sampleの誤差を算出</span>
+<span class="n">D_real</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">real_img</span><span class="p">)</span>
+<span class="n">D_real_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_real</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># fake sampleの誤差を算出</span>
+<span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>  <span class="c1"># stop back propagate to G</span>
+<span class="n">D_fake_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># minimizing loss</span>
+<span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">D_real_loss</span> <span class="o">+</span> <span class="n">D_fake_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">batch_size</span>  <span class="c1"># lsganの目的関数</span>
+<span class="n">D_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">D_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="n">D_running_loss</span> <span class="o">+=</span> <span class="n">D_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></code></pre></div>
+<p>Generatorも同様、以下の様になります。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
+
+<span class="n">G_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+<span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="p">)</span>
+
+<span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batch_size</span>
+<span class="n">G_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">G_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="n">G_running_loss</span> <span class="o">+=</span> <span class="n">G_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></code></pre></div>
+<p>これを訓練ループとして定義します。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">save_image</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="mi">62</span><span class="p">):</span>
+    
+    <span class="c1"># settings</span>
+    <span class="n">D_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0002</span> <span class="p">,</span><span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
+    <span class="n">G_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0002</span> <span class="p">,</span><span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
+    
+    <span class="c1"># labels</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epoch</span><span class="p">):</span>
+
+        <span class="c1"># answer labels</span>
+        <span class="n">y_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_fake</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">D_running_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">G_running_loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">batch_index</span><span class="p">,</span> <span class="p">(</span><span class="n">real_img</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_itr</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">real_img</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># random sampling from latent space</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
+
+            <span class="c1"># --------------------</span>
+            <span class="c1"># update discriminator</span>
+            <span class="c1"># --------------------</span>
+
+            <span class="n">D_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+            <span class="c1"># real</span>
+            <span class="n">D_real</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">real_img</span><span class="p">)</span>
+            <span class="n">D_real_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_real</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># fake</span>
+            <span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>  <span class="c1"># stop back propagate to G</span>
+            <span class="n">D_fake_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># minimizing loss</span>
+            <span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">D_real_loss</span> <span class="o">+</span> <span class="n">D_fake_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">batch_size</span>
+            <span class="n">D_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">D_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">D_running_loss</span> <span class="o">+=</span> <span class="n">D_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="c1"># ----------------</span>
+            <span class="c1"># update generator</span>
+            <span class="c1"># ----------------</span>
+            
+            <span class="n">G_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+            <span class="n">fake_img</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">D_fake</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">fake_img</span><span class="p">)</span>
+            
+            <span class="n">G_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">D_fake</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">batch_size</span>
+            <span class="n">G_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">G_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">G_running_loss</span> <span class="o">+=</span> <span class="n">G_loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;epoch: </span><span class="si">%d</span><span class="s1"> loss_d: </span><span class="si">%.3f</span><span class="s1"> loss_g: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">D_running_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">G_running_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">))</span>
+
+        <span class="c1"># save image</span>
+        <span class="n">save_image</span><span class="p">(</span><span class="n">fake_img</span><span class="p">,</span> <span class="n">save_place</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_place</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_place</span><span class="p">)</span></code></pre></div>
+<h2 id="データセット">データセット</h2>
+
 <p>今回はMNISTのデータを使います。pytorchのライブラリにデータがあるので、それを使います。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># dataset</span>
-</span></span><span class="line"><span class="cl"><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;data/mnist&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">train_itr</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span></code></pre></div><h2 id="学習">学習</h2>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># dataset</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()</span>
+<span class="p">])</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;data/mnist&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">train_itr</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></code></pre></div>
+<h2 id="学習">学習</h2>
+
 <p>それでは、学習を開始します。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># args</span>
-</span></span><span class="line"><span class="cl"><span class="n">z_dim</span> <span class="o">=</span> <span class="mi">62</span>
-</span></span><span class="line"><span class="cl"><span class="n">epoch</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">epoch</span>
-</span></span><span class="line"><span class="cl"><span class="n">batch_size</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">batch_size</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># initialize modules</span>
-</span></span><span class="line"><span class="cl"><span class="n">D</span> <span class="o">=</span> <span class="n">Discriminator</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span>
-</span></span></code></pre></div><h2 id="結果">結果</h2>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># args</span>
+<span class="n">z_dim</span> <span class="o">=</span> <span class="mi">62</span>
+<span class="n">epoch</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">epoch</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">batch_size</span>
+
+<span class="c1"># initialize modules</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">Discriminator</span><span class="p">()</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span>
+
+<span class="n">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">train_itr</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">)</span></code></pre></div>
+<h2 id="結果">結果</h2>
+
 <p>epoch 1</p>
-<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_001.png" alt=""></p>
+
+<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_001.png" alt="" /></p>
+
 <p>epoch 15</p>
-<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_015.png" alt=""></p>
+
+<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_015.png" alt="" /></p>
+
 <p>epoch 30</p>
-<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_030.png" alt=""></p>
+
+<p><img src="https://github.com/seiichiinoue/LSGANs/raw/master/data/generated/epoch_030.png" alt="" /></p>
+
 <p>30回ほどで本物とほぼ見分けのつかない画像が生成されました。びっくり。
 本当はアニメ顔の生成をしたかったので、以降、豊富な計算資源を手に入れたらネットワークを大きくして、試してみたいと思います。</p>
+
 <p>あと、Least Squaresの利点にわざわざ言及しておきながら他の誤差関数を用いた学習との比較をしていません。(すみません)
 詳しくは論文: <a href="https://arxiv.org/abs/1611.04076">Least Squares Generative Adversarial Networks</a>に書いてあるので、気になるかたはそちらをご覧ください。</p>
 
@@ -315,7 +357,7 @@ Discriminatorの更新は以下のようになります。</p>
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.846707 &#43;0900 JST m=&#43;0.292103936">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.498389 &#43;0900 JST m=&#43;0.158401103">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

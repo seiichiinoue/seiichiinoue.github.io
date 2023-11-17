@@ -49,32 +49,34 @@
 		
 
 		<p>C言語の<code>readdir</code>を利用する．これは，<code>dirent.h</code>で定義されてるのでインクルードしておく．</p>
+
 <p>以下のように使える．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstdlib&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;dirent.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
-</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">path</span> <span class="o">=</span> <span class="s">&#34;./&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">DIR</span> <span class="o">*</span><span class="n">dp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">dp</span> <span class="o">=</span> <span class="n">opendir</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">dp</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">dirent</span><span class="o">*</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">path</span> <span class="o">&lt;&lt;</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">d_name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>出力は以下の通り．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ g++ a.cpp
-</span></span><span class="line"><span class="cl">$ ./a.out
-</span></span><span class="line"><span class="cl">./.
-</span></span><span class="line"><span class="cl">./..
-</span></span><span class="line"><span class="cl">./a.cpp
-</span></span></code></pre></div><p>Linux系のOSであれば<code>dirent</code>構造体に<code>d_type</code>というメンバがあるらしい．通常のファイルであれば<code>DT_REG</code>が与えられ，ディレクトリであれば<code>DT_DIR</code>が与えられる．プログラムをマルチプラットフォームで使いたいのであれば<code>d_ino</code>(<code>inode</code>番号)と<code>d_name</code>(ファイル名)以外は使うべきではない．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;cstdlib&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;dirent.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">path</span> <span class="o">=</span> <span class="s">&#34;./&#34;</span><span class="p">;</span>
+    <span class="n">DIR</span> <span class="o">*</span><span class="n">dp</span><span class="p">;</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">opendir</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dp</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">dirent</span><span class="o">*</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">entry</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">path</span> <span class="o">&lt;&lt;</span> <span class="n">entry</span><span class="o">-&gt;</span><span class="n">d_name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">readdir</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>出力は以下の通り．</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ g++ a.cpp
+$ ./a.out
+./.
+./..
+./a.cpp</code></pre></div>
+<p>Linux系のOSであれば<code>dirent</code>構造体に<code>d_type</code>というメンバがあるらしい．通常のファイルであれば<code>DT_REG</code>が与えられ，ディレクトリであれば<code>DT_DIR</code>が与えられる．プログラムをマルチプラットフォームで使いたいのであれば<code>d_ino</code>(<code>inode</code>番号)と<code>d_name</code>(ファイル名)以外は使うべきではない．</p>
 
 
         <h2 id="related">See Also</h2>
@@ -93,7 +95,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.819289 &#43;0900 JST m=&#43;0.264686294">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.472239 &#43;0900 JST m=&#43;0.132250554">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

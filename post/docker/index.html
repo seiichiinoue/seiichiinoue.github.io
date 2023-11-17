@@ -48,13 +48,19 @@
 
 		
 
-		<p>最近，<a href="https://www.sigbus.info/compilerbook">Rui Ueyamaさんのコンパイラ本</a>を参考にコンパイラを作成しているのですが，推奨環境がLinuxだったのでDockerで仮想環境を作成しました．</p>
+		
+
+<p>最近，<a href="https://www.sigbus.info/compilerbook">Rui Ueyamaさんのコンパイラ本</a>を参考にコンパイラを作成しているのですが，推奨環境がLinuxだったのでDockerで仮想環境を作成しました．</p>
+
 <h2 id="やったこと">やったこと</h2>
+
 <ul>
 <li>Dockerfileの作成</li>
 <li>vimのインストールと設定</li>
 </ul>
+
 <h2 id="dockerコマンド">Dockerコマンド</h2>
+
 <ul>
 <li><code>FROM</code>: イメージの基の指定</li>
 <li><code>RUN</code>: 実行コマンド（<code>docker build</code>の際に実行される）</li>
@@ -65,53 +71,60 @@
 <li><code>COPY</code>: File/Directoryのコピー</li>
 <li><code>WORKDIR</code>: 作業ディレクトリの指定</li>
 </ul>
+
 <h2 id="dockerfileの作成">Dockerfileの作成</h2>
+
 <p>適当に必要なものをinstallしていく．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ vim Dockerfile
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="cl"><span class="c"># image</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> ubuntu:14.04</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># install gcc for compiler development</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> sudo apt-get update<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> sudo apt-get -y install gcc make git binutils libc6-dev<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># install vim</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> sudo apt-get -y install vim<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># language environment settings</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># japanese lang</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get -y install language-pack-ja-base language-pack-ja<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># env var</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ENV</span> LANG ja_JP.UTF-8	<span class="c1"># この設定をしないと日本語が文字化けするらしい</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># workdirの指定</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /workspace/</span><span class="err">
-</span></span></span></code></pre></div><h2 id="コンテナの作成">コンテナの作成</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ vim Dockerfile</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="c"># image</span><span class="err">
+</span><span class="err"></span><span class="k">FROM</span><span class="s"> ubuntu:14.04</span><span class="err">
+</span><span class="err"></span><span class="c"># install gcc for compiler development</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> sudo apt-get update<span class="err">
+</span><span class="err"></span><span class="k">RUN</span> sudo apt-get -y install gcc make git binutils libc6-dev<span class="err">
+</span><span class="err"></span><span class="c"># install vim</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> sudo apt-get -y install vim<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># language environment settings</span><span class="err">
+</span><span class="err"></span><span class="c"># japanese lang</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt-get -y install language-pack-ja-base language-pack-ja<span class="err">
+</span><span class="err"></span><span class="c"># env var</span><span class="err">
+</span><span class="err"></span><span class="k">ENV</span><span class="s"> LANG ja_JP.UTF-8	# この設定をしないと日本語が文字化けするらしい</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="c"># workdirの指定</span><span class="err">
+</span><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /workspace/</span></code></pre></div>
+<h2 id="コンテナの作成">コンテナの作成</h2>
+
 <p>作成したdockerfileからimageをbuildする．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ sudo docker build -t ubuntu/workspace .
-</span></span></code></pre></div><p><code>-t</code>オプションはbuild後メッセージ表示用．</p>
-<p>&ldquo;ubuntu/workspace&quot;からコンテナを作成</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ sudo docker run -d -t -i ubuntu/workspace
-</span></span></code></pre></div><h2 id="マウント">マウント</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ sudo docker build -t ubuntu/workspace .</code></pre></div>
+<p><code>-t</code>オプションはbuild後メッセージ表示用．</p>
+
+<p>&ldquo;ubuntu/workspace&rdquo;からコンテナを作成</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ sudo docker run -d -t -i ubuntu/workspace</code></pre></div>
+<h2 id="マウント">マウント</h2>
+
 <p>localのディレクトリと同期させたかったので対象ディレクトリをマウント．</p>
+
 <p>マウントはコンテナを起動する際に<code>-v</code>オプションをつけることで行うことができる</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ docker run -v /host/path:/container/path some_image
-</span></span><span class="line"><span class="cl"><span class="c1"># ホストの絶対パス:コンテナの絶対パス</span>
-</span></span></code></pre></div><p>今回は，<code>/Users/seiichi/compiler/</code>を<code>/workspace/</code>としてマウントしたかったので，以下のようなコマンドでコンテナを作成．（<code>-it</code>はコンソール出力用）</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ docker run -it -v /Users/seiichi/compiler/:/workspace/ ubuntu/workspace
-</span></span></code></pre></div><h2 id="vimの設定">vimの設定</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker run -v /host/path:/container/path some_image
+<span class="c1"># ホストの絶対パス:コンテナの絶対パス</span></code></pre></div>
+<p>今回は，<code>/Users/seiichi/compiler/</code>を<code>/workspace/</code>としてマウントしたかったので，以下のようなコマンドでコンテナを作成．（<code>-it</code>はコンソール出力用）</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker run -it -v /Users/seiichi/compiler/:/workspace/ ubuntu/workspace</code></pre></div>
+<h2 id="vimの設定">vimの設定</h2>
+
 <p>ローカルの<code>.vimrc</code>を<code>COPY</code>してしまえば早い話なんだが，ローカルではneovimを使用しているので，サーバ上で環境構築するコストが高かった．</p>
+
 <p><code>.vimrc</code>に各種設定を書いていく．とりあえず必要なものだけ．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-vim" data-lang="vim"><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">t_Co</span><span class="p">=</span><span class="m">256</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">background</span><span class="p">=</span><span class="nb">dark</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">colorscheme</span> <span class="nx">desert</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">syntax</span> <span class="nx">on</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">number</span>	<span class="c">&#34; 行番号</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">ruler</span>	<span class="c">&#34; カーソルの位置表示</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">wildmenu</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">wrap</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">textwidth</span><span class="p">=</span><span class="m">0</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">foldmethod</span><span class="p">=</span><span class="nx">indent</span>	<span class="c">&#34; 折りたたみ</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nx">set</span> <span class="nx">foldlavel</span><span class="p">=</span><span class="m">100</span>	<span class="c">&#34;ファイルを開くときに折りたたみしない</span><span class="err">
-</span></span></span></code></pre></div><p>これで表示系は困らなくなった，けどまだ物足りないので，暇な時に追記したいと思います．</p>
+<div class="highlight"><pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">set</span> <span class="nx">t_Co</span><span class="p">=</span><span class="m">256</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">background</span><span class="p">=</span><span class="nb">dark</span><span class="err">
+</span><span class="err"></span><span class="nx">colorscheme</span> <span class="nx">desert</span><span class="err">
+</span><span class="err"></span><span class="nx">syntax</span> <span class="nx">on</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">number</span>	<span class="c">&#34; 行番号</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">ruler</span>	<span class="c">&#34; カーソルの位置表示</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">wildmenu</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">wrap</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">textwidth</span><span class="p">=</span><span class="m">0</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">foldmethod</span><span class="p">=</span><span class="nx">indent</span>	<span class="c">&#34; 折りたたみ</span><span class="err">
+</span><span class="err"></span><span class="nx">set</span> <span class="nx">foldlavel</span><span class="p">=</span><span class="m">100</span>	<span class="c">&#34;ファイルを開くときに折りたたみしない</span></code></pre></div>
+<p>これで表示系は困らなくなった，けどまだ物足りないので，暇な時に追記したいと思います．</p>
 
 
         <h2 id="related">See Also</h2>
@@ -130,7 +143,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.819391 &#43;0900 JST m=&#43;0.264788615">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.47994 &#43;0900 JST m=&#43;0.139952352">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

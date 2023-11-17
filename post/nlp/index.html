@@ -48,279 +48,442 @@
 
 		
 
-		<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+		
+
+<!--
+
+### Word2Vec
+
+- 論文: [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781)
+
+- 大量のテキストデータを用いて学習を行い，各単語の意味を推論によって表現する方法．
+- CBOWモデル(周辺の単語からターゲットを予測するモデル)とSkip-Gramモデルがあるが，そのうちSkip-Gramモデル(ある単語の周辺に出現する単語の出現確率を計算するモデル)が主に使われる．
+- Skip-Gram は２層のニューラルネットワークであり隠れ層は一つだけ．隣接する層のユニットは全結合している．
+
+<img src="https://camo.qiitausercontent.com/135690f9499a9717cd0537dab997cc6bcd33f1a0/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f36333338393465382d366531652d633237342d613333612d3833643062343665393961382e706e67" width=300>
+
+- 目的関数を設定して，2層のニューラルネットワークを構築するが，**word2vecにおいて必要なものは，モデル自体ではなく隠れ層の重み**であることに注意．
+- 入力としてある単語，出力にその周辺単語を与えてニューラルネットワークを学習させることで，「**意味が近い(=意味ベクトルの距離が近い)時は周辺単語の意味ベクトルもまた距離が近いはず**」という仮説に基づいたembedding表現を得ることができる．
+
+<img src="https://camo.qiitausercontent.com/f087da40cde3cba6e8e4f49105f1d87fdacb3c9c/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64346335363430632d316465302d333731652d396465632d6435376637306636393863622e706e67" width=600>
+
+<img src="https://camo.qiitausercontent.com/00f2cdda20a9a7d7852498621d48d4799ed728be/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f63393539373939392d656166632d343635312d306135372d3830336434383039343036372e706e67" width=600>
+
+- 上図のように，one-hotベクトルを入力として与えてあげれば，実際に対象の単語ベクトルを抽出する際は内積ではなくインデックスを使って抽出すれば良いだけなので単語数や隠れそうの次元を気にすることなくモデルを構築することができる
+
+<img src="https://camo.qiitausercontent.com/96a336fd510e0e4100396787d80e2a4c199dca94/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f37373037392f64373435303531352d343064302d306662332d643536302d6639663864653466373036362e706e67" width=650>
+
+- 出力層は上図のよう．対象の単語の重みベクトルを得たあと，中間層から出力層の単語の重みベクトルとの内積をとっている．つまり単語同士の内積が出力となっていることがわかる．
+
+### fastText
+
+- 論文: [Enriching Word Vectors with Subword Information](https://arxiv.org/pdf/1607.04606v1.pdf)
+
+- 単語より小さな単位でembeddingを行うことで未知語への対応を可能にした．
+- 文字レベルのN-gramを用いる．
+- 以下の通り，subwordを用いて活用形で変化しない基幹部分の表現を得るといった手法．
+
+![](https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F25990%2F6b13bea3-7639-cdb7-675f-6a6eb313ee63.png?ixlib=rb-1.2.2&auto=compress%2Cformat&fit=max&s=761b64372eb8e158923eb5b529c931eb)
+
+-->
+
 <h2 id="lstm">LSTM</h2>
+
 <ul>
-<li>
-<p>論文: <a href="https://arxiv.org/abs/1409.3215">Sequence to Sequence Learning with Neural Networks</a></p>
-</li>
-<li>
-<p>LSTM(Long short-term memory)は，RNN(Recurrent Neural Network)の拡張として1995年に登場した，時系列データ(sequential data)に対するモデル，あるいは構造(architecture)の1種．その名は，Long term memory(長期記憶)とShort term memory(短期記憶)という神経科学における用語から取られている．LSTMはRNNの中間層のユニットをLSTM blockと呼ばれるメモリと3つのゲートを持つブロックに置き換えることで実現されている．</p>
-</li>
+<li><p>論文: <a href="https://arxiv.org/abs/1409.3215">Sequence to Sequence Learning with Neural Networks</a></p></li>
+
+<li><p>LSTM(Long short-term memory)は，RNN(Recurrent Neural Network)の拡張として1995年に登場した，時系列データ(sequential data)に対するモデル，あるいは構造(architecture)の1種．その名は，Long term memory(長期記憶)とShort term memory(短期記憶)という神経科学における用語から取られている．LSTMはRNNの中間層のユニットをLSTM blockと呼ばれるメモリと3つのゲートを持つブロックに置き換えることで実現されている．</p></li>
 </ul>
+
 <h3 id="hochreiterの勾配消失問題">Hochreiterの勾配消失問題</h3>
+
 <ul>
-<li>
-<p>当時のRNNの学習方法は，BPTT(Back-Propagation Through Time)法とRTRL(Real-Time Recurrent Learning)法の2つが主流で，その2つとも完全な勾配(Complete Gradient)を用いたアルゴリズムだった</p>
-</li>
-<li>
-<p>しかし，このような勾配を逆方向(時間をさかのぼる方向)に伝播させるアルゴリズムは，多くの状況において「爆発」または「消滅」することがあり，結果として長期依存の系列の学習が全く正しく行われないといいう欠点が指摘されてきた</p>
-</li>
-<li>
-<p>Hochreiterは自身の修士論文(91年)において，時間をまたいだユニット間の重みの絶対値が指定の(ごくゆるい)条件を満たすとき，その勾配はタイムステップ$t$に指数関数的に比例して消滅または発散することを示した．</p>
-</li>
-<li>
-<p>これはRNNだけではなく，勾配が複数段に渡って伝播する深いニューラルネットにおいてもほぼ共通する問題らしい．</p>
-</li>
-<li>
-<p>例えば，単体のユニット$u$から$v$への誤差の伝播について解析する．ステップ$t$における任意のユニット$u$で発生した誤差が$q$ステップ前のユニット$v$に伝播する状況を考えたとき，誤差は以下に示すような係数でスケールする．</p>
-</li>
+<li>当時のRNNの学習方法は，BPTT(Back-Propagation Through Time)法とRTRL(Real-Time Recurrent Learning)法の2つが主流で，その2つとも完全な勾配(Complete Gradient)を用いたアルゴリズムだった</li>
+<li>しかし，このような勾配を逆方向(時間をさかのぼる方向)に伝播させるアルゴリズムは，多くの状況において「爆発」または「消滅」することがあり，結果として長期依存の系列の学習が全く正しく行われないといいう欠点が指摘されてきた</li>
+<li>Hochreiterは自身の修士論文(91年)において，時間をまたいだユニット間の重みの絶対値が指定の(ごくゆるい)条件を満たすとき，その勾配はタイムステップ$t$に指数関数的に比例して消滅または発散することを示した．</li>
+
+<li><p>これはRNNだけではなく，勾配が複数段に渡って伝播する深いニューラルネットにおいてもほぼ共通する問題らしい．</p></li>
+
+<li><p>例えば，単体のユニット$u$から$v$への誤差の伝播について解析する．ステップ$t$における任意のユニット$u$で発生した誤差が$q$ステップ前のユニット$v$に伝播する状況を考えたとき，誤差は以下に示すような係数でスケールする．</p></li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = 
+\Biggl\{
+\begin{array}{ll}
+f'_v(net_v (t-1)) w_{uv} & q = 1 \\\
+f'_v(net_v (t-q)) \sum_{l=1}^{n} \frac{\partial v_v (t-q+1)}{\partial v_u (t)}w_{lv} & q > 1
+\end{array}
+}$$
+</div>
+
 <ul>
 <li>$l_q=v$ と$l_0=u$を使用して、</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$${\frac{\partial v_v (t-q)}{\partial v_u (t)} = \sum_{l_1 = 1}^{n} \cdots　\sum_{l_{q-1} = 1}^{n} \prod_{m=1}^q f'_{l_m} (net_{l_m} (t - m)) w_{l_m l_{m-1}}
+}$$
+</div>
+
 <ul>
 <li>上式より，以下の場合はスケール係数は発散し，その結果としてユニット$v$に到着する誤差の不安定性により学習が困難になる．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$${\begin{array}{ll}
+| f'_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  > 1.0 & for\; all\; m
+\end{array}
+}$$
+</div>
+
 <ul>
 <li>一方，以下の場合はスケール係数は$q$に関して指数関数的に減少する．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$${\begin{array}{ll}
+| f'_{l_m}(net_{l_m} (t - m)) w_{l_m l_{m-1}} | \;  < 1.0 & for\; all\; m
+\end{array}
+}$$
+</div>
+
 <ul>
 <li>これらの問題を解決するために考案されたのがLSTM</li>
 </ul>
+
 <h3 id="lstmモデル">LSTMモデル</h3>
+
 <ul>
 <li>$R$と$W$は重み行列</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/7a6631efe2ef70321264f254c2df625ec3cbd3ec/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36303936392f34383566363334642d396264322d326565332d393962322d3039363934653833316635352e706e67" width=500></p>
+
 <h3 id="lstmの順伝播計算">LSTMの順伝播計算</h3>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+\bar{z}^t &=& W_z x^t + R_z y^{(t-1)} + b_z, \ z^t = g(\bar{z}^t) \\
+\bar{i}^t &=& W_{in} x^t + R_{in} y^{(t-1)} + p_{in} \odot c^{t-1} + b_{in}, \ i^t = \sigma(\bar{i}^t) \\
+\bar{f}^t &=& W_{for} x^t + R_{for} y^{(t-1)} + p_{for} \odot c^{t-1} + b_{for}, \ f^t = \sigma(\bar{f}^t) \\
+c^t &=& i^t \odot z^t + f^t \odot c^{t-1} \\
+\bar{o}^t &=& \sigma(W_{out} x^t + R_{out} y^{(t-1)} + p_{out} \odot c^t + b_{out}), \ o^t = \sigma(\bar{o}^t) \\
+y^t &=& o^t \odot h(c^t) \\
+s.t. \ \sigma(x) &=& sigmoid(x) = \frac{1}{1 + e^{-x}}, \; g(x) = h(x) = tanh(x)
+\end{eqnarray}$$
+</div>
+
 <h3 id="逆伝播計算">逆伝播計算</h3>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/64c89c6204641d58c04d6ad391ad1f8e273c75a4/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36303936392f62626331376330352d343937392d323934312d383636372d3463663066303233356663332e706e67" width=500></p>
+
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+\delta y^t &=& \Delta^t + R_z^T \delta z^{t+1} + R_{in}^T \delta i^{t+1} + R_{for}^T \delta f^{t+1} + R_{out}^T \delta o^{t+1} \\
+\delta o^t &=& \delta y^t \odot h(c^t) \odot \sigma'(\bar{o}^t) \\
+\delta c^t &=& \delta y^t \odot o^t \odot h'(c^t) + p_{out} \odot \delta o^t + p_{in} \odot \delta i^{t+1} + p_{for} \odot \delta f^{t+1} + \delta c^{t+1} \odot f^{t+1} \\
+\delta f^t &=& \delta c^t \odot c^{t-1} \odot \sigma'(\bar{f}^t) \\
+\delta i^t &=& \delta c^t \odot z^t \odot \sigma'(\bar{i}^t) \\
+\delta z^t &=& \delta c^t \odot i^t \odot g'(\bar{z}^t)
+\end{eqnarray}$$
+</div>
+
 <h2 id="attention">Attention</h2>
+
 <ul>
 <li>論文: <a href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine Translation</a></li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/dc9367114569469784d8f5a92b23f3d4291a562f/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f37633230383137622d336563632d363430322d666266362d6263303035643430383734392e706e67" width=700></p>
+
 <ul>
 <li>Attentionの基本は$query$と$memory$($key$, $value$)．</li>
 <li>Attentionとは$query$によって$memory$から必要な情報を選択的に引っ張ってくること．$memory$から情報を引っ張ってくるときには， $query$は$key$によって取得する$memory$を決定し，対応する$value$を取得する．</li>
 </ul>
+
 <h3 id="encoder-decoderにおけるattention">Encoder-Decoderにおけるattention</h3>
+
 <ul>
 <li>一般的なEncoder-Decoderの注意はエンコーダの隠れ層を$Source$，デコーダの隠れ層を$Target$として次式によって表される．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$Attention(Target,Source)=Softmax(Target⋅Source^T)⋅Source$$
+</div>
+
 <ul>
 <li>$Target$を$query$(検索クエリ)と見做し，$Source$を$Key$と$Value$に分離する．</li>
 </ul>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$Attention(query,Key,Value)=Softmax(query⋅Key^T)⋅Value$$
+</div>
+
+<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221163903.png" width=500></p>
+
 <ul>
 <li>この時$Key$と$Value$は各$key$と各$value$が一対一対応するkey-valueペアの配列，つまり辞書オブジェクトとして機能する．</li>
 <li>$query$と$Key$の内積は$query$と各$key$の類似度を測り，$softmax$で正規化した注意の重み (Attention Weight) は$query$に一致した$key$の位置を表現する．注意の重みと$Value$の内積は$key$の位置に対応する$value$を加重和として取り出す操作である．</li>
 <li>つまり注意とは$query$(検索クエリ)に一致する$key$を索引し，対応する$value$を取り出す操作であり，これは辞書オブジェクトの機能と同じである．例えば一般的な Encoder-Decoder の注意は，エンコーダのすべての隠れ層 (情報源)$Value$から$query$に関連する隠れ層 (情報)$value$を注意の重みの加重和として取り出すことである．</li>
 <li>query の配列 Query が与えられれば，その数だけ key-value ペアの配列から value を取り出す．</li>
 </ul>
+
 <h3 id="memoryをkeyとvalueに分離する意味">MemoryをKeyとValueに分離する意味</h3>
+
 <ul>
 <li>key-valueペアの配列の初出は End-To-End Memory Network [Sukhbaatar, 2015] であるが，$Key$を Input，$Value$を Output (両方を合わせて Memory) と表記しており，辞書オブジェクトという認識はなかった．</li>
 <li>(初めて辞書オブジェクトと認識されたのは <a href="https://arxiv.org/abs/1606.03126">Key-Value Memory Networks</a> [Miller, 2016] である．)</li>
 </ul>
-<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164543.png" alt=""></p>
+
+<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164543.png" alt="" /></p>
+
 <ul>
-<li>
-<p>Key-Value Memory Networks では key-value ペアを文脈 (e.g. 知識ベースや文献) を記憶として格納する一般的な手法だと説明している．<strong>$Memory$を$Key$と$Value$に分離することで$key$と$value$間の非自明な変換によって高い表現力が得られる</strong>という．ここでいう非自明な変換とは，例えば「$key$を入力して$value$を予測する学習器」を容易には作れない程度に複雑な (予測不可能な) 変換という意味である．</p>
-</li>
-<li>
-<p>その後，言語モデルでも同じ認識の手法 [Daniluk, 2017] が提案されている．</p>
-</li>
+<li><p>Key-Value Memory Networks では key-value ペアを文脈 (e.g. 知識ベースや文献) を記憶として格納する一般的な手法だと説明している．<strong>$Memory$を$Key$と$Value$に分離することで$key$と$value$間の非自明な変換によって高い表現力が得られる</strong>という．ここでいう非自明な変換とは，例えば「$key$を入力して$value$を予測する学習器」を容易には作れない程度に複雑な (予測不可能な) 変換という意味である．</p></li>
+
+<li><p>その後，言語モデルでも同じ認識の手法 [Daniluk, 2017] が提案されている．</p></li>
 </ul>
-<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164537.png" alt=""></p>
+
+<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164537.png" alt="" /></p>
+
 <h3 id="attentionのweightの算出方法">attentionのweightの算出方法</h3>
-<!-- raw HTML omitted -->
+
+<p><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/R/Ryobot/20171221/20171221164307.png" width=500></p>
+
 <ul>
 <li>加法注意と内積注意があり，加法注意は一層のフィードフォワードネットワークで重みを算出する一方，内積注意はattentionの重みを$query$と$key$の内積で算出する．こちらは前者に比べてパラメータが必要ないため，効率よく学習ができる．</li>
 </ul>
+
 <h3 id="self-attention">self-attention</h3>
-<p><img src="https://camo.qiitausercontent.com/e3841e989665ca207b2bafc5ae1bbb81074e5724/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f30333366313339372d336361382d616464612d633066312d6530386661386630333031352e706e67" alt=""></p>
+
+<p><img src="https://camo.qiitausercontent.com/e3841e989665ca207b2bafc5ae1bbb81074e5724/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f30333366313339372d336361382d616464612d633066312d6530386661386630333031352e706e67" alt="" /></p>
+
 <ul>
-<li>
-<p>$input$($query$)と$memory$($key$, $value$)すべてが同じTensorを使うAttention</p>
-</li>
-<li>
-<p>Self-Attentionは言語の文法構造であったり，照応関係（its が指してるのは Law だよねとか）を獲得するのにも使われているなどと論文では分析されている</p>
-</li>
-<li>
-<p>例えば「バナナが好き」という文章ベクトルを自己注意するとしたら，以下のような構造になる．</p>
-</li>
+<li>$input$($query$)と$memory$($key$, $value$)すべてが同じTensorを使うAttention</li>
+
+<li><p>Self-Attentionは言語の文法構造であったり，照応関係（its が指してるのは Law だよねとか）を獲得するのにも使われているなどと論文では分析されている</p></li>
+
+<li><p>例えば「バナナが好き」という文章ベクトルを自己注意するとしたら，以下のような構造になる．</p></li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/c0357c70af7308f9be5bb30ad4e69fa2f7a00629/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f37353566343237302d336331302d653134612d343033362d3561626639306565663137312e706e67" width=500></p>
+
 <h3 id="source-target-attention">Source-Target Attention</h3>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/4edacdcfaa0a7104ca91b11adbd85f3ea31c6ac6/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f35343239393939302d623161382d393536392d636536342d3038393830366236303061622e706e67" width=600></p>
+
 <ul>
 <li>Transformerではdecoder部分で使われる．</li>
 </ul>
+
 <h2 id="transformer">Transformer</h2>
+
 <ul>
-<li>
-<p>論文: <a href="https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need</a></p>
-</li>
-<li>
-<p>論文タイトルにもある通り，RNNやCNNを使わずattentionのみを使用した機械翻訳タスクを実現するモデル．</p>
-</li>
-<li>
-<p>Google <a href="https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html">プロジェクトページ</a></p>
-</li>
-<li>
-<p>PyTorch実装 <a href="https://github.com/jadore801120/attention-is-all-you-need-pytorch">Github</a></p>
-</li>
+<li><p>論文: <a href="https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need</a></p></li>
+
+<li><p>論文タイトルにもある通り，RNNやCNNを使わずattentionのみを使用した機械翻訳タスクを実現するモデル．</p></li>
+
+<li><p>Google <a href="https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html">プロジェクトページ</a></p></li>
+
+<li><p>PyTorch実装 <a href="https://github.com/jadore801120/attention-is-all-you-need-pytorch">Github</a></p></li>
 </ul>
-<p><img src="https://camo.qiitausercontent.com/5af7348bde95e4f6c52da9c0f1a2c6a95a64510a/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f65366532316335612d346432392d303333642d373731312d3834393337653235366332302e706e67" alt=""></p>
+
+<p><img src="https://camo.qiitausercontent.com/5af7348bde95e4f6c52da9c0f1a2c6a95a64510a/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f65366532316335612d346432392d303333642d373731312d3834393337653235366332302e706e67" alt="" /></p>
+
 <ul>
-<li>
-<p>モデルの概要は以下の通り</p>
+<li><p>モデルの概要は以下の通り</p>
+
 <ul>
 <li>エンコーダ: [自己注意, 位置毎の FFN] のブロックを6層スタック</li>
 <li>デコーダ: [(マスキング付き) 自己注意, ソースターゲット注意, 位置毎の FFN] のブロックを6層スタック</li>
+</ul></li>
+
+<li><p>ネットワーク内の特徴表現は [単語列の長さ x 各単語の次元数] の行列で表される．注意の層を除いて0階の各単語はバッチ学習の各標本のように独立して処理される．</p></li>
+
+<li><p>訓練時のデコーダは自己回帰を使用せず，全ターゲット単語を同時に入力，全ターゲット単語を同時に予測する．ただし予測すべきターゲット単語の情報が予測前のデコーダにリークしないように自己注意にマスクをかけている (ie, <strong>Masked Decoder</strong>)．評価/推論時は自己回帰で単語列を生成する．</p></li>
+
+<li><p>Transformerでは内積注意を縮小付き内積注意 (Scaled Dot-Product Attention) と呼称する．通常の内積注意と同じく$query$をもとにkey-valueペアの配列から加重和として$value$を取り出す操作であるが$Q$と$K$の内積をスケーリング因子$\sqrt{d_k}$で除算する．</p></li>
+
+<li><p>また，$query$の配列は1つの行列$Q$にまとめて同時に内積注意を計算する (従来通り$key$と$value$の配列も $K$,$V$ にまとめる)．</p></li>
 </ul>
-</li>
-<li>
-<p>ネットワーク内の特徴表現は [単語列の長さ x 各単語の次元数] の行列で表される．注意の層を除いて0階の各単語はバッチ学習の各標本のように独立して処理される．</p>
-</li>
-<li>
-<p>訓練時のデコーダは自己回帰を使用せず，全ターゲット単語を同時に入力，全ターゲット単語を同時に予測する．ただし予測すべきターゲット単語の情報が予測前のデコーダにリークしないように自己注意にマスクをかけている (ie, <strong>Masked Decoder</strong>)．評価/推論時は自己回帰で単語列を生成する．</p>
-</li>
-<li>
-<p>Transformerでは内積注意を縮小付き内積注意 (Scaled Dot-Product Attention) と呼称する．通常の内積注意と同じく$query$をもとにkey-valueペアの配列から加重和として$value$を取り出す操作であるが$Q$と$K$の内積をスケーリング因子$\sqrt{d_k}$で除算する．</p>
-</li>
-<li>
-<p>また，$query$の配列は1つの行列$Q$にまとめて同時に内積注意を計算する (従来通り$key$と$value$の配列も $K$,$V$ にまとめる)．</p>
-</li>
-</ul>
+
 <h3 id="縮小付き内積注意">縮小付き内積注意</h3>
+
 <ul>
 <li>縮小付き内積注意は以下のように表される．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$Attention(Q, K, V) = Softmax(\frac{Q K^T}{\sqrt{d_k}})V$$
+</div>
+
 <ul>
-<li>
-<p>Mask (option) はデコーダの予測すべきターゲット単語の情報が予測前のデコーダーにリークしないように自己注意にかけるマスクである (Softmax への入力のうち自己回帰の予測前の位置に対応する部分を1で埋める)．</p>
-</li>
-<li>
-<p>Transformer では縮小付き内積注意を1つのヘッドと見做し，複数ヘッドを並列化した複数ヘッドの注意 (Multi-Head Attention) を使用する．ヘッド数$h=8$と各ヘッドの次元数$d_{model} / h=64$はトレードオフなので合計のパラメータ数はヘッド数に依らず均一である．</p>
-</li>
+<li><p>Mask (option) はデコーダの予測すべきターゲット単語の情報が予測前のデコーダーにリークしないように自己注意にかけるマスクである (Softmax への入力のうち自己回帰の予測前の位置に対応する部分を1で埋める)．</p></li>
+
+<li><p>Transformer では縮小付き内積注意を1つのヘッドと見做し，複数ヘッドを並列化した複数ヘッドの注意 (Multi-Head Attention) を使用する．ヘッド数$h=8$と各ヘッドの次元数$d_{model} / h=64$はトレードオフなので合計のパラメータ数はヘッド数に依らず均一である．</p></li>
 </ul>
+
 <h3 id="複数ヘッドの注意">複数ヘッドの注意</h3>
+
 <ul>
-<li>
-<p>$d_{model}=512$次元の$Q,K,V$を用いて単一の内積注意を計算する代わりに，$Q,K,V$をそれぞれ$h=8$回異なる重み行列 $W^Q_i,W^K_i,W^V_i$ で $d_k,d_k,d_v=64$ 次元に線形写像して$h=8$個の内積注意を計算する．各内積注意の$d_v=64$次元の出力は連結 (concatenate) して重み行列$W_o$で$d_{model}=512$次元に線形写像する．</p>
-</li>
-<li>
-<p>複数ヘッドの注意は次式によって表される．</p>
-</li>
+<li><p>$d_{model}=512$次元の$Q,K,V$を用いて単一の内積注意を計算する代わりに，$Q,K,V$をそれぞれ$h=8$回異なる重み行列 $W^Q_i,W^K_i,W^V_i$ で $d_k,d_k,d_v=64$ 次元に線形写像して$h=8$個の内積注意を計算する．各内積注意の$d_v=64$次元の出力は連結 (concatenate) して重み行列$W<em>o$で$d</em>{model}=512$次元に線形写像する．</p></li>
+
+<li><p>複数ヘッドの注意は次式によって表される．</p></li>
 </ul>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+\begin{eqnarray}
+MultiHead(Q, K, V) &=& Concat(head_1, head_2, \cdots ,head_h) W^o \\
+where \; head_i &=& Attention(Q W_i^Q, K W_i^K, V W_i^V)
+\end{eqnarray}
+</div>
+
+<div style="overflow-x: auto;">
+$$W^O \in \mathbb{R}^{h d_v \times d_{model}}, \; W_i^Q \in \mathbb{R}^{d_{model} \times d_k}, \; W_i^K \in \mathbb{R}^{d_{model} \times d_k}, \; W_i^V \in \mathbb{R}^{d_{model} \times d_v}$$
+</div>
+
 <h3 id="位置毎のフィードフォワードネットワーク">位置毎のフィードフォワードネットワーク</h3>
+
 <ul>
 <li>FFNは以下のように表される</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$FFN(x) = max(0, x W_1 + b_1) W_2 + b_2$$
+</div>
+
 <ul>
 <li>$ReLU$で活性化する$d_{ff}=2048$次元の中間層と$d_{model}=512$次元の出力層から成る2層の全結合ニューラルネットワークである．</li>
 </ul>
+
 <h3 id="位置エンコーディング">位置エンコーディング</h3>
+
 <ul>
 <li><strong>TransformerはRNNやCNNを使用しないので単語列の語順(単語の相対的ないし絶対的な位置)の情報を追加する必要がある．</strong></li>
 <li>本手法では入力の埋め込み行列(Embedded Matrix)に<strong>位置エンコーディング(Positional Encoding)の行列$PE$を要素ごとに加算</strong>する．</li>
 <li>位置エンコーディングの行列$PE$の各成分は次式によって表される．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+\begin{eqnarray}
+PE_{(pos,2i)} &=& sin(pos / 10000^{2i / d_{model}}) \\
+PE_{(pos,2i+1)} &=& cos(pos / 10000^{2i / d_{model}})
+\end{eqnarray}
+</div>
+
 <ul>
 <li>ここで$pos$は単語の位置，$i$は成分の次元である．位置エンコーディングの各次元は波長が$2 \pi$から$10000⋅2 \pi$に幾何学的に伸びる正弦波に対応する．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://i.stack.imgur.com/zvol4.png" width=500></p>
+
 <ul>
 <li>縦軸が単語の位置(0 ~ 99)，横軸が成分の次元(0 ~ 511)，濃淡が加算する値(-1 ~ 1)．</li>
 </ul>
+
 <h3 id="transformaerにおけるattention">TransformaerにおけるAttention</h3>
+
 <ul>
 <li>BERTの基本単位を構成するTransformerは言語タスクにおいて，人間の直感と近い注意の仕方をしていることが論文に記載されている．</li>
 <li>ポジネガ極性判定タスクを解かせると，極性をよく表す箇所にAttentionが当たっている様子が見える．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/0fbc7570106ee71d958910581d9d092ac51689aa/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f30363863346561612d666132322d376463322d313632622d3561316365373963653132312e706e67"></p>
+
 <ul>
-<li>
-<p>ネットワークがタスクに応じて必要な情報に注意できることから，BERTの事前学習でも予測単語を推測するための文章全体からの周辺情報の活用と，隣接分予測のための文章の構造および大意を把握する情報に注意を向ける傾向があると思われる．</p>
-</li>
-<li>
-<p>以下の画像は<code>query</code>が<code>making</code>だった場合のAttention状況を示している．上がQueryで下がValue．<code>making</code>に対して<code>more</code>や<code>difficult</code>などに強いAttentionがあたっており、<code>making ... more difficult</code>という長距離で関係を持つ句関係を捉えていることがわかる．</p>
-</li>
+<li><p>ネットワークがタスクに応じて必要な情報に注意できることから，BERTの事前学習でも予測単語を推測するための文章全体からの周辺情報の活用と，隣接分予測のための文章の構造および大意を把握する情報に注意を向ける傾向があると思われる．</p></li>
+
+<li><p>以下の画像は<code>query</code>が<code>making</code>だった場合のAttention状況を示している．上がQueryで下がValue．<code>making</code>に対して<code>more</code>や<code>difficult</code>などに強いAttentionがあたっており、<code>making ... more difficult</code>という長距離で関係を持つ句関係を捉えていることがわかる．</p></li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/d14d1165cbfb1c9c3e233bc48ae3865e5511a84e/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f36386532663933352d386566622d303461372d373065622d6662313666363962333930312e706e67"></p>
+
 <ul>
 <li>次の画像は<code>query</code>が<code>its</code>だった場合のAttention状況．<code>Law</code>と<code>application</code>にAttentionがかかっており、<code>its = Law = application</code>という照応関係を捉えていることがわかる．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/6f5e2d450040fe98afb03719c06ca44160437bc1/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f30366232613564372d613535372d613536662d356539342d3537643836373535666265662e706e67"></p>
+
 <h2 id="bert">BERT</h2>
+
 <ul>
 <li>論文: <a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></li>
 </ul>
+
 <h3 id="概要">概要</h3>
+
 <ul>
 <li>単語の分散表現を獲得するための機構．TransformerのEncoderブロックから構成される．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="http://jalammar.github.io/images/bert-encoders-input.png"></p>
+
 <ul>
 <li>ネットワーク側ではなく学習データ側にマスクをかけてあげることで双方向transformerが実現した．下図がモデルの概要．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*ARMfhOTPxDWDiiAb-jFrvw.png"></p>
+
 <ul>
 <li>transformerモデルのEncoder部分を全結合的に接続したのがBERTモデル．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/0c71ab10a88d718eedb3ffadfc9a3c3339b9f7f2/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f63633966333864302d633934632d326334372d366466662d3235366239316166623431302e706e67" width=700></p>
+
 <ul>
 <li>上図のScaled Dot-Product Attentionはself-attention．attentionの重みを計算する際，softmaxで値が大きくなった時に勾配が0にならないようにsoftmaxのlogitのqueryとkeyの行列積を以下のように調整してあげる．</li>
 </ul>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$attenton \ weight = Softmax(\frac{q k^T}{\sqrt{depth}}) \\\  where \ depth = dim \ of \ embedding$$
+</div>
+
+<p><img src="https://camo.qiitausercontent.com/03b608cc2a33dd3a485eb440569560d4466b0e45/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f61323533633837632d653631392d366431392d316233622d3632306430666535393936652e706e67"></p>
+
 <ul>
 <li>使用するTransformerのEncoderは以下のようになっている(しかしattentionは一つ．)</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/bafd1edb8464cf01419981b80573c7305af57ca2/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f36313037392f36336639343733382d663066372d333538372d393036312d3739643631373531373432352e706e67"></p>
+
 <h3 id="事前学習タスク">事前学習タスク</h3>
+
 <ul>
 <li>どちらもBERTからはきだされた内部状態テンソルをInputとして一層のMLPでクラス分類しているだけ．</li>
 <li>これらを用いてBERTの事前学習を行う</li>
 </ul>
+
 <h4 id="事前学習1-マスク単語の予測">事前学習1 マスク単語の予測</h4>
+
 <ul>
 <li>系列の15%を[MASK]トークンに置き換えて予測</li>
 <li>そのうち80%がマスク，10%がランダムな単語，10%を置き換えない方針で変換する</li>
 </ul>
+
 <h4 id="事前学習2-隣接文の予測">事前学習2 隣接文の予測</h4>
+
 <ul>
 <li>二つの文章を与え隣り合っているかをYes/Noで判定</li>
 <li>文章AとBが与えられた時に，50%の確率で別の文章Bに置き換える</li>
 </ul>
+
 <h3 id="bertモデルの応用">BERTモデルの応用</h3>
+
 <ul>
 <li>事前学習を行ったモデルを使って様々なタスクへの応用が行われている．</li>
 </ul>
-<!-- raw HTML omitted -->
+
+<p><img src="https://camo.qiitausercontent.com/46ce0feed4f5f5fbe753dc02910ca045bf49b27b/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3132333538392f62383835303864612d613961662d383165392d333530382d6638646232653333366264652e706e67"></p>
+
 <h4 id="classification-task">Classification Task</h4>
+
 <ul>
 <li>MNLI, QQP, QNLI, STS-B, MRPC, RTE, SWAGなど</li>
 <li>可変長の入力に対する固定長の分散表現を獲得するためBERTの出力のうち，[CLS]トークンに対応するembeddingだけをしようして後続のDenseレイヤーに入力する．出力はsoftmax関数などを使用して各ラベルの確率を出力する．</li>
 </ul>
+
 <h4 id="question-answering-task">Question Answering Task</h4>
+
 <ul>
 <li>SQuADなど</li>
 <li>Question, Paragraphを[SEP]タグでつなぎ，1sequenceとして入力する．出力が回答になる．</li>
@@ -343,7 +506,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.813479 &#43;0900 JST m=&#43;0.258876159">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.475398 &#43;0900 JST m=&#43;0.135409630">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

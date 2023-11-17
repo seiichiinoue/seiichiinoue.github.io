@@ -48,112 +48,151 @@
 
 		
 
-		<h2 id="binary-indexed-treeとは">Binary Indexed Treeとは</h2>
+		
+
+<h2 id="binary-indexed-treeとは">Binary Indexed Treeとは</h2>
+
 <p>簡単に説明すると，BIT，またはフェニック木は，ある変数列の部分和の計算と要素の更新を効率よくできる木構造です．</p>
+
 <p>どういう時に嬉しいかというと，例を見るのが早いと思います．以下のような問題設定に適用できます．</p>
+
 <ul>
 <li><a href="https://onlinejudge.u-aizu.ac.jp/problems/ALDS1_5_D">AOJ - The Number of Inversions</a></li>
 <li><a href="https://onlinejudge.u-aizu.ac.jp/problems/DSL_2_B">AOJ - Range Sum Query</a></li>
 </ul>
+
 <p>簡単にBITのアイデアを理解するために，以下のような基本的な問題を考えます．</p>
+
 <ul>
 <li>$N$個の変数$v_1, v_2, \cdots, v_N$</li>
 <li>以下の2種類のクエリを$O(\log N)$で実現する
+
 <ul>
 <li>$v_a$に$w$を加える</li>
 <li>prefix[1, a]のところの和$v_1 + v_2 + \cdots + v_a$を求める．</li>
+</ul></li>
 </ul>
-</li>
-</ul>
+
 <p>冒頭に述べたとおり，BITは木構造でデータを保持します．（実際は長さNの配列で実現します）</p>
+
 <p>木構造は以下のようになっています．青いノードが実際に配列で管理する要素になります．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/bit.png"></p>
+
 <p>深さ$\log N$の二分木となっており，以下のような法則で配列に値を保持しています．</p>
+
 <ol>
 <li>各ノードには，部分木の要素の和が格納されている．</li>
-<li>それぞれのノードが管理している区間の長さを番号(10進)で表示したとき，二進数でみると，二進数の最も下の&quot;1&quot;が立っているビットが区間の長さに対応する．</li>
+<li>それぞれのノードが管理している区間の長さを番号(10進)で表示したとき，二進数でみると，二進数の最も下の&rdquo;1&rdquo;が立っているビットが区間の長さに対応する．</li>
 </ol>
+
 <p>見たらわかるとおりですが，このようなデータ構造にすることで，変数の更新は，最大でも木の深さ回の更新，区間の和の算出も同様に木の深さ回の計算，つまり$O(logN)$で実現できそうです．</p>
+
 <p>具体的に最大のケースを考えると，変数の更新は，$v_1$の更新が変更回数が最大で，</p>
+
 <ul>
 <li>$v_1$の値を更新</li>
 <li>親ノードの$v_1 + v_2$の値を更新</li>
 <li>親ノードの$v_1 + v_2 + v_3 + v_4$の更新</li>
 <li>親ノードの$v_1 + v_2 + \cdots + v_8$の更新</li>
 </ul>
+
 <p>の4回で，$\log_2 (N+1)$の区間に足し算をすることになります．</p>
+
 <p>また，区間の和では，$\Sigma_{i=1}^{7} v_i$が最大で，</p>
+
 <ul>
 <li>$v_1 + v_2 + v_3 + v_4$をとる</li>
 <li>$v_5 + v_6$を足す</li>
 <li>$v_7$を足す</li>
 </ul>
+
 <p>という感じでこちらも$\log N$オーダーに収まっています．</p>
+
 <p>[補足] Nは2ベキではなくてもBITの構築は可能らしいです．</p>
+
 <h2 id="実装方法">実装方法</h2>
+
 <p>冒頭でも少し触れたとおり，木構造を長さ$N$の配列でインデックスの振り方を工夫しながら表現します．</p>
+
 <p>まず，indexの振り方ですが，以下のように各要素（ノード）の管理している区間の長さを二進表記にします．</p>
-<!-- raw HTML omitted -->
-<p>すると，長さNの配列をBITとしたとき，BIT[x]が管理する区間の長さは，xの最も下の&quot;1&quot;が立っているビットになっていることがわかります．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/bit_bin.png"></p>
+
+<p>すると，長さNの配列をBITとしたとき，BIT[x]が管理する区間の長さは，xの最も下の&rdquo;1&rdquo;が立っているビットになっていることがわかります．</p>
+
 <ul>
-<li>例えば，BIT[4]が管理している区間の長さは，2で，4を2進表記にすると0110，最も下の&quot;1&quot;が立っているビットは2なので長さは2．</li>
+<li>例えば，BIT[4]が管理している区間の長さは，2で，4を2進表記にすると0110，最も下の&rdquo;1&rdquo;が立っているビットは2なので長さは2．</li>
 </ul>
-<p>以下は計算方法の話になりますが，次のように最も下の&quot;1&quot;が立っているビットを取り出すことができるので覚えましょう．</p>
-<!-- raw HTML omitted -->
+
+<p>以下は計算方法の話になりますが，次のように最も下の&rdquo;1&rdquo;が立っているビットを取り出すことができるので覚えましょう．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/bin_extract.png"></p>
+
 <p>また，変数の更新は次のようになります．ある要素を更新した時，次に更新すべき区間は，番号に区間の長さを足すともとまるということになります．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/update.png"></p>
+
 <p>コードで書くと以下のようになります．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">w</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">x</span><span class="o">+=</span><span class="n">x</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">bit</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+=</span> <span class="n">w</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>そして，区間の和の計算は以下のようになります．ある要素までの区間和を計算し始めた時，次に足すべき区間は番号から区間の長さを引いたものになります．</p>
-<!-- raw HTML omitted -->
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">w</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">x</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">x</span><span class="o">+=</span><span class="n">x</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">bit</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+=</span> <span class="n">w</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>そして，区間の和の計算は以下のようになります．ある要素までの区間和を計算し始めた時，次に足すべき区間は番号から区間の長さを引いたものになります．</p>
+
+<p><img src="https://seiichiinoue.github.io/img/range_sum.png"></p>
+
 <p>コードで書くと以下のようになります．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">x</span><span class="o">-=</span><span class="n">x</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">ret</span> <span class="o">+=</span> <span class="n">bit</span><span class="p">[</span><span class="n">x</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>これらをまとめて，構造体にすると，</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">BIT</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">dat</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="cm">/* [1, n] */</span>
-</span></span><span class="line"><span class="cl">    <span class="n">BIT</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">dat</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="n">dat</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="cm">/* a is 1-indexed */</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">dat</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">+=</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="cm">/* [1, a], a is 1-indexed */</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">inline</span> <span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">-=</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="cm">/* [a, b), a and b are 1-indexed */</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">inline</span> <span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>こんな感じになります．完成です．</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="kt">int</span> <span class="nf">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">x</span><span class="o">-=</span><span class="n">x</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="n">bit</span><span class="p">[</span><span class="n">x</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>これらをまとめて，構造体にすると，</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">BIT</span> <span class="p">{</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">dat</span><span class="p">;</span>
+    <span class="cm">/* [1, n] */</span>
+    <span class="n">BIT</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">dat</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{}</span>
+    <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="n">dat</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="p">}</span>
+    <span class="cm">/* a is 1-indexed */</span>
+    <span class="kr">inline</span> <span class="kt">void</span> <span class="n">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">dat</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">+=</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="cm">/* [1, a], a is 1-indexed */</span>
+    <span class="kr">inline</span> <span class="kt">int</span> <span class="n">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">-=</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="cm">/* [a, b), a and b are 1-indexed */</span>
+    <span class="kr">inline</span> <span class="kt">int</span> <span class="n">sum</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">sum</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>こんな感じになります．完成です．</p>
+
 <p>実際に使用する際には，以下の2点に注意して使用しなければいけません．</p>
+
 <ul>
-<li>
-<p>数列の要素に0以下のものがあると要素の追加ができないので，下駄を履かせる必要があります．これは，bitの初期化の値を0以外の何かで代用することで対応できそうです．</p>
-</li>
-<li>
-<p>数列のサイズはNよりも大きくないといけません．indexを1から始める際はN+1にしておけば大丈夫そうです．</p>
-</li>
+<li><p>数列の要素に0以下のものがあると要素の追加ができないので，下駄を履かせる必要があります．これは，bitの初期化の値を0以外の何かで代用することで対応できそうです．</p></li>
+
+<li><p>数列のサイズはNよりも大きくないといけません．indexを1から始める際はN+1にしておけば大丈夫そうです．</p></li>
 </ul>
+
 <h2 id="おわりに">おわりに</h2>
+
 <p>データ構造やアルゴリズムって理解するのはもちろんですが，説明するのって難しいですね．</p>
+
 <h2 id="参照">参照</h2>
+
 <ul>
 <li><a href="http://hos.ac/slides/20140319_bit.pdf">Binary Indexed Treeのはなし</a></li>
 <li><a href="https://kira000.hatenadiary.jp/entry/2019/02/23/053917">転倒数アルゴリズム</a></li>
@@ -176,7 +215,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.828535 &#43;0900 JST m=&#43;0.273932098">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.481891 &#43;0900 JST m=&#43;0.141903349">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

@@ -48,74 +48,147 @@
 
 		
 
-		<p>今回はn-gram言語モデルの実装を行いました．実装は<a href="https://github.com/seiichiinoue/vpylm">seiichiinoue/vpylm</a>です．</p>
+		
+
+<p>今回はn-gram言語モデルの実装を行いました．実装は<a href="https://github.com/seiichiinoue/vpylm">seiichiinoue/vpylm</a>です．</p>
+
 <p>n-gram言語モデルとは，単語間のマルコフ過程によって文の確率を計算するもので，自然言語処理の様々な場面に適用されてきた，基礎的で重要なモデルです．</p>
+
 <p>n-gram言語モデルは，直前の$n-1$個の単語列を状態とした$n-1$次のマルコフモデルによって次の単語の条件付き確率を計算していくものです．この時に，状態数は単語の総数を$V$とすると$V^{n-1}$のオーダーとなり，$n$を1増やすとと総パラメータ数は通常数万倍となり，指数的に爆発します．このため，せいぜい$n = 4, 5$程度が限界であり，それ以上の長い相関は計算問題上取り扱えないという問題がありました．</p>
-<p>しかし，実際の言語データには，&ldquo;The United States of America&quot;のようなトライグラム（3-gram）を超える長いフレーズや固有名詞が頻出します．そういった問題を解決すべく，単語分割の粒度に依存しないモデルとして提案されたのが，今回のVPYLMです．</p>
+
+<p>しかし，実際の言語データには，&rdquo;The United States of America&rdquo;のようなトライグラム（3-gram）を超える長いフレーズや固有名詞が頻出します．そういった問題を解決すべく，単語分割の粒度に依存しないモデルとして提案されたのが，今回のVPYLMです．</p>
+
 <p>ちなみに，上の問題を理論的に解決できなかった理由は，nグラム分布を階層的に生成する確率モデルが存在しなかったためらしいです．しかし，VPYLMの元となっている，HPYLMによって提案された，階層Pitman-Yor過程とよばれるノンパラメトリックな確率過程によって，適切にスムージングされたnグラム分布を階層的に生成，推定できることが明らかになりました．</p>
+
 <p>VPYLMは，Pitman-Yor過程に基づくn-gramモデル（HPYLM）を拡張して，データ中の各単語が生成されたnグラム長を隠れ変数とみなしてベイズ推定を行います．</p>
+
 <h2 id="中華料理店過程とpitman-yor過程">中華料理店過程とPitman-Yor過程</h2>
+
 <p>Pitman-Yor過程は中華料理店過程の一般化です．まずは中華料理店過程とは何か，簡単に説明します．</p>
+
 <p>中華料理店過程とは，ディリクレ過程の実現例の一つであり，クラスタリングの事前確率をモデル化する手法です．中華料理店に客がやってきたときに，どの円卓に座るかを考えることが名前の由来となっています．</p>
+
 <p>店には無数の円卓があると仮定し，また円卓には無数の客が座れると仮定します．</p>
+
 <p>まず，最初の客は空の円卓に座ります．2番目以降の客は座っている人の多い円卓を好んで着席するというルールに従います．</p>
+
 <p>厳密に表現すると，以下のようになります．（下の図を参照しながら確認してください）</p>
+
 <ul>
 <li>すでに$n_i$人着席しているテーブル$i$に確率$n_i / (n - 1 + \theta)$で着席する</li>
 <li>新しいテーブルに確率$\theta / (n - 1 + \theta)$で着席する</li>
 </ul>
+
 <p>これを自然言語で考えると，テーブルは単語，客はその単語の生成回数と考えることができ，ある単語を観測する以前の状態の時に，これから観測する単語が何なのかのモデリングに適用できます．以下は，7人目の客が座るテーブルを決定するそれぞれの確率を示しています．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/crp.png"></p>
+
 <p>$n$人目までの客が観測された状態で，$n+1$人目の客が座るテーブルの予測分布を考えます．総テーブル数を$t$，総客数を$c$，$k$番目のテーブルの客数を$c_k$，$\theta$を集中度パラメータ，$G_0$を基底測度とすると，次の客$x_{n+1}$が座るテーブル$w$は，以下のようにモデル化することができます．</p>
-<!-- raw HTML omitted -->
-<p>$$p(x_{n+1} = w | \Theta) = \frac{c_w}{c + \theta} + \frac{\theta}{c + \theta}$$</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k}{c + \theta} + \frac{\theta}{c + \theta} G_0$$
+
+$$p(x_{n+1} = w | \Theta) = \frac{c_w}{c + \theta} + \frac{\theta}{c + \theta}$$
+</div>
+
 <p>ここで，基底測度$G_0$は，未観測のテーブルを生成する親の連続分布であり，集中度パラメータ$\theta$について，$\theta$を大きくすると，$G_0$に近づくことに注意しましょう．（逆に$\theta$が小さいと経験分布$\frac{c_w}{c + \theta}$に近づきます）</p>
+
 <p>このように，中華料理店過程は，集中度パラメータ$\theta$と基底測度$G_0$から新しい分布$G$を生成することができ，これを通常以下のように書きます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$G \sim DP(G_0, \theta)$$
+</div>
+
 <p>Pitman-Yor過程は，中華料理店過程にディスカウント係数$d$を足したものになっており，基本は中華料理店過程と変わりません．</p>
+
 <p>着席の際，n番目以降の客は，</p>
+
 <ul>
 <li>すでに$n_i$人着席しているテーブル$i$に確率$(n_i - d) / (n - 1 + \theta)$で着席する．</li>
 <li>新しいテーブルに確率$(\theta + d_t) / (n - 1 + \theta)$で着席する．</li>
 </ul>
+
 <p>のルールに基づいてテーブルに着席します．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/pitman-yor.png"></p>
+
 <p>生成される分布は，</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$G \sim PY(G_0, \theta, d)$$
+</div>
+
 <p>のように書き，中華料理店過程と同様に予測分布は以下のようになります．</p>
-<!-- raw HTML omitted -->
-<p>$$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_t}{c + \theta}$$</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p(x_{n+1} | x_1 ... x_n) = \Sigma_{k=1}^{t} \frac{c_k - d}{c + \theta} + \frac{\theta + d_t}{c + \theta} G_0$$
+
+$$p(x_{n+1} = w | \Theta) = \frac{c_w - d_{t_w}}{c + \theta} + \frac{\theta + d_t}{c + \theta}$$
+</div>
+
 <p>結局のところ，中華料理店過程も，Pitman-Yor過程も基底測度$G_0$に似た分布を作っているだけなのですが，中華料理店過程は$logn$のオーダーでテーブルが増えていく一方，Pitman-Yor過程は$n^d$のオーダーで増えていきます．これは冪乗則に従っており，自然言語のモデリングに適しているため，言語モデルにはPitman-Yor過程が使用されます．</p>
+
 <h2 id="階層pitman-yor過程">階層Pitman-Yor過程</h2>
+
 <p>Pitman-Yor過程の$G_0$をまた別のPitman-Yor過程にすることで，階層Pitman-Yor過程を作ることができます．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/nested.png"></p>
+
 <p>階層Pitman-Yor過程において，ユニグラムの基底測度$G_0$は語彙数$V$の逆数の一様分布です．ユニグラム分布は，$G_0$から生成され，バイグラム分布はユニグラム分布から生成され，トライグラム分布はバイグラム分布から生成されます．</p>
+
 <p>具体的には，以下のように単語が生成されると考えます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p(\cdot) \sim PY(\frac{1}{V}, d_0, \theta_0)$$
+$$p(\cdot | she) \sim PY(p(\cdot), d_1, \theta_1)$$
+$$p(\cdot | she \, will) \sim PY(p(\cdot | she), d_2, \theta_2)$$
+$$p(\cdot | she \, will \, sing) \sim PY(p(\cdot | she \, will), d_3, \theta_3)$$
+</div>
+
 <p>このようにすることで，レストランを文脈，テーブルを単語，客を生成回数として考えることができます．</p>
+
 <h2 id="hpylm">HPYLM</h2>
+
 <p>HPYLMは，冒頭で述べた通り，階層Pitman-Yor過程を用いたn-gramオーダー固定の言語モデルです．</p>
+
 <p>テキストデータが以下の3文とします．</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">she will sing
-</span></span><span class="line"><span class="cl">she will like
-</span></span><span class="line"><span class="cl">he will call
-</span></span></code></pre></div><p>この時，単語列she willに続いてlikeがくる確率$P(like | she , will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
-<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he , will) = 0$となります．</p>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">she will sing
+she will like
+he will call</code></pre></div>
+<p>この時，単語列she willに続いてlikeがくる確率$P(like | she \, will)$はshe willで始まる文が2つあり，そのうち1つがshe willに続いてlikeがきているので0.5となります．</p>
+
+<p>しかし，he willにlikeが続くデータは観測していないため，$P(like | he \, will) = 0$となります．</p>
+
 <p>このように，観測データに存在しないものは全て確率が0となってしまうところを，0でない適切な確率を計算できるようにするのが，スムージングという手法です．</p>
+
 <p>ここでは3-gramモデルで説明を行います．つまり，ある単語が生成される確率は，以下のように後ろの2単語のみで決まると仮定したモデルです．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$ P(dog | The \, quick \, brown \, fox \, jumps \, over \, the \, lazy) = P(dog | the \, lazy)$$
+</div>
+
 <p>HPYLMでは以下のような文脈木を考え，単語のことを客，木のノードをレストランと呼びます．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/suffix_tree.png"></p>
+
 <p>HPYLMでは，この文脈木を用いて単語の数をカウントします．</p>
+
 <p>図の黒色の客が文脈に続いて観測された単語で，白色の客がスムージングのための代理客です．</p>
+
 <p>例えば，she willという単語列の後にlikeという単語が何回来たかをカウントしたい場合，文脈木のルートからwill→sheとレストランを辿り，sheというレストランにlikeという客を追加します．その後，親のレストラン（ノード）に代理客を送り，再帰的に処理します．</p>
+
 <p>HPYLMにおけるパラメータは文脈木内の代理客を含めた全ての客の配置（単語はカウント）です．</p>
+
 <p>全ての客の配置を$\Theta$とすると，文脈$u$に単語$w$が続く確率$P(w | u)$は，</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$P(w | u) = P(w | u, \Theta)$$
+</div>
+
 <p>と表され，n-gram確率が$\Theta$によって決まります．よって，HPYLMの学習は，真の$\Theta$を推定することになり，ギブスサンプリングによって推定します．</p>
+
 <p>まず，$RemoveCustomer(u, w)$により，レストラン$u$から，$w$を削除します．削除された後の残りの客全ての配置を$\lnot \Theta$とし，$\lnot \Theta$の元で$w$を再サンプリングします．こうすると，新たな配置$\Theta^{new}$がギブスサンプリングされたことになり，以上の操作をランダムに選んだ訓練データを使って繰り返し行うことで，$\Theta$を更新していきます．</p>
+
 <ul>
 <li>$w$を単語</li>
 <li>$u$を文脈</li>
@@ -128,60 +201,123 @@
 <li>$t_u$をレストラン$u$のテーブルの総数</li>
 <li>$d_{|u|}$，$\theta_{|u|}$，$G_0 (w)$をハイパーパラメータ</li>
 </ul>
+
 <p>とすると，再サンプリング時には，文脈$u$の後に$w$が続く確率は，</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\begin{eqnarray}
+WordProbability (u, w) &=& P(w | u, \Theta) \\
+                       &=& \frac{c_{uw} - d_{|u|} t_{uw}}{\theta_{|u|} + c_u} + \frac{\theta_{|u|} + d_{|u|} t_u}{\theta_{|u|} + c_u} WordProbability(\pi(u), w)
+\end{eqnarray}$$
+</div>
+
 <p>となり，再帰的に文脈のオーダーを落とすことで計算できます．</p>
+
 <p>また，文脈$u$のもとで，単語$w$が観測されたとき，深さ$n - 1$（HPYLMでは，n-gramオーダー固定のため，常に$n - 1$の深さにノードを追加）に$w$を追加します．</p>
+
 <p>追加する際は，</p>
+
 <ul>
 <li>$max(0, c_{uwk} - d_{|u|} t_{uw})$に比例する確率で，$w$を提供している全てのテーブルの中の$k$番目のテーブルに追加</li>
 <li>$(\theta_u + d_u t_u) WordProbability(\pi(u), w)$に比例する確率で，$w$を提供する新しいテーブルを作成して，そこに追加．この時，再帰的に親レストラン$\pi(u)$に対しても客を追加（代理客）</li>
 </ul>
+
 <p>のように確率的に客をテーブルに追加します．（文脈に続く単語の生成回数をカウントしていきます）</p>
+
 <h2 id="vpylm">VPYLM</h2>
+
 <p>VPYLMは，HPYLMを拡張して，HPYLMでは固定で考えていたn-gramオーダーを各単語ごとに推定するようにしたモデルです．n-gramオーダーを可変長で考えるため，HPYLMで考えた客の配置に加えて，停止確率も考えます．</p>
+
 <p>VPYLMでは，以下のように，文脈木の各レストラン$u$に，木をルートから辿る時にそのレストランで止まる確率$q_u$があると考えます．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/vpylm.png"></p>
+
 <p>そして，これらの停止確率は，共通のベータ事前分布から生成されていると仮定します．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$q_u \sim Beta(\alpha, \beta)$$
+</div>
+
 <p>また，期待値は，</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$E[q_u] = \frac{\alpha}{\alpha + \beta}$$
+</div>
+
 <p>となります．</p>
-<p>VPYLMでは，単語列$w = w_1 , w_2 \cdots w_T$の確率を以下のように表します（HPYLMの単語確率に$n$が追加されただけ）</p>
-<!-- raw HTML omitted -->
-<p>$\Theta$はHPYLMと同様，全ての客の配置を表す隠れ変数で，$n = n_1 , n_2 \cdots n_T$は$w$のそれぞれの単語が生成された隠れたn-gram長を表します．</p>
+
+<p>VPYLMでは，単語列$w = w_1 \, w_2 \cdots w_T$の確率を以下のように表します（HPYLMの単語確率に$n$が追加されただけ）</p>
+
+<div style="overflow-x: auto;">
+$$P(w) = \Sigma_n \Sigma_{\Theta} P(w, n, \Theta)$$
+</div>
+
+<p>$\Theta$はHPYLMと同様，全ての客の配置を表す隠れ変数で，$n = n_1 \, n_2 \cdots n_T$は$w$のそれぞれの単語が生成された隠れたn-gram長を表します．</p>
+
 <p>よってVPYLMでは，客の配置$\Theta$と$n$をギブスサンプリングによって推定します．その際，単語列$w$の位置$t$の単語$w_t$の隠れたn-gramオーダーを</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$n_t \sim P(n_t | w, n_{-t}, \Theta_{-t})$$
+</div>
+
 <p>のようにギブスサンプリングする必要があるのですが，実際は直接サンプリングすることはできません．そこで，上式をベイズの定理を用いて次のようへ変形します．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$P(n_t | w, n_{-t}, \Theta_{-t}) \propto P(w_t | w_{-t}, n, \Theta_{-t}) P (n_t | w_{-t}, n_{-t}, \Theta_{-t})$$
+</div>
+
 <p>ここで，$n_{-t}$は，単語$w_t$を除いた単語列</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$w_{-t} = w_1, w_2, \cdots , w_{t-1}, w_{t+1}, \cdots, w_{T}$$
+</div>
+
 <p>に対応するn-gramオーダー</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$n_{-t} = n_1, n_2, \cdots, n_{t-1}, n_{t+1}, \cdots, n_T$$
+</div>
+
 <p>を表しています．</p>
+
 <p>しかし，$n_{-t}$はただの整数列であり，この値がそのままモデルのパラメータにあるわけではありません．そして$n_t$をギブスサンプリングするためには，$n_{-t}$をモデルの何らかのパラメータとして保持している必要があります．そこでVPYLMでは，文脈木の各レストラン$u$で，全ての客（単語）の通過回数$a_u$と$b_u$を記録します．</p>
+
 <p>そして，上述の停止確率$q_u$の期待値をベータ事後分布の期待値として以下のように推定します．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$E[q_u] = \frac{a_u + \alpha}{a_u + b_u + \alpha + \beta}$$
+</div>
+
 <p>このようにすることで，$n_{-t}$の条件付き確率を次のように表すことができ，</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$P(n_t = l | w_{-t}, n_{-t}, \Theta_{-t}) = \frac{a_l + \alpha}{a_l + b_l + \alpha + \beta} \prod_{i = 0}^{l - 1} \frac{b_i + \beta}{a_i + b_i + \alpha + \beta}$$
+</div>
+
 <p>$n_t$を$n_{-t}$の条件付き確率からギブスサンプリングすることができるようになります．</p>
+
 <p>ハイパーパラメータのサンプリングについては，難解すぎたので，割愛させていただきますが，それを含めて，実装を行い，単語n-gramモデルを学習させました．</p>
+
 <h2 id="実験">実験</h2>
+
 <p>夏目漱石の「こころ」を学習させて文章生成を行った結果，以下のようになりました．</p>
-<h3 id="こころ夏目漱石">こころ（夏目漱石）</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">女の方からという事を話して聞かずを明白で大きな解りません」
-</span></span><span class="line"><span class="cl">は祝いをそこに男の方が先取ろうしたのですか」と先生を見付け出したものか、ああいうようにあるしたが、まだある病気のどちらのてしまいました。
-</span></span><span class="line"><span class="cl">先生は私に聞いた。
-</span></span><span class="line"><span class="cl">私はすぐ解るそれで私が始めて役に立ちそろそろ通り抜け一念傍に溶かす教えてまた弾かご覧になって、先生にでした。
-</span></span><span class="line"><span class="cl">以内の後を口にすると、それを一種の希望する地位れる恐れ駈け仕方がないから先生から、すべて私を礼を穿い巻き親しくもする事はが私の強いられて気が落ち付いたようになりました。
-</span></span><span class="line"><span class="cl">私はいつもの名を付こはすぐようになった。
-</span></span><span class="line"><span class="cl">奥さんとお嬢さんを出した。
-</span></span><span class="line"><span class="cl">するとた出て来るといって賞花なら、引合る晩先生を、を置いた。
-</span></span><span class="line"><span class="cl">しかしともなかった。
-</span></span><span class="line"><span class="cl">私はまだまだ日本のが自分のように、また取り上げを妻には段々動かたと信じていますし、ちょうどで疑わました。
-</span></span></code></pre></div><p>それらしい文章が出力されていることがわかります．
+
+<h3 id="こころ-夏目漱石">こころ（夏目漱石）</h3>
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">女の方からという事を話して聞かずを明白で大きな解りません」
+は祝いをそこに男の方が先取ろうしたのですか」と先生を見付け出したものか、ああいうようにあるしたが、まだある病気のどちらのてしまいました。
+先生は私に聞いた。
+私はすぐ解るそれで私が始めて役に立ちそろそろ通り抜け一念傍に溶かす教えてまた弾かご覧になって、先生にでした。
+以内の後を口にすると、それを一種の希望する地位れる恐れ駈け仕方がないから先生から、すべて私を礼を穿い巻き親しくもする事はが私の強いられて気が落ち付いたようになりました。
+私はいつもの名を付こはすぐようになった。
+奥さんとお嬢さんを出した。
+するとた出て来るといって賞花なら、引合る晩先生を、を置いた。
+しかしともなかった。
+私はまだまだ日本のが自分のように、また取り上げを妻には段々動かたと信じていますし、ちょうどで疑わました。</code></pre></div>
+<p>それらしい文章が出力されていることがわかります．
 文章生成としての用途においては，近年のニューラル言語モデルには劣りますが，確率的生成モデルを用いて文章をモデル化する手法について非常に勉強になりました．</p>
+
 <h2 id="参照">参照</h2>
+
 <ul>
 <li><a href="http://chasen.org/~daiti-m/paper/nl178vpylm.pdf">Bayesian Variable Order n-gram Language Model based on Pitman-Yor Processes</a></li>
 <li><a href="http://musyoku.github.io/">musyoku.github.io</a></li>
@@ -204,7 +340,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.822399 &#43;0900 JST m=&#43;0.267795745">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.466004 &#43;0900 JST m=&#43;0.126015361">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">

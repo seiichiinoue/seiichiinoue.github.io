@@ -48,69 +48,242 @@
 
 		
 
-		<p>ガウス過程に基づく連続空間トピックモデル(CSTM)は，単語に潜在空間における座標を明示的に与え，その上にガウス過程を考えることによって，通常の混合モデルに基づくトピックモデルに比べて高精度な言語モデルを得ることのできる手法です．実装は<a href="https://github.com/seiichiinoue/cstm">seiichiinoue/cstm</a>にあります．</p>
+		
+
+<p>ガウス過程に基づく連続空間トピックモデル(CSTM)は，単語に潜在空間における座標を明示的に与え，その上にガウス過程を考えることによって，通常の混合モデルに基づくトピックモデルに比べて高精度な言語モデルを得ることのできる手法です．実装は<a href="https://github.com/seiichiinoue/cstm">seiichiinoue/cstm</a>にあります．</p>
+
 <p>論文は<a href="http://chasen.org/~daiti-m/paper/nl213cstm.pdf">こちら</a>．</p>
+
 <h2 id="トピックモデル">トピックモデル</h2>
+
 <p>今回実装したCSTMは，トピックモデルの一種です．まずは，トピックモデルとはどのようなものなのか，簡単に説明をしてから本題に入ろうと思います．</p>
-<p>トピックモデルは，様々な離散データに隠れた潜在的なトピックを推定するモデルです．ここでいうトピックとは，文書や会話における話題，分野などの大雑把な&quot;意味&quot;のようなものを表しています．</p>
+
+<p>トピックモデルは，様々な離散データに隠れた潜在的なトピックを推定するモデルです．ここでいうトピックとは，文書や会話における話題，分野などの大雑把な&rdquo;意味&rdquo;のようなものを表しています．</p>
+
 <p>トピックモデルの代表であるLDA(Latent Dirichlet Allocation)において文書は，複数の潜在的なトピックから確率的に生成されていると仮定されており，また，単語はトピックが持つ確率分布に従って出現していると仮定しています．</p>
+
 <p>つまり，以下のような過程で単語の集合である文書$w = w_1 w_2 \cdots w_N$が生成されたと仮定します．</p>
+
 <ol>
 <li>トピック(話題)分布 $\theta \sim Dir(\alpha)$ を生成</li>
-<li>For n = 1 &hellip; N\
-(a) トピック $z \sim Mult(\theta)$ を選択\
+<li>For n = 1 &hellip; N<br />
+(a) トピック $z \sim Mult(\theta)$ を選択<br />
 (b) 単語 $w_n \sim p(w | z)$ を生成</li>
 </ol>
+
 <p>ここで，$Mult(\theta)$は多項分布であり，$Dir(\alpha)$は多項分布の共役事前分布のディリクレ分布，$\theta$および，$\beta = { p(w | z) }$はLDAの学習パラメータです．</p>
+
 <p>このような手法を用いて，文書の学習を行うと，文書集合のデータ(離散データ)から，文書に隠れた潜在的なトピックを機械的に推定することができ，文書ごとに選択されるトピックを見ることで，その文書を分類することに役立ちます．</p>
+
 <p>ちなみに，LDAではトピックという潜在表現を用いて文書を表現していますが、CSTMでは直接単語の確率を操作しているので様々な拡張が可能になっています．</p>
+
 <h2 id="cstmの考え方">CSTMの考え方</h2>
+
 <p>CSTMでは，単語に潜在空間における座標を明示的に与えており，各単語$w$が$d$次元の潜在座標$\phi(w) \sim N(0, I_d)$を持っていると仮定します．つまり各単語は$d$次元のベクトルで表現され，そのベクトルのそれぞれの要素は，平均0，分散1の正規分布に従います．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://seiichiinoue.github.io/img/gauss.png"></p>
+
 <p>次に，意味的に関連のある単語の確率を同時に大きくするために，上図のようなカーネル行列$K$，平均が$0$のガウス過程</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$f_d \sim GP(0,K)$$
+</div>
+
 <p>を文書ごとに考え，文書$d$における単語の確率を以下のようにモデル化します．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p_d(w_k) \propto e^{f_d (w_k)} G_0(w_k)$$
+</div>
+
 <p>ここで，$f_d$は，実際には次元数が語彙数と同じガウス分布で，単語$w_k$に対応する$f_d(w_k)$は異なる値になりますが，平均は$0$になります．また$G_0(w_k)$は単語$w_k$のデフォルト確率を表しており，最尤推定値</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$G_0 (w_k) = \frac{n(w_k)}{\Sigma_w n(w_k)}$$
+</div>
+
 <p>と考えます．また，CSTMでは，カーネル行列の要素として線形カーネル（実際には単語を単語座標へと射影する関数？）を用います．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$K(w_i, w_j) = \phi(w_i)^T \phi(w_j)$$
+</div>
+
 <p>単語の確率となる$p_d (w_k)$は，文書ごとの倍率である$e^{f_d (w_k)}$とデフォルト確率$G_0(w_k)$を掛け合わせたものと解釈することができ，論文によると$f_d (w_k)$はおおよそ$-9 \leq f_d (w_k) \leq 9$をとるため，$e^{f_d (w_k)}$は$e^{-9} \leq e^{f_d (w_k)} \leq e^9$の範囲の値になるらしいです．</p>
+
 <p>このようにモデル化することで，文書全体ではほとんどは出現しないが，特定の文書にだけ高頻度で出現するような単語であっても文書ごとに確率を変動させることで適切な確率を与えることができます．</p>
+
 <p>しかし，実際のところ，言語には単語が一度出現すると，その後現れやすくなるというバースト性があり，この影響をモデル化するために，単語の確率に，$p_d (w_k)$ではなく，次のようなDirichlet Compound Multinomial(DCM)を用います．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$p_d(w | \alpha_d, n_d) = \frac{\Gamma (\Sigma_k \alpha_{d, k})}{\Gamma (\Sigma_k \alpha_{d, k} + n_{d, k})} \prod_k \frac{\Gamma (\alpha_{d, k} + n_{d, k})}{\Gamma \alpha_{d, k}}$$
+</div>
+
 <p>ここで，語彙数を$V$とすると，$n_d = (n_{d, 1}, n_{d, 2}, &hellip; , n_{d, V})$は文書$d$での各単語の出現頻度です．また，$w = (w_1, w_2, &hellip;, w_V)$は全ての単語です．</p>
+
 <p>また，上式は語彙全体の文書$d$における同時確率を表しているため，その文書に含まれていない単語の確率も考えていることに注意です．</p>
+
 <h2 id="学習">学習</h2>
+
 <p>上述の$f$を直接求めるのは難しいため，補助変数を導入した手法を用います．</p>
+
 <p>まず，文書$d$の潜在座標を$u_d \sim N(0, I_d)$とし，全ての単語の$\phi (w)$をまとめて以下のようにおきます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\Phi = (\phi (w_1), \phi (w_2), ..., \phi (w_V))^T$$
+</div>
+
 <p>次に，$f_d = \Phi u_d$として，$u$を積分消去すると，（$f_d$の分散は，$u$の定義により，$E(\Phi u u^T \Phi^T) = \Phi^T E(u u^T) \Phi = \Phi I \Phi^T = K$となり）</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$f_d \sim N(0, \Phi^T \Phi) = N(0, K)$$
+</div>
+
 <p>となり，この$f$は最初に定義したガウス過程と同じガウス過程に従います．</p>
+
 <p>また，上述のDCMのパラメータである$\alpha_d$は，$f_d (w_k)$を用いて，以下のように表すことができます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$\alpha_{d, k} = \alpha_0 G_0 (w_k) e^{f_d (w_k)} = \alpha_0 G_0 (w_k) e^{{\phi(w_k)}^T u_d}$$
+</div>
+
 <p>このように，CSTMでは，語彙全体の同時確率をモデル化し，その確率を$\alpha$を通じて文書ごとに異なる値に変えるようなプロセスになっています．</p>
+
 <p>CSTMにおける学習は，単語の確率$p_d$を最大化する文書ベクトル$u_d$と単語ベクトルの集合$\Phi$を更新していくことです．</p>
+
 <p>学習方法として，単語の確率を微分して更新量を計算できそうですが，論文によると，$\phi (w_k)$の間には非常に高い相関があることから，局所解の問題のないランダムウォークによるメトロポリス・ヘイスティング法の使用が推奨されています．</p>
+
 <p>MH法は，更新したい変数について，提案分布から候補となる値を生成し，採択確率に従ってその値で更新するか否かを決定し，更新していくアルゴリズムです．</p>
+
 <p>MH法での更新において，文書ベクトル$u_d$の提案分布は，$N(u_d, \sigma^2_{(u)})$，単語ベクトル$\phi (w_k)$の提案分布は$N(\phi(w_k), \sigma^2_{(\phi)})$，$\alpha_0$の提案分布は$N(0, \sigma^2_{(\alpha)})$を使います．</p>
+
 <p>これは書き直すと，$u^{\prime}_d \leftarrow u_d + N(0, \sigma^2_{(u)})$となり，現在のベクトルの各要素に正規分布か発生させたノイズを載せたものを新しい値とすることになります．</p>
+
 <p>論文によると，$\sigma^2_{(u)} = 0.01$，$\sigma^2_{(\phi)} = 0.02$，$\sigma^2_{(\alpha)} = 0.2$です．</p>
+
 <p>採択確率は，「パラメータの事前分布及び尤度を用いる」と論文には記載されていたのですが，詳細は載っていなかったので，<a href="http://musyoku.github.io/">ご注文は機械学習ですか</a>さんを参考にさせていただくと，以下のような形になると考えられます．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$A (u^{\prime}_d) = min \Biggl\{ 1, \frac{p_d (w | \alpha^{\prime}_d, n_d) p(u^{\prime}_d | 0, I_d)}{p_d (w | \alpha_d, n_d) p(u_d | 0, I_d)} \Biggr\}$$
+</div>
+
 <p>単語ベクトルの採択確率は，以下のようになります．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$A (\phi (w_k)^{\prime}) = min \Biggl\{ 1, \prod_{d=1}^{D} \frac{ p_d(w | \alpha_d^{\prime}, n_d) p(\phi(w_k)^{\prime} | 0, I_d ) }{ p_d (w | \alpha_d, n_d) p(\phi (w_k) | 0, I_d) } \Biggr\}$$
+</div>
+
 <p>文書ベクトルの時とは違い，$\phi(w_k)$は値を変更すると全ての文書の確率に影響を与えるため，総乗が入ります．</p>
+
 <p>$\alpha_0$の採択確率も，全文書での確率を用います．</p>
-<!-- raw HTML omitted -->
+
+<div style="overflow-x: auto;">
+$$A (\alpha_0^{\prime}) = min \Biggl\{ 1, \prod_{d=1}^{D} \frac{ p_d (w | \alpha_d^{\prime}, n_d) Ga(\alpha_0^{\prime} | a_0, b_0) }{ p_d (w | \alpha_d, n_d) Ga (\alpha_0 | a_0, b_0) } \Biggr\}$$
+</div>
+
 <p>これらの採択確率を用いて，提案分布から生成した新しい値で確率的に更新していくことで，モデルの学習を行うことができます．</p>
+
 <h2 id="実験">実験</h2>
+
 <p>実験にはNIPS, CSJ, 毎日新聞の3つを用いました．以下にパープレキシティの推移を掲載します．</p>
-<!-- raw HTML omitted -->
+
+<p><img src="https://img.esa.io/uploads/production/attachments/14410/2021/04/29/91632/ee82d1b6-87f6-4f61-a39c-c745a8a83c83.png" width=80%></p>
+
 <p>いずれのコーパスに対しても推論ができていて，パープレキシティも収束していることがわかります．</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<!--
+それでは，学習したモデルを使用して単語ベクトルを抽出し，プロットしてみます．非常にサイズの大きな画像となっているので，以下には20次元のうち，一部を載せます．
+
+### 0-1次元
+
+<img src="https://seiichiinoue.github.io/img/words_0_1.png">
+
+### 9-10次元
+
+<img src="https://seiichiinoue.github.io/img/words_9_10.png">
+
+次に，単語ベクトルを使用して，類似する単語を上位からいくつか検索してみます．類似度の計算には，コサイン類似度を用いています．CSTMでは，word2vecとは異なり，語順や語の位置をみていないため，類似するベクトルはあくまでトピックが類似しているだけであり，意味が類似しているわけでは無いことに注意してください．
+
+### 四条金吾
+
+```text
+word id: 2409 word: 四条金吾 count: 5 sim: 1.0000000000000002
+word id: 11613 word: に坐し count: 9 sim: 0.7475744705196312
+word id: 2414 word: 委くは count: 13 sim: 0.7321756369887295
+word id: 12271 word: 霊山浄土に count: 10 sim: 0.7290645830411115
+word id: 6791 word: 疎 count: 14 sim: 0.7255670764712732
+word id: 878 word: 粗 count: 56 sim: 0.7168076575914425
+word id: 6549 word: の座 count: 39 sim: 0.7132202562646839
+word id: 8611 word: 宦 count: 1 sim: 0.7124084974658997
+word id: 6634 word: 離れ count: 14 sim: 0.7026721568602319
+word id: 788 word: も先 count: 7 sim: 0.695878867585012
+word id: 5773 word: 麈 count: 8 sim: 0.6895588892845527
+word id: 9314 word: 我が滅度の後に於て応に count: 5 sim: 0.6811674735190771
+word id: 8492 word: 尼とならせ給い count: 1 sim: 0.6796516725903965
+word id: 6398 word: 慥に count: 19 sim: 0.6772827812726429
+word id: 6616 word: 戒を持ちて count: 5 sim: 0.6738143910515236
+word id: 10422 word: かげ count: 12 sim: 0.6717896817213159
+word id: 11645 word: より甲州 count: 3 sim: 0.6678975850062032
+word id: 11515 word: 寺の別当 count: 4 sim: 0.6579620340392612
+word id: 12467 word: 楽と count: 7 sim: 0.6579452881718544
+word id: 13392 word: は梵天 count: 3 sim: 0.6556428726415026
+```
+
+### 流罪
+
+```text
+word id: 4106 word: 流罪 count: 69 sim: 1.0
+word id: 8459 word: 人人にも count: 3 sim: 0.8270976823111298
+word id: 14097 word: 帷 count: 2 sim: 0.7879294120831661
+word id: 2523 word: 他国 count: 23 sim: 0.754207043265161
+word id: 3146 word: 召し合せ count: 18 sim: 0.7528396039092112
+word id: 12641 word: 御文委く count: 3 sim: 0.7360282175889699
+word id: 2002 word: 人王八十 count: 15 sim: 0.7314352847496989
+word id: 2582 word: 日蓮が count: 196 sim: 0.7223847876573585
+word id: 3685 word: 全 count: 34 sim: 0.7184302918676784
+word id: 8969 word: 二十四 count: 8 sim: 0.7166273715754699
+word id: 7850 word: 奏し count: 9 sim: 0.7110346973358233
+word id: 10518 word: 師檀 count: 5 sim: 0.7054823239191312
+word id: 12303 word: 網を count: 9 sim: 0.6982852967550862
+word id: 15318 word: 片瀬 count: 2 sim: 0.6978123728346228
+word id: 2959 word: は法華経の count: 52 sim: 0.6950898296439688
+word id: 10965 word: 蜘 count: 5 sim: 0.6916445918652208
+word id: 5892 word: 然る count: 34 sim: 0.6890282284418385
+word id: 2715 word: 大師の御 count: 7 sim: 0.6877322431132905
+word id: 9904 word: 供養す count: 16 sim: 0.6874966344947109
+word id: 7588 word: 置いて count: 21 sim: 0.6836983078964222
+```
+
+試しに，文書ベクトル同士でも類似度の計算をおこなってみました．結果は以下の通りです．
+
+### 開目抄
+
+```text
+doc id: 333 doc: 開目抄下 sim: 0.9999999999999999
+doc id: 349 doc: 開目抄上 sim: 0.991156541340843
+doc id: 27 doc: 撰時抄 sim: 0.983186474897307
+doc id: 266 doc: 諌暁八幡抄 sim: 0.9826058618206056
+doc id: 95 doc: 顕謗法抄 sim: 0.9822041280157211
+doc id: 328 doc: 下山御消息 sim: 0.9790919338975732
+doc id: 191 doc: 諸経と法華経と難易の事 sim: 0.9786721888718478
+doc id: 90 doc: 聖愚問答抄上 sim: 0.978580682705938
+doc id: 6 doc: 報恩抄日蓮之を撰す sim: 0.9776324671842886
+doc id: 309 doc: 寺泊御書 sim: 0.9771637166260301
+doc id: 8 doc: 唱法華題目抄 sim: 0.9763578685101035
+doc id: 275 doc: 曾谷入道殿許御書 sim: 0.974925075035618
+doc id: 219 doc: 善無畏抄 sim: 0.974582469040803
+doc id: 313 doc: 小乗大乗分別抄 sim: 0.9726244460274308
+doc id: 291 doc: 法華行者逢難事 sim: 0.971994785693808
+doc id: 220 doc: 星名五郎太郎殿御返事 sim: 0.9718421492519042
+doc id: 139 doc: 呵責謗法滅罪抄 sim: 0.9717119252011754
+doc id: 37 doc: 如説修行抄 sim: 0.9708722425486271
+doc id: 102 doc: 顕仏未来記 sim: 0.9704520391114769
+doc id: 60 doc: 祈祷抄 sim: 0.9688657062535053
+```
+
+開目抄上下で類似度が高くなっているのは，想定通りの結果なので，文書の特徴をうまく捉えて学習できてそうでよかったです．
+
+まだ，とりあえず学習させてみた状態で，これらを用いて他の計算を行っていないので実用性の評価にはかけますが，かなり面白い結果となったのでは無いかと思います．こういったモデルを使って，リコメンデーションアプリなどを作れたら面白いのでは無いかと思いました．（作るかはわかりません）
+-->
+
 <p>まだ，とりあえず学習させてみただけなのですが，学習によって得られる潜在座標は，文書座標と同じ空間にあるので様々な可視化に役立ちそうと思いました．またこのモデルをある種の文書表現獲得器と捉えると，文書分類等の後続のタスクへの応用もできそうだなと思いました．</p>
 
 
@@ -130,7 +303,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2023-11-16 23:59:58.813038 &#43;0900 JST m=&#43;0.258435909">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2023-09-21 02:38:44.464753 &#43;0900 JST m=&#43;0.124764424">2023</time> Seiichi Inoue. Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
             <script type="text/javascript" src="https://seiichiinoue.github.io/js/related.js"></script>
             <script type="text/x-mathjax-config">
